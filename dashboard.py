@@ -228,36 +228,13 @@ with st.sidebar:
     st.caption("datagedreven · menselijk gecheckt")
 
 # ─── Header ──────────────────────────────────────────────
-hcol1, hcol2 = st.columns([1.5,1])
-with hcol1:
-    logo = data.get("logo", "🌊")
-    accent = data.get("accent_kleur", "#10b981")
-    st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}</p></div></div>", unsafe_allow_html=True)
-with hcol2:
-    with st.container():
-        st.markdown("""
-        <style>
-        div[data-testid="column"]:nth-child(2) button, div[data-testid="column"]:nth-child(3) button, div[data-testid="column"]:nth-child(4) button {
-            height: 50px !important;
-            width: 100% !important;
-            min-width: 180px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-        div[data-testid="column"]:nth-child(2) button {
-            background: #0f1117 !important;
-            border: 1px solid #2a2e3d !important;
-            color: #edf2f7 !important;
-        }
-        div[data-testid="column"]:nth-child(2) button:hover {
-            background: #1a1d27 !important;
-            border-color: #363b4d !important;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-        _,b1,b2,b3=st.columns([0.05,3.0,3.0,3.5])
-        with b1:
+logo = data.get("logo", "🌊")
+accent = data.get("accent_kleur", "#10b981")
+st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}</p></div></div>", unsafe_allow_html=True)
+
+# ─── Knoppen over volle breedte ──────────────────────────
+bcols = st.columns([1, 1, 1])
+with bcols[0]:
             if st.button("📄 PDF", type="secondary", use_container_width=True):
                 try:
                     pb=genereer_pdf(data)
@@ -275,7 +252,7 @@ with hcol2:
                         w.writerow([nm, inf.get("waarde",""), inf.get("doel",""), inf.get("trend","")])
                     csv_str = buf.getvalue()
                     st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}.csv", "text/csv", use_container_width=True)
-        with b3:
+        with bcols[2]:
             # Notificaties genereren uit data
             alerts = []
             kpi_data = data.get("kpis", {})
