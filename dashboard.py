@@ -58,6 +58,12 @@ section[data-testid="stSidebar"] { background: var(--surface) !important; border
 #MainMenu { visibility: hidden !important; }
 footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
+div[data-testid="stSidebarCollapsedControl"] { display: none !important; }
+div[data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
+ul[data-testid="stPageLink-NavColumn"] { display: none !important; }
+div[data-testid="stPageLink-NavColumn"] { display: none !important; }
+section[data-testid="stSidebar"] ul[data-testid="stPageLink-NavList"] { display: none !important; }
+nav[data-testid="stPageLink-NavColumn"] { display: none !important; }
 
 /* KPI card styling */
 .kpi-box {
