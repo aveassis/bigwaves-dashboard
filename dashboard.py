@@ -141,6 +141,7 @@ def tc(t):
 
 if kpis:
     kpi_cols = st.columns(4)
+    colors = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}
     for i, (kpi, info) in enumerate(list(kpis.items())[:4]):
         sts = info.get("status", "groen")
         w = info["waarde"]
@@ -148,16 +149,22 @@ if kpis:
         dsp = f"{w:,}" if isinstance(w, int) else str(w)
         if e == "euro": dsp = f"€{w:,}" if isinstance(w, int) else f"€{w}"
         elif e == "seconden": dsp = f"{w}s"
-        tc = "up" if "+" in info.get("trend","") or "lager" in info.get("trend","").lower() else "down" if "-" in info.get("trend","") else "neutral"
+        tc = "up" if "+" in info.get("trend","") or "lager" in info.get("trend","").lower() else "down" if "-" in info.get("trend","") else ""
         arrow = "↑" if tc == "up" else "↓" if tc == "down" else "→"
+        clr = colors.get(sts, "#10b981")
         with kpi_cols[i]:
-            st.markdown(f"""<div class="kpi-card">
-                <div class="kpi-top"><div class="kpi-icon">{se(sts)}</div><div class="kpi-dots">⋯</div></div>
-                <div class="kpi-label">{kpi}</div>
-                <div class="kpi-val">{dsp}</div>
-                <div class="kpi-target">Doel: {info['doel']}</div>
-                <div class="kpi-foot {tc}">{arrow} {info.get('trend','')}</div>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(f"""
+            <div style="background:#1e2231; border:1px solid #2a2e3d; border-radius:14px; padding:1.1rem 1.3rem; box-shadow:0 2px 8px rgba(0,0,0,0.2); margin-bottom:0.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.6rem;">
+                    <div style="width:38px; height:38px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.15);">{se(sts)}</div>
+                    <div style="color:#64748b; font-size:1.1rem; cursor:pointer;">⋯</div>
+                </div>
+                <div style="font-size:0.72rem; color:#64748b; font-weight:500; text-transform:uppercase; letter-spacing:0.4px;">{kpi}</div>
+                <div style="font-size:1.6rem; font-weight:700; color:#edf2f7; line-height:1.2; margin:2px 0 3px 0;">{dsp}</div>
+                <div style="font-size:0.68rem; color:#64748b;">Doel: {info['doel']}</div>
+                <div style="font-size:0.68rem; margin-top:5px; font-weight:500; color:{'#10b981' if tc=='up' else '#ef4444' if tc=='down' else '#64748b'};">{arrow} {info.get('trend','')}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 # ─── Grafieken ──────────────────────────────────────────
 g=data.get("grafieken",{})
