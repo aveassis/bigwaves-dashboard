@@ -280,9 +280,7 @@ st.title(f"🌊 {klant_naam}")
 st.caption(f"Performance overzicht • {data['periode']}")
 
 # ─── Welkomstbericht met uitleg ──────────────────────────
-st.container()
-with st.container():
-    with st.expander("💡 Wat zie ik hier?", expanded=False):
+with st.expander("💡 Wat zie ik hier?", expanded=False):
     st.markdown("""
     Dit dashboard geeft je een compleet overzicht van hoe jouw AI-processen presteren.
 
