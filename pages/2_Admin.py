@@ -232,47 +232,114 @@ if "edit_klant" in st.session_state and st.session_state.edit_klant in klanten:
     data = klanten[k]
 
     st.markdown(f"## ✏️ Bewerken: {data.get('logo','🌊')} {k}")
+    st.caption("Vul de gegevens in en klik op Opslaan. Trend is een tekst zoals '+8% vs vorige maand' of 'Gelijk'.")
 
     with st.form(key=f"form_{k}"):
         # Basis instellingen
+        st.markdown("**Basis**")
         col1, col2 = st.columns(2)
         with col1:
-            nieuwe_wachtwoord = st.text_input("Wachtwoord", value=data.get("wachtwoord", ""))
+            nieuwe_wachtwoord = st.text_input("Inlog wachtwoord voor klant", value=data.get("wachtwoord", ""),
+                help="De klant gebruikt dit wachtwoord om in te loggen op het dashboard")
         with col2:
-            nieuwe_periode = st.text_input("Periode", value=data.get("periode", ""))
+            nieuwe_periode = st.text_input("Periode (bv. 'Mei 2026')", value=data.get("periode", ""))
 
-        st.markdown("**KPI-waarden**")
+        st.markdown("**Prestatie KPI's**")
+        st.caption("Vul bij elke KPI de huidige waarde, het streefdoel en een trend-omschrijving in.")
+
         kpi_cols = st.columns(3)
         kpi_keys = list(data.get("kpis", {}).keys())
         nieuwe_kpis = {}
         for i, kpi_name in enumerate(kpi_keys):
             info = data["kpis"][kpi_name]
+            eenheid = info.get("eenheid", "")
+            eenheid_label = {"items": "aantal", "euro": "euro (€)", "%": "procent", "seconden": "seconden"}.get(eenheid, eenheid)
+
             with kpi_cols[i % 3]:
-                waarde = st.number_input(f"{kpi_name} — waarde", value=float(info["waarde"]) if isinstance(info["waarde"], (int, float)) else 0.0, key=f"w_{k}_{kpi_name}", format="%f")
-                doel = st.number_input(f"Doel", value=float(info["doel"]) if isinstance(info["doel"], (int, float)) else 0.0, key=f"d_{k}_{kpi_name}", format="%f")
-                trend = st.text_input(f"Trend", value=info.get("trend", ""), key=f"t_{k}_{kpi_name}")
+                st.markdown(f"**{kpi_name}** ({eenheid_label})")
+
+                huidige = info["waarde"]
+                if isinstance(huidige, (int, float)):
+                    standaard_waarde = float(huidige)
+                else:
+                    standaard_waarde = 0.0
+
+                stap_grootte = 1.0 if eenheid in ["items", "euro"] else 0.1
+                nieuwe_waarde = st.number_input(
+                    f"Huidige waarde",
+                    value=standaard_waarde,
+                    step=stap_grootte,
+                    format="%.0f" if eenheid in ["items", "euro"] else "%.1f",
+                    key=f"w_{k}_{kpi_name}",
+                    help=f"Wat is de actuele prestatie? (in {eenheid_label})"
+                )
+
+                doel = info["doel"]
+                if isinstance(doel, (int, float)):
+                    standaard_doel = float(doel)
+                else:
+                    standaard_doel = 0.0
+
+                nieuw_doel = st.number_input(
+                    f"Doel / streefwaarde",
+                    value=standaard_doel,
+                    step=stap_grootte,
+                    format="%.0f" if eenheid in ["items", "euro"] else "%.1f",
+                    key=f"d_{k}_{kpi_name}",
+                    help=f"Wat is de target? (in {eenheid_label})"
+                )
+
+                trend = st.text_input(
+                    f"Trend (bv. '+5% vs vorige maand')",
+                    value=info.get("trend", ""),
+                    key=f"t_{k}_{kpi_name}",
+                    help="Bijv. '+8.3% vs vorige maand', '-0.4s', 'Gelijk', of leeg laten"
+                )
+
                 nieuwe_kpis[kpi_name] = {
-                    "waarde": int(waarde) if info.get("eenheid") in ["items", "euro"] else round(waarde, 1),
-                    "doel": int(doel) if info.get("eenheid") in ["items", "euro"] else round(doel, 1),
-                    "eenheid": info.get("eenheid", ""),
+                    "waarde": int(nieuwe_waarde) if eenheid in ["items", "euro"] else round(nieuwe_waarde, 1),
+                    "doel": int(nieuw_doel) if eenheid in ["items", "euro"] else round(nieuw_doel, 1),
+                    "eenheid": eenheid,
                     "trend": trend,
-                    "status": "groen"  # auto
+                    "status": "groen"
                 }
 
         # Kostenbesparing
-        st.markdown("**Kostenbesparing**")
+        st.markdown("**💰 Kostenbesparing**")
+        st.caption("Hoeveel euro bespaart de klant deze maand door AI-automatisering?")
         col1, col2 = st.columns(2)
         with col1:
-            kosten = st.number_input("Kostenbesparing (€)", value=float(data.get("kosten_besparing", 0)), key=f"kosten_{k}")
+            kosten = st.number_input(
+                "Kostenbesparing deze maand (€)",
+                value=float(data.get("kosten_besparing", 0)),
+                step=100.0,
+                format="%.0f",
+                key=f"kosten_{k}",
+                help="Totaal bedrag dat de klant deze maand heeft bespaard"
+            )
         with col2:
-            vorige_kosten = st.number_input("Vorige maand (€)", value=float(data.get("doelen_vorige_maand", {}).get("kosten_besparing", 0)), key=f"vkosten_{k}")
+            vorige_kosten = st.number_input(
+                "Vorige maand (€)",
+                value=float(data.get("doelen_vorige_maand", {}).get("kosten_besparing", 0)),
+                step=100.0,
+                format="%.0f",
+                key=f"vkosten_{k}",
+                help="Vergelijkingsbedrag van vorige maand (toont + of - verschil)"
+            )
 
         # Bottleneck
-        st.markdown("**Bottleneck**")
+        st.markdown("**⚠️ Bottleneck / Knelpunt**")
+        st.caption("Zijn er problemen of aandachtspunten deze periode?")
         bottleneck = data.get("bottleneck", {})
-        bottleneck_tekst = st.text_area("Bottleneck tekst", value=bottleneck.get("tekst", ""), key=f"bn_{k}")
+        bottleneck_tekst = st.text_area(
+            "Beschrijving (of leeg laten als alles goed gaat)",
+            value=bottleneck.get("tekst", ""),
+            key=f"bn_{k}",
+            help="Bijv. 'Servercapaciteit moet worden uitgebreid' of 'Geen knelpunten deze week'"
+        )
 
         # Opslaan
+        st.divider()
         if st.form_submit_button("💾 Opslaan", type="primary", use_container_width=True):
             data["wachtwoord"] = nieuwe_wachtwoord
             data["periode"] = nieuwe_periode
