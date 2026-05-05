@@ -63,6 +63,10 @@ button[title*="sidebar"] { display: none !important; }
 button[aria-label*="sidebar"] { display: none !important; }
 [data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
 
+/* Verberg alle tooltips */
+[title] { pointer-events: none !important; }
+[aria-label] { pointer-events: none !important; }
+
 /* Forceer sidebar altijd uitgeklapt */
 section[data-testid="stSidebar"] { visibility: visible !important; width: 240px !important; transform: none !important; }
 section[data-testid="stSidebar"] + div { margin-left: 240px !important; }
