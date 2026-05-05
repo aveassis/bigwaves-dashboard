@@ -237,7 +237,16 @@ def login_screen():
     st.markdown("---")
     st.caption("🌊 BigWaves — datagedreven, menselijk gecheckt")
     st.markdown('</div>', unsafe_allow_html=True)
+
+    # Admin login link
+    st.markdown("<div style='text-align:center; margin-top:1rem;'>", unsafe_allow_html=True)
+    if st.button("🔐 Admin", use_container_width=True):
+        st.switch_page("pages/2_Admin.py")
+    st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
+
+ADMIN_USER = "admin"
+ADMIN_PASS = "bigwaves2026"
 
 if "ingelogd" not in st.session_state or not st.session_state.ingelogd:
     login_screen()
