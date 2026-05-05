@@ -240,7 +240,17 @@ with hcol2:
                     st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",use_container_width=True)
                 except Exception as e: st.error(f"Fout: {e}")
         with b2:
-            st.button("🔔 Notifications", type="secondary", use_container_width=True)
+            if st.button("📊 CSV", type="secondary", use_container_width=True):
+                import csv, io
+                kpi_data = data.get("kpis", {})
+                if kpi_data:
+                    buf = io.StringIO()
+                    w = csv.writer(buf)
+                    w.writerow(["KPI", "Waarde", "Doel", "Trend"])
+                    for name, info in kpi_data.items():
+                        w.writerow([name, info.get("waarde",""), info.get("doel",""), info.get("trend","")])
+                    csv_str = buf.getvalue()
+                    st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}_{data.get('periode','').replace(' ','_')}.csv", "text/csv", use_container_width=True)
 
 # ─── KPI Cards ──────────────────────────────────────────
 kpis=data.get("kpis",{})
