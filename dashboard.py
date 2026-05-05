@@ -239,11 +239,11 @@ with hcol2:
         <style>
         div[data-testid="column"]:nth-child(2) button, div[data-testid="column"]:nth-child(3) button, div[data-testid="column"]:nth-child(4) button {
             height: 50px !important;
+            width: 100% !important;
+            min-width: 180px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            white-space: nowrap !important;
-            min-width: 160px !important;
         }
         div[data-testid="column"]:nth-child(2) button {
             background: #0f1117 !important;
