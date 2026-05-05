@@ -59,6 +59,9 @@ section[data-testid="stSidebar"] { background: var(--surface) !important; border
 footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
 div[data-testid="stSidebarCollapsedControl"] { display: none !important; }
+button[title*="sidebar"] { display: none !important; }
+button[aria-label*="sidebar"] { display: none !important; }
+[data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
 
 /* Verberg Streamlit app navigatie (dashboard, HITL, Admin) */
 div[data-testid="stSidebar"] > section[data-testid="stSidebarContent"] > div:first-child > div:first-child { display: none !important; }
