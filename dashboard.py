@@ -63,11 +63,6 @@ button[title*="sidebar"] { display: none !important; }
 button[aria-label*="sidebar"] { display: none !important; }
 [data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
 
-/* Verberg Streamlit app navigatie (dashboard, HITL, Admin) */
-div[data-testid="stSidebar"] > section[data-testid="stSidebarContent"] > div:first-child > div:first-child { display: none !important; }
-div[data-testid="stSidebar"] nav { display: none !important; }
-div[data-testid="stSidebar"] ul[role="list"] { display: none !important; }
-
 /* KPI card styling */
 .kpi-box {
     background: #1e2231;
@@ -200,6 +195,35 @@ with st.sidebar:
         for k in["ingelogd","klant_naam","data"]:
             if k in st.session_state: del st.session_state[k]
         st.rerun()
+    st.divider()
+    # Dark/light toggle
+    if "dark_mode" not in st.session_state:
+        st.session_state.dark_mode = True
+    dark = st.toggle("🌙 Donker", value=st.session_state.dark_mode, key="dark_toggle")
+    if dark != st.session_state.dark_mode:
+        st.session_state.dark_mode = dark
+        st.rerun()
+
+    # Light mode CSS override
+    if not st.session_state.dark_mode:
+        st.markdown("""<style>
+        :root {
+        --bg: #f5f7fa !important;
+        --surface: #ffffff !important;
+        --card: #ffffff !important;
+        --border: #e8ecf1 !important;
+        --border-light: #d1d5db !important;
+        --text: #1a1d23 !important;
+        --text-sec: #6b7280 !important;
+        --text-muted: #9ca3af !important;
+        }
+        section[data-testid="stSidebar"] { background: var(--surface) !important; }
+        .kpi-box { background: var(--card) !important; }
+        .kpi-val { color: var(--text) !important; }
+        .kpi-label { color: var(--text-muted) !important; }
+        .kpi-target { color: var(--text-muted) !important; }
+        div[data-testid="column"]:nth-child(2) button { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
+        </style>""", unsafe_allow_html=True)
     st.divider()
     st.caption("🌊 BigWaves AI-bureau")
     st.caption("datagedreven · menselijk gecheckt")
