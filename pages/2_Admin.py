@@ -9,6 +9,10 @@ ADMIN_USER = "admin"
 ADMIN_PASS = "bigwaves2026"
 DATA_DIR = Path(__file__).parent / "data"
 
+# Controleer of admin is ingelogd
+if "admin_logged_in" not in st.session_state:
+    st.session_state.admin_logged_in = False
+
 # Admin login
 def admin_login():
     st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
