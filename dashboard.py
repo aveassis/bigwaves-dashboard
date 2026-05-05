@@ -46,8 +46,10 @@ section[data-testid="stSidebar"] { background: var(--surface) !important; border
 .stApp p, .stApp li, .stApp label { color: var(--text-sec) !important; font-size: 0.82rem !important; }
 .stApp .st-caption { color: var(--text-muted) !important; font-size: 0.72rem !important; }
 .stButton button { border-radius: var(--radius-sm) !important; font-weight: 500 !important; }
-.stButton button[kind="primary"] { background: var(--primary) !important; border: 1px solid var(--primary) !important; color: #000 !important; }
-.stButton button[kind="primary"]:hover { background: #059669 !important; color: #fff !important; }
+.stButton button[kind="primary"] { background: var(--primary) !important; border: 1px solid var(--primary) !important; }
+.stButton button[kind="primary"] p { color: #000 !important; }
+.stButton button[kind="primary"]:hover { background: #059669 !important; }
+.stButton button[kind="primary"]:hover p { color: #fff !important; }
 .stTextInput input { background: var(--surface) !important; color: var(--text) !important; border: 1px solid var(--border) !important; border-radius: var(--radius-sm) !important; }
 .stTextInput input:focus { border-color: var(--primary) !important; }
 .stApp hr { border-color: var(--border) !important; }
