@@ -40,7 +40,7 @@ st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@3
     }
 
     .stApp { background: var(--bw-surface) !important; }
-    .main > div { padding-top: 1.5rem; }
+    .main > div { padding-top: 0.5rem !important; max-width: 1400px; margin: 0 auto; }
 
     .stApp, .st-emotion-cache-1avcm0n, .st-emotion-cache-1r4qj8v {
         background: var(--bw-surface) !important;
@@ -49,54 +49,65 @@ st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@3
     section[data-testid="stSidebar"] {
         background: var(--bw-dark) !important;
         border-right: 1px solid var(--bw-border) !important;
+        min-width: 200px !important;
+        max-width: 220px !important;
     }
     section[data-testid="stSidebar"] .st-emotion-cache-1wmy9hl {
         background: var(--bw-dark) !important;
+    }
+    section[data-testid="stSidebar"] .st-emotion-cache-16txtl3 {
+        padding: 1rem 0.8rem !important;
     }
 
     .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6 {
         color: var(--bw-text) !important;
         font-weight: 500 !important;
+        margin-bottom: 0.3rem !important;
     }
+    .stApp h1 { font-size: 1.4rem !important; }
+    .stApp h2 { font-size: 1.2rem !important; }
+    .stApp h3 { font-size: 1rem !important; }
+    .stApp h4 { font-size: 0.9rem !important; }
     .stApp p, .stApp li, .stApp span, .stApp label {
         color: var(--bw-text-secondary) !important;
+        font-size: 0.8rem !important;
     }
     .stApp .st-caption, .stApp caption, .stApp .caption {
         color: var(--bw-text-muted) !important;
+        font-size: 0.7rem !important;
     }
 
     .kpi-card {
         background: var(--bw-card) !important;
-        border-radius: 12px !important;
-        padding: 1.2rem 1.5rem !important;
+        border-radius: 8px !important;
+        padding: 0.7rem 1rem !important;
         border: 1px solid var(--bw-border) !important;
-        border-left: 4px solid var(--bw-primary) !important;
-        margin-bottom: 0.8rem !important;
+        border-left: 3px solid var(--bw-primary) !important;
+        margin-bottom: 0.5rem !important;
     }
     .kpi-card.groen { border-left-color: var(--bw-green) !important; }
     .kpi-card.oranje { border-left-color: var(--bw-orange) !important; }
     .kpi-card.rood { border-left-color: var(--bw-red) !important; }
     .kpi-label {
-        font-size: 0.8rem !important;
+        font-size: 0.65rem !important;
         color: var(--bw-text-muted) !important;
         font-weight: 500 !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
+        letter-spacing: 0.3px !important;
     }
     .kpi-waarde {
-        font-size: 1.8rem !important;
+        font-size: 1.3rem !important;
         font-weight: 600 !important;
         color: var(--bw-text) !important;
-        margin-top: 4px !important;
-    }
-    .kpi-doel {
-        font-size: 0.75rem !important;
-        color: var(--bw-text-muted) !important;
         margin-top: 2px !important;
     }
+    .kpi-doel {
+        font-size: 0.65rem !important;
+        color: var(--bw-text-muted) !important;
+    }
     .kpi-trend {
-        font-size: 0.75rem !important;
-        margin-top: 4px !important;
+        font-size: 0.65rem !important;
+        margin-top: 2px !important;
         font-weight: 500 !important;
     }
     .kpi-trend.positief { color: var(--bw-green) !important; }
@@ -104,46 +115,39 @@ st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@3
 
     .status-badge {
         display: inline-block !important;
-        padding: 2px 12px !important;
+        padding: 1px 8px !important;
         border-radius: 9999px !important;
-        font-size: 0.7rem !important;
+        font-size: 0.6rem !important;
         font-weight: 500 !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
     }
-    .status-badge.groen { background: rgba(0, 200, 83, 0.15) !important; color: var(--bw-green) !important; }
-    .status-badge.oranje { background: rgba(255, 145, 0, 0.15) !important; color: var(--bw-orange) !important; }
-    .status-badge.rood { background: rgba(213, 0, 0, 0.15) !important; color: var(--bw-red) !important; }
 
     .bottleneck-card {
         background: var(--bw-card) !important;
-        border-radius: 12px !important;
-        padding: 1.2rem !important;
+        border-radius: 8px !important;
+        padding: 0.8rem 1rem !important;
         border: 1px solid var(--bw-border) !important;
-        border-left: 4px solid var(--bw-orange) !important;
-        margin: 1rem 0 !important;
+        border-left: 3px solid var(--bw-orange) !important;
+        margin: 0.5rem 0 !important;
+        font-size: 0.8rem !important;
         color: var(--bw-text-secondary) !important;
     }
-    .bottleneck-card.hoog { border-left-color: var(--bw-red) !important; }
-    .bottleneck-card.medium { border-left-color: var(--bw-orange) !important; }
-    .bottleneck-card.laag { border-left-color: var(--bw-green) !important; }
-    .bottleneck-card strong { color: var(--bw-text) !important; }
 
     .section-header {
-        font-size: 1.1rem !important;
+        font-size: 0.85rem !important;
         font-weight: 500 !important;
         color: var(--bw-text) !important;
-        margin: 1.5rem 0 1rem 0 !important;
-        padding-bottom: 0.5rem !important;
+        margin: 1rem 0 0.5rem 0 !important;
+        padding-bottom: 0.3rem !important;
         border-bottom: 1px solid var(--bw-border) !important;
     }
 
     .login-box {
-        max-width: 400px !important;
-        margin: 6rem auto !important;
-        padding: 2.5rem !important;
+        max-width: 360px !important;
+        margin: 4rem auto !important;
+        padding: 1.5rem !important;
         background: var(--bw-card) !important;
-        border-radius: 16px !important;
+        border-radius: 12px !important;
         border: 1px solid var(--bw-border) !important;
         text-align: center !important;
     }
