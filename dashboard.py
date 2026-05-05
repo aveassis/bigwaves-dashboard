@@ -144,7 +144,6 @@ with st.sidebar:
     st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-sec">Main</div>', unsafe_allow_html=True)
     st.page_link("dashboard.py", label="📊  Dashboard", use_container_width=True)
-    st.page_link("pages/1_HITL.py", label="👤  HITL", use_container_width=True)
     st.markdown('<div class="sidebar-sec">Klant</div>', unsafe_allow_html=True)
     st.markdown(f"<div style='padding:0.3rem 0;font-size:0.85rem;color:var(--text);font-weight:500;'>{data.get('logo','🌊')} {kn}</div>", unsafe_allow_html=True)
     st.caption(f"Periode: {data.get('periode','—')}")
