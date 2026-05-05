@@ -59,11 +59,11 @@ section[data-testid="stSidebar"] { background: var(--surface) !important; border
 footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
 div[data-testid="stSidebarCollapsedControl"] { display: none !important; }
-div[data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
-ul[data-testid="stPageLink-NavColumn"] { display: none !important; }
-div[data-testid="stPageLink-NavColumn"] { display: none !important; }
-section[data-testid="stSidebar"] ul[data-testid="stPageLink-NavList"] { display: none !important; }
-nav[data-testid="stPageLink-NavColumn"] { display: none !important; }
+
+/* Verberg Streamlit app navigatie (dashboard, HITL, Admin) */
+div[data-testid="stSidebar"] > section[data-testid="stSidebarContent"] > div:first-child > div:first-child { display: none !important; }
+div[data-testid="stSidebar"] nav { display: none !important; }
+div[data-testid="stSidebar"] ul[role="list"] { display: none !important; }
 
 /* KPI card styling */
 .kpi-box {
