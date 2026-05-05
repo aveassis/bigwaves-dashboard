@@ -123,7 +123,21 @@ with hcol1:
 with hcol2:
     _,b1,b2=st.columns([0.5,1,1])
     with b1:
-        if    st.button("📄\nPDF", type="primary", use_container_width=True):
+        st.markdown("""
+        <style>
+        div[data-testid="column"]:nth-child(2) button p {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 0px !important;
+            line-height: 1.2 !important;
+        }
+        div[data-testid="column"]:nth-child(2) button p span:first-child {
+            font-size: 1.2rem !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        if st.button("📄\nPDF", type="primary", use_container_width=True):
             try:
                 pb=genereer_pdf(data)
                 st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",use_container_width=True)
