@@ -140,25 +140,24 @@ def tc(t):
     return "neutral"
 
 if kpis:
-    st.markdown("<div class='kpi-grid'>", unsafe_allow_html=True)
-    for kpi,info in list(kpis.items())[:4]:
-        sts=info.get("status","groen"); w=info["waarde"]; e=info.get("eenheid","")
-        dsp=f"{w:,}" if isinstance(w,int) else str(w)
-        if e=="euro": dsp=f"€{w:,}" if isinstance(w,int) else f"€{w}"
-        elif e=="seconden": dsp=f"{w}s"
-        st.markdown(f"""
-        <div class="kpi-card">
-            <div class="kpi-top">
-                <div class="kpi-icon">{se(sts)}</div>
-                <div class="kpi-dots">⋯</div>
-            </div>
-            <div class="kpi-label">{kpi}</div>
-            <div class="kpi-val">{dsp}</div>
-            <div class="kpi-target">Doel: {info['doel']}</div>
-            <div class="kpi-foot {tc(info.get('trend',''))}">{"↑" if tc(info.get('trend',''))=="up" else "↓" if tc(info.get('trend',''))=="down" else "→"} {info.get('trend','')}</div>
-        </div>
-        """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    kpi_cols = st.columns(4)
+    for i, (kpi, info) in enumerate(list(kpis.items())[:4]):
+        sts = info.get("status", "groen")
+        w = info["waarde"]
+        e = info.get("eenheid", "")
+        dsp = f"{w:,}" if isinstance(w, int) else str(w)
+        if e == "euro": dsp = f"€{w:,}" if isinstance(w, int) else f"€{w}"
+        elif e == "seconden": dsp = f"{w}s"
+        tc = "up" if "+" in info.get("trend","") or "lager" in info.get("trend","").lower() else "down" if "-" in info.get("trend","") else "neutral"
+        arrow = "↑" if tc == "up" else "↓" if tc == "down" else "→"
+        with kpi_cols[i]:
+            st.markdown(f"""<div class="kpi-card">
+                <div class="kpi-top"><div class="kpi-icon">{se(sts)}</div><div class="kpi-dots">⋯</div></div>
+                <div class="kpi-label">{kpi}</div>
+                <div class="kpi-val">{dsp}</div>
+                <div class="kpi-target">Doel: {info['doel']}</div>
+                <div class="kpi-foot {tc}">{arrow} {info.get('trend','')}</div>
+            </div>""", unsafe_allow_html=True)
 
 # ─── Grafieken ──────────────────────────────────────────
 g=data.get("grafieken",{})
