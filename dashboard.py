@@ -16,13 +16,11 @@ st.set_page_config(
 )
 
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
-# Accentkleur per klant
+# Accentkleur via aparte mini-style (geen f-string issues)
 accent = data.get("accent_kleur", "#10b981")
-st.markdown(f"""<style>
-:root {{
---primary: {accent};
---primary-glow: rgba(16,185,129,0.15);
---primary-light: rgba(16,185,129,0.1);
+st.markdown(f"<style>:root{{--primary:{accent};--primary-glow:rgba(16,185,129,0.15);--primary-light:rgba(16,185,129,0.1);}}</style>", unsafe_allow_html=True)
+st.markdown("""<style>
+:root {
 --bg: #0f1117;
 --surface: #1a1d27;
 --card: #1e2231;
