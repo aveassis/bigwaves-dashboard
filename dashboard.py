@@ -121,7 +121,7 @@ with hcol1:
     st.title("📊 Dashboard")
     st.caption(f"Performance overzicht • {data.get('periode','Huidige maand')}")
 with hcol2:
-    _,b1,b2=st.columns([1,1,1])
+    _,b1,b2=st.columns([0.5,1,1])
     with b1:
         if st.button("📄 PDF", type="primary", use_container_width=True):
             try:
