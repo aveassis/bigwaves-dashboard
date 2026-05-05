@@ -117,7 +117,10 @@ def login_screen():
     st.markdown("""
     <style>
     section[data-testid="stSidebar"] { display: none !important; }
+    section[data-testid="stSidebar"] + div { margin-left: 0 !important; }
     .main > div { padding: 1.2rem 1.8rem !important; max-width: 1440px; margin: 0 auto; }
+    .st-emotion-cache-1wrcr25 { display: none !important; }
+    .st-emotion-cache-1f3w014 { margin-left: 0 !important; }
     </style>
     """, unsafe_allow_html=True)
     st.markdown('<div class="login-box">', unsafe_allow_html=True)
