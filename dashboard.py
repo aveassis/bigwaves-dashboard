@@ -123,7 +123,7 @@ with hcol1:
 with hcol2:
     _,b1,b2=st.columns([0.5,1,1])
     with b1:
-        if st.button("📄 PDF", type="primary", use_container_width=True):
+        if    st.button("📄\nPDF", type="primary", use_container_width=True):
             try:
                 pb=genereer_pdf(data)
                 st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",use_container_width=True)
