@@ -113,6 +113,13 @@ def laad_klanten():
 
 # ─── Login ───────────────────────────────────────────────
 def login_screen():
+    # Hide sidebar on login
+    st.markdown("""
+    <style>
+    section[data-testid="stSidebar"] { display: none !important; }
+    .main > div { padding: 1.2rem 1.8rem !important; max-width: 1440px; margin: 0 auto; }
+    </style>
+    """, unsafe_allow_html=True)
     st.markdown('<div class="login-box">', unsafe_allow_html=True)
     st.markdown("<span style='font-size:2.2rem;'>🌊</span>", unsafe_allow_html=True)
     st.markdown("## BigWaves")
