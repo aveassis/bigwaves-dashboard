@@ -279,6 +279,22 @@ with st.sidebar:
 st.title(f"🌊 {klant_naam}")
 st.caption(f"Performance overzicht • {data['periode']}")
 
+# ─── Welkomstbericht met uitleg ──────────────────────────
+with st.expander("💡 Wat zie ik hier?", expanded=False):
+    st.markdown("""
+    Dit dashboard geeft je een compleet overzicht van hoe jouw AI-processen presteren.
+
+    **De KPI-kaarten** (hieronder) laten de belangrijkste prestaties zien:
+    - 🟢 **Groen** = op of boven doel
+    - 🟠 **Oranje** = aandacht nodig, benadert limiet  
+    - 🔴 **Rood** = onder doel, actie gewenst
+
+    **Trends** geven aan of het beter of slechter gaat dan vorige maand.
+
+    **Human In The Loop (HITL)** is BigWaves' unieke aanpak: elk AI-proces heeft een menselijke check.
+    Een lagere HITL-ratio betekent dat de AI meer zelfstandig kan — dat is goed!
+    """)
+
 # ─── KPI-kaartjes in rows van 3 ────────────────────────
 st.markdown('<div class="section-header">Kern-KPI\'s</div>', unsafe_allow_html=True)
 kpi_data = data.get("kpis", {})
@@ -313,6 +329,7 @@ for i, (kpi, info) in enumerate(kpi_data.items()):
 grafieken = data.get("grafieken", {})
 if grafieken:
     st.markdown('<div class="section-header">Trends</div>', unsafe_allow_html=True)
+    st.caption("Deze grafieken laten de dagelijkse en wekelijkse ontwikkelingen zien. De oranje stippellijn is het streefdoel.")
     import plotly.graph_objects as go
     gcols = st.columns(2)
 
@@ -362,6 +379,7 @@ if bottleneck and bottleneck.get("tekst"):
 hitl = data.get("hitl_detail", None)
 if hitl:
     st.markdown('<div class="section-header">Human In The Loop</div>', unsafe_allow_html=True)
+    st.caption("HITL = elk AI-proces heeft een menselijke check. Een lager percentage betekent dat de AI meer zelfstandig werkt. BigWaves' unieke aanpak.")
     hitl_ratio = data.get("kpis", {}).get("HITL-ratio", {}).get("waarde", 0)
     hitl_cols = st.columns(4)
     with hitl_cols[0]:
@@ -380,7 +398,8 @@ if hitl:
 
 # ─── Kostenbesparing ────────────────────────────────────
 if data.get("kosten_besparing"):
-    st.markdown('<div class="section-header">Kostenbesparing</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header">💰 Kostenbesparing</div>', unsafe_allow_html=True)
+    st.caption("Dit is de prognose van wat AI-automatisering deze maand oplevert aan bespaarde kosten.")
     vorige = data.get("doelen_vorige_maand", {}).get("kosten_besparing", 0)
     delta = data["kosten_besparing"] - vorige
     st.metric("Prognose deze maand", f"€{data['kosten_besparing']:,}", delta=f"{'+' if delta >= 0 else ''}€{delta:,} vs vorige maand")
