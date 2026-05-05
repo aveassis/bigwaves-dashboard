@@ -15,8 +15,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
+st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
+st.markdown("""<style>
 * { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
 :root {
 --bg: #0f1117;
