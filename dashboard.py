@@ -264,17 +264,36 @@ with hcol2:
                     st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",use_container_width=True)
                 except Exception as e: st.error(f"Fout: {e}")
         with b2:
-            if st.button("📊 CSV", type="secondary", use_container_width=True):
-                import csv, io
-                kpi_data = data.get("kpis", {})
-                if kpi_data:
-                    buf = io.StringIO()
-                    w = csv.writer(buf)
-                    w.writerow(["KPI", "Waarde", "Doel", "Trend"])
-                    for name, info in kpi_data.items():
-                        w.writerow([name, info.get("waarde",""), info.get("doel",""), info.get("trend","")])
-                    csv_str = buf.getvalue()
-                    st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}_{data.get('periode','').replace(' ','_')}.csv", "text/csv", use_container_width=True)
+            # Notificaties genereren uit data
+            alerts = []
+            kpi_data = data.get("kpis", {})
+            for name, info in kpi_data.items():
+                sts = info.get("status", "groen")
+                if sts == "rood":
+                    alerts.append(("🔴", f"**{name}** is onder doel! {info.get('waarde','')} vs doel {info.get('doel','')}"))
+                elif sts == "oranje":
+                    alerts.append(("🟠", f"**{name}** nadert zijn limiet. {info.get('waarde','')} / {info.get('doel','')}"))
+                trend = info.get("trend", "")
+                if "+" in trend:
+                    alerts.append(("🟢", f"**{name}** {trend}"))
+            bn = data.get("bottleneck", {})
+            if bn and bn.get("tekst") and bn.get("tekst") != "Geen knelpunten deze week. Alle processen draaien binnen de gestelde doelen.":
+                alerts.append(("⚠️", bn["tekst"]))
+            update = data.get("laatste_update", "")
+            if update:
+                alerts.append(("📅", f"Data geüpdatet op {update}"))
+
+            badge = f" ({len(alerts)})" if alerts else ""
+            if st.button(f"🔔 Notificaties{badge}", type="secondary", use_container_width=True):
+                st.session_state.show_notifications = not st.session_state.get("show_notifications", False)
+
+        # Notificatie paneel
+        if st.session_state.get("show_notifications", False):
+            with st.container():
+                st.markdown(f"""<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:0.5rem;max-height:300px;overflow-y:auto;">
+                    <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:0.5rem;">🔔 Meldingen</div>
+                    {''.join([f'<div style="padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;color:var(--text-sec);">{a[0]} {a[1]}</div>' for a in alerts[:8]])}
+                </div>""", unsafe_allow_html=True)
 
 # ─── KPI Cards ──────────────────────────────────────────
 kpis=data.get("kpis",{})
