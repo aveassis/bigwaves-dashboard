@@ -1,6 +1,7 @@
 {
   "naam": "Logistiek NL",
   "logo": "🚚",
+  "accent_kleur": "#3b82f6",
   "wachtwoord": "logistiek",
   "periodes": {
     "Mei 2026": {

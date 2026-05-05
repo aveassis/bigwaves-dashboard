@@ -1,6 +1,7 @@
 {
   "naam": "Demo Klant B.V.",
   "logo": "🌊",
+  "accent_kleur": "#10b981",
   "periodes": {
     "Mei 2026": {
       "laatste_update": "2026-05-03",

@@ -1,6 +1,7 @@
 {
   "naam": "TechStart",
   "logo": "💻",
+  "accent_kleur": "#8b5cf6",
   "wachtwoord": "techstart",
   "periodes": {
     "Mei 2026": {
