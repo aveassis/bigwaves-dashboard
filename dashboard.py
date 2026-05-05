@@ -237,7 +237,7 @@ with hcol2:
     with st.container():
         st.markdown("""
         <style>
-        div[data-testid="column"]:nth-child(2) button, div[data-testid="column"]:nth-child(3) button {
+        div[data-testid="column"]:nth-child(2) button, div[data-testid="column"]:nth-child(3) button, div[data-testid="column"]:nth-child(4) button {
             height: 50px !important;
             display: flex !important;
             align-items: center !important;
@@ -256,7 +256,7 @@ with hcol2:
         }
         </style>
         """, unsafe_allow_html=True)
-        _,b1,b2=st.columns([0.1,1,1])
+        _,b1,b2,b3=st.columns([0.05,1,1,1])
         with b1:
             if st.button("📄 PDF", type="secondary", use_container_width=True):
                 try:
@@ -264,6 +264,18 @@ with hcol2:
                     st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",use_container_width=True)
                 except Exception as e: st.error(f"Fout: {e}")
         with b2:
+            if st.button("📊 CSV", type="secondary", use_container_width=True):
+                import csv, io
+                kd = data.get("kpis", {})
+                if kd:
+                    buf = io.StringIO()
+                    w = csv.writer(buf)
+                    w.writerow(["KPI", "Waarde", "Doel", "Trend"])
+                    for nm, inf in kd.items():
+                        w.writerow([nm, inf.get("waarde",""), inf.get("doel",""), inf.get("trend","")])
+                    csv_str = buf.getvalue()
+                    st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}.csv", "text/csv", use_container_width=True)
+        with b3:
             # Notificaties genereren uit data
             alerts = []
             kpi_data = data.get("kpis", {})
