@@ -125,14 +125,16 @@ with hcol2:
         st.markdown("""
         <style>
         div[data-testid="column"]:nth-child(2) button, div[data-testid="column"]:nth-child(3) button {
-            height: 60px !important;
+            height: 50px !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
+            white-space: nowrap !important;
+            min-width: 120px !important;
         }
         </style>
         """, unsafe_allow_html=True)
-        _,b1,b2=st.columns([0.3,1,1])
+        _,b1,b2=st.columns([0.2,1,1])
         with b1:
             if st.button("📄 PDF", type="primary", use_container_width=True):
                 try:
