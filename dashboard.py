@@ -63,14 +63,6 @@ button[title*="sidebar"] { display: none !important; }
 button[aria-label*="sidebar"] { display: none !important; }
 [data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
 
-/* Verberg tooltips sidebar */
-section[data-testid="stSidebar"] [title] { pointer-events: none !important; }
-section[data-testid="stSidebar"] [aria-label] { pointer-events: none !important; }
-
-/* Forceer sidebar altijd uitgeklapt */
-section[data-testid="stSidebar"] { visibility: visible !important; width: 240px !important; transform: none !important; }
-section[data-testid="stSidebar"] + div { margin-left: 240px !important; }
-
 /* Verberg Streamlit app navigatie (dashboard, HITL, Admin) */
 div[data-testid="stSidebar"] > section[data-testid="stSidebarContent"] > div:first-child > div:first-child { display: none !important; }
 div[data-testid="stSidebar"] nav { display: none !important; }
