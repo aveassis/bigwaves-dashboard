@@ -9,21 +9,21 @@ ADMIN_USER = "admin"
 ADMIN_PASS = "bigwaves2026"
 DATA_DIR = Path(__file__).parent / "data"
 
-# Controleer of admin is ingelogd
-if "admin_logged_in" not in st.session_state:
-    st.session_state.admin_logged_in = False
-
 # Admin login
 def admin_login():
-    st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
-        :root { --bw-surface: #171717; --bw-card: #1a1a1a; --bw-border: #2e2e2e; --bw-text: #fafafa; --bw-text-muted: #898989; --bw-primary: #0A4DA4; }
-        .stApp { background: var(--bw-surface) !important; }
-        .stApp h1, .stApp h2, .stApp h3, .stApp h4 { color: var(--bw-text) !important; font-weight: 500 !important; }
-        .stApp p { color: var(--bw-text-muted) !important; }
-    </style>
-    """, unsafe_allow_html=True)
+    st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
+:root { --bg:#0f1117; --surface:#1a1d27; --card:#1e2231; --border:#2a2e3d; --text:#edf2f7; --text-sec:#94a3b8; --text-muted:#64748b; --primary:#10b981; }
+.stApp { background: var(--bg) !important; }
+.stApp h1, .stApp h2, .stApp h3, .stApp h4 { color: var(--text) !important; font-weight: 600 !important; }
+.stApp p { color: var(--text-sec) !important; }
+.stButton button { border-radius: 10px !important; font-weight: 500 !important; }
+.stButton button[kind="primary"] { background: var(--primary) !important; border: 1px solid var(--primary) !important; color: #fff !important; }
+.stTextInput input { background: var(--surface) !important; color: var(--text) !important; border: 1px solid var(--border) !important; border-radius: 10px !important; }
+.stTextInput input:focus { border-color: var(--primary) !important; }
+</style>
+""", unsafe_allow_html=True)
 
     st.title("🔐 BigWaves Admin")
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -56,23 +56,36 @@ if not st.session_state.admin_logged_in:
 st.set_page_config(page_title="Admin — BigWaves", page_icon="🔐", layout="wide")
 
 # ─── Styling ───────────────────────────────────────────────
-st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-    * { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
-    :root { --bw-surface: #171717; --bw-card: #1a1a1a; --bw-border: #2e2e2e; --bw-border-light: #363636;
-        --bw-text: #fafafa; --bw-text-secondary: #b4b4b4; --bw-text-muted: #898989;
-        --bw-primary: #0A4DA4; --bw-accent: #00B4D8; --bw-green: #00C853; --bw-orange: #FF9100; --bw-red: #D50000; }
-    .stApp { background: var(--bw-surface) !important; }
-    .stApp h1, .stApp h2, .stApp h3, .stApp h4 { color: var(--bw-text) !important; font-weight: 500 !important; }
-    .stApp p, .stApp li, .stApp span, .stApp label { color: var(--bw-text-secondary) !important; }
-    .stApp .st-caption { color: var(--bw-text-muted) !important; }
-    .stTextInput input { background: #0f0f0f !important; color: var(--bw-text) !important; border-color: var(--bw-border) !important; }
-    .stTextInput input:focus { border-color: var(--bw-primary) !important; }
-    .stButton button { border-radius: 9999px !important; font-weight: 500 !important; }
-    .stButton button[kind="primary"] { background: var(--bw-primary) !important; border: 1px solid var(--bw-primary) !important; color: white !important; }
-    section[data-testid="stSidebar"] { background: #0f0f0f !important; border-right: 1px solid var(--bw-border) !important; }
-    hr { border-color: var(--bw-border) !important; }
-    #MainMenu {visibility: hidden !important;} footer {visibility: hidden !important;} .stDeployButton {display: none !important;}
+* { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
+:root { --bg:#0f1117; --surface:#1a1d27; --card:#1e2231; --border:#2a2e3d; --border-light:#363b4d; --text:#edf2f7; --text-sec:#94a3b8; --text-muted:#64748b; --primary:#10b981; --primary-light:rgba(16,185,129,0.1); --shadow:0 2px 8px rgba(0,0,0,0.2); --radius:14px; --radius-sm:10px; }
+.stApp { background: var(--bg) !important; }
+.stApp h1 { font-size: 1.4rem !important; font-weight: 700 !important; color: var(--text) !important; }
+.stApp h2 { font-size: 1.1rem !important; font-weight: 600 !important; color: var(--text) !important; }
+.stApp h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: var(--text) !important; }
+.stApp p, .stApp li, .stApp span, .stApp label { color: var(--text-sec) !important; font-size: 0.82rem !important; }
+.stApp .st-caption { color: var(--text-muted) !important; font-size: 0.72rem !important; }
+.stTextInput input { background: var(--surface) !important; color: var(--text) !important; border: 1px solid var(--border) !important; border-radius: var(--radius-sm) !important; }
+.stTextInput input:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-light) !important; }
+.stButton button { border-radius: var(--radius-sm) !important; font-weight: 500 !important; }
+.stButton button[kind="primary"] { background: var(--primary) !important; border: 1px solid var(--primary) !important; color: #fff !important; }
+.stButton button[kind="primary"]:hover { background: #059669 !important; }
+section[data-testid="stSidebar"] { background: var(--surface) !important; border-right: 1px solid var(--border) !important; }
+.stApp hr { border-color: var(--border) !important; }
+.stApp .st-bq { background: var(--card) !important; border: 1px solid var(--border) !important; border-radius: var(--radius) !important; }
+.stApp .stAlert { background: var(--card) !important; border: 1px solid var(--border) !important; color: var(--text) !important; }
+#MainMenu { visibility: hidden !important; }
+footer { visibility: hidden !important; }
+.stDeployButton { display: none !important; }
+
+/* Admin cards */
+.admin-card { background: var(--card) !important; border: 1px solid var(--border) !important; border-radius: var(--radius) !important; padding: 1.2rem !important; box-shadow: var(--shadow) !important; margin-bottom: 1rem !important; }
+.admin-card strong { color: var(--text) !important; }
+.admin-kpi { text-align: center; padding: 0.3rem; }
+.admin-kpi .lbl { color: var(--text-muted); font-size: 0.65rem; text-transform: uppercase; }
+.admin-kpi .val { color: var(--text); font-size: 1rem; font-weight: 600; }
+.admin-kpi .tgt { color: var(--text-muted); font-size: 0.6rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -181,20 +194,18 @@ if not klanten:
 for klant_naam in sorted(klanten.keys()):
     data = klanten[klant_naam]
     with st.container():
-        st.markdown(f"""
-        <div style="background:#1a1a1a; border:1px solid #2e2e2e; border-radius:12px; padding:1.2rem; margin-bottom:1rem;">
+        st.markdown(f"""<div class="admin-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                    <strong style="color:#fafafa; font-size:1.1rem;">{data.get('logo','🌊')} {klant_naam}</strong>
-                    <span style="color:#898989; font-size:0.8rem; margin-left:1rem;">wachtwoord: {data.get('wachtwoord','—')}</span>
+                    <strong style="color:var(--text); font-size:1.05rem;">{data.get('logo','🌊')} {klant_naam}</strong>
+                    <span style="color:var(--text-muted); font-size:0.78rem; margin-left:1rem;">wachtwoord: {data.get('wachtwoord','—')}</span>
                 </div>
                 <div>
-                    <span style="color:#b4b4b4; font-size:0.8rem;">{data.get('periode','')}</span>
-                    <span style="color:#898989; font-size:0.8rem; margin-left:1rem;">update: {data.get('laatste_update','—')}</span>
+                    <span style="color:var(--text-sec); font-size:0.78rem;">{data.get('periode','')}</span>
+                    <span style="color:var(--text-muted); font-size:0.78rem; margin-left:1rem;">update: {data.get('laatste_update','—')}</span>
                 </div>
             </div>
-        </div>
-        """, unsafe_allow_html=True)
+        </div>""", unsafe_allow_html=True)
 
         # KPI-overzichtje in de kaart
         kpis = data.get("kpis", {})
@@ -202,13 +213,11 @@ for klant_naam in sorted(klanten.keys()):
             kpi_cols = st.columns(len(kpis))
             for i, (kpi_name, info) in enumerate(kpis.items()):
                 with kpi_cols[i]:
-                    st.markdown(f"""
-                    <div style="text-align:center; padding:0.3rem;">
-                        <div style="color:#898989; font-size:0.65rem; text-transform:uppercase;">{kpi_name[:12]}</div>
-                        <div style="color:#fafafa; font-size:1rem; font-weight:600;">{info['waarde']}{'%' if info.get('eenheid')=='%' else ''}</div>
-                        <div style="color:#898989; font-size:0.6rem;">doel: {info['doel']}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    st.markdown(f"""<div class="admin-kpi">
+                        <div class="lbl">{kpi_name[:12]}</div>
+                        <div class="val">{info['waarde']}{'%' if info.get('eenheid')=='%' else ''}</div>
+                        <div class="tgt">doel: {info['doel']}</div>
+                    </div>""", unsafe_allow_html=True)
 
         # Bewerken knop
         col1, col2 = st.columns([1, 6])
