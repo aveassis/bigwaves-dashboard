@@ -279,6 +279,8 @@ with st.sidebar:
 st.title(f"🌊 {klant_naam}")
 st.caption(f"Performance overzicht • {data['periode']}")
 
+st.markdown("<br>", unsafe_allow_html=True)
+
 # ─── Welkomstbericht met uitleg ──────────────────────────
 with st.expander("💡 Wat zie ik hier?", expanded=False):
     st.markdown("""
