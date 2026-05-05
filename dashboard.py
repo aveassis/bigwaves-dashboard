@@ -283,17 +283,23 @@ with hcol2:
             if update:
                 alerts.append(("📅", f"Data geüpdatet op {update}"))
 
-            badge = f" ({len(alerts)})" if alerts else ""
+            # Badge alleen als niet gelezen
+            show_badge = not st.session_state.get("notifications_read", False) and len(alerts) > 0
+            badge = f" ({len(alerts)})" if show_badge else ""
             if st.button(f"🔔 Notificaties{badge}", type="secondary", use_container_width=True):
                 st.session_state.show_notifications = not st.session_state.get("show_notifications", False)
 
         # Notificatie paneel
         if st.session_state.get("show_notifications", False):
             with st.container():
-                st.markdown(f"""<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:0.5rem;max-height:300px;overflow-y:auto;">
+                st.markdown(f"""<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:0.5rem;max-height:350px;overflow-y:auto;">
                     <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:0.5rem;">🔔 Meldingen</div>
                     {''.join([f'<div style="padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;color:var(--text-sec);">{a[0]} {a[1]}</div>' for a in alerts[:8]])}
                 </div>""", unsafe_allow_html=True)
+                if st.button("✅ Markeer als gelezen", use_container_width=True):
+                    st.session_state.notifications_read = True
+                    st.session_state.show_notifications = False
+                    st.rerun()
 
 # ─── KPI Cards ──────────────────────────────────────────
 kpis=data.get("kpis",{})
