@@ -130,13 +130,22 @@ with hcol2:
             align-items: center !important;
             justify-content: center !important;
             white-space: nowrap !important;
-            min-width: 120px !important;
+            min-width: 140px !important;
+        }
+        div[data-testid="column"]:nth-child(2) button {
+            background: #0f1117 !important;
+            border: 1px solid #2a2e3d !important;
+            color: #edf2f7 !important;
+        }
+        div[data-testid="column"]:nth-child(2) button:hover {
+            background: #1a1d27 !important;
+            border-color: #363b4d !important;
         }
         </style>
         """, unsafe_allow_html=True)
-        _,b1,b2=st.columns([0.2,1,1])
+        _,b1,b2=st.columns([0.1,1,1])
         with b1:
-            if st.button("📄 PDF", type="primary", use_container_width=True):
+            if st.button("📄 PDF", type="secondary", use_container_width=True):
                 try:
                     pb=genereer_pdf(data)
                     st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",use_container_width=True)
