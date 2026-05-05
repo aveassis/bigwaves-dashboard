@@ -1,0 +1,27 @@
+{
+  "naam": "Logistiek NL",
+  "logo": "🚚",
+  "wachtwoord": "logistiek",
+  "periodes": {
+    "Mei 2026": {
+      "laatste_update": "2026-05-03",
+      "kpis": {
+        "Verwerkte items": {"waarde": 1230, "doel": 1100, "eenheid": "items", "status": "groen", "trend": "+11.8% vs vorige maand"},
+        "Gem. responstijd": {"waarde": 1.8, "doel": 2.5, "eenheid": "seconden", "status": "groen", "trend": "-0.3s vs vorige maand"},
+        "Nauwkeurigheid": {"waarde": 97, "doel": 95, "eenheid": "%", "status": "groen", "trend": "+2% vs vorige maand"},
+        "Uptime": {"waarde": 99.9, "doel": 99.0, "eenheid": "%", "status": "groen", "trend": "+0.1% vs vorige maand"},
+        "HITL-ratio": {"waarde": 12, "doel": 15, "eenheid": "%", "status": "groen", "trend": "-3% vs vorige maand"},
+        "Kostenbesparing": {"waarde": 5200, "doel": 4500, "eenheid": "euro", "status": "groen", "trend": "+€700 vs vorige maand"}
+      },
+      "grafieken": {
+        "verwerkte_items_per_dag": {"titel": "Verwerkte items per dag", "labels": ["Ma","Di","Wo","Do","Vr","Za","Zo"], "waarden": [210,235,198,245,220,65,57], "doel": 157},
+        "responstijd_per_dag": {"titel": "Gemiddelde responstijd per dag (s)", "labels": ["Ma","Di","Wo","Do","Vr","Za","Zo"], "waarden": [1.5,1.7,1.9,1.6,1.8,2.1,2.3], "doel": 2.5},
+        "hitl_trend": {"titel": "HITL-ratio per week", "labels": ["W1","W2","W3","W4","W5"], "waarden": [15,14,13,12,12], "doel": 15}
+      },
+      "bottleneck": {"actief": false, "tekst": "Geen knelpunten. Processen verlopen soepel.", "prioriteit": "laag"},
+      "hitl_detail": {"totaal_acties": 1230, "menselijke_check": 148, "geautomatiseerd": 1082, "bespaarde_uren": 24.5, "categorieen": {}},
+      "kosten_besparing": 5200,
+      "doelen_vorige_maand": {"kosten_besparing": 4500}
+    }
+  }
+}

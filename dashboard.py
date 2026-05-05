@@ -16,9 +16,13 @@ st.set_page_config(
 )
 
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
-st.markdown("""<style>
-* { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
-:root {
+# Accentkleur per klant
+accent = data.get("accent_kleur", "#10b981")
+st.markdown(f"""<style>
+:root {{
+--primary: {accent};
+--primary-glow: rgba(16,185,129,0.15);
+--primary-light: rgba(16,185,129,0.1);
 --bg: #0f1117;
 --surface: #1a1d27;
 --card: #1e2231;
@@ -27,9 +31,6 @@ st.markdown("""<style>
 --text: #edf2f7;
 --text-sec: #94a3b8;
 --text-muted: #64748b;
---primary: #10b981;
---primary-glow: rgba(16,185,129,0.15);
---primary-light: rgba(16,185,129,0.1);
 --green: #10b981;
 --orange: #f59e0b;
 --red: #ef4444;
@@ -231,8 +232,9 @@ with st.sidebar:
 # ─── Header ──────────────────────────────────────────────
 hcol1, hcol2 = st.columns([1.5,1])
 with hcol1:
-    st.title("📊 Dashboard")
-    st.caption(f"Performance overzicht • {data.get('periode','Huidige maand')}")
+    logo = data.get("logo", "🌊")
+    accent = data.get("accent_kleur", "#10b981")
+    st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}</p></div></div>", unsafe_allow_html=True)
 with hcol2:
     with st.container():
         st.markdown("""
