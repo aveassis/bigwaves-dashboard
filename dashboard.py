@@ -243,7 +243,7 @@ with hcol2:
             align-items: center !important;
             justify-content: center !important;
             white-space: nowrap !important;
-            min-width: 140px !important;
+            min-width: 160px !important;
         }
         div[data-testid="column"]:nth-child(2) button {
             background: #0f1117 !important;
@@ -256,7 +256,7 @@ with hcol2:
         }
         </style>
         """, unsafe_allow_html=True)
-        _,b1,b2,b3=st.columns([0.05,1.3,1.3,1.4])
+        _,b1,b2,b3=st.columns([0.05,1.5,1.5,1.7])
         with b1:
             if st.button("📄 PDF", type="secondary", use_container_width=True):
                 try:
