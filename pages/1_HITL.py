@@ -11,69 +11,58 @@ klant_naam = st.session_state.klant_naam
 st.set_page_config(page_title="HITL Detail — BigWaves", page_icon="👤", layout="wide")
 
 # ─── Styling ─────────────────────────────────────────────
-st.markdown("""
+st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    * { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
+
+    :root {
+        --bw-primary: #0A4DA4; --bw-accent: #00B4D8; --bw-dark: #0f0f0f; --bw-surface: #171717;
+        --bw-card: #1a1a1a; --bw-border: #2e2e2e; --bw-text: #fafafa;
+        --bw-text-secondary: #b4b4b4; --bw-text-muted: #898989;
+        --bw-green: #00C853; --bw-orange: #FF9100; --bw-red: #D50000;
+    }
+    .stApp { background: var(--bw-surface) !important; }
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4 { color: var(--bw-text) !important; font-weight: 500 !important; }
+    .stApp p, .stApp li, .stApp span, .stApp label { color: var(--bw-text-secondary) !important; }
+    .stApp .st-caption, .stApp caption { color: var(--bw-text-muted) !important; }
+
     .section-header {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #0A1628;
-        margin: 1.5rem 0 1rem 0;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #00B4D8;
+        font-size: 1.1rem !important; font-weight: 500 !important;
+        color: var(--bw-text) !important; margin: 1.5rem 0 1rem 0 !important;
+        padding-bottom: 0.5rem !important; border-bottom: 1px solid var(--bw-border) !important;
     }
     .hitl-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        text-align: center;
-        margin-bottom: 0.8rem;
+        background: var(--bw-card) !important; border-radius: 12px !important;
+        padding: 1.5rem !important; border: 1px solid var(--bw-border) !important;
+        text-align: center !important; margin-bottom: 0.8rem !important;
     }
     .hitl-card .big-number {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #0A4DA4;
+        font-size: 2.5rem !important; font-weight: 600 !important; color: var(--bw-text) !important;
     }
     .hitl-card .label {
-        font-size: 0.85rem;
-        color: #666;
+        font-size: 0.85rem !important; color: var(--bw-text-muted) !important;
     }
-    .hitl-card.menselijk { border-top: 4px solid #00B4D8; }
-    .hitl-card.auto { border-top: 4px solid #0A4DA4; }
-    .hitl-card.besparing { border-top: 4px solid #00C853; }
+    .hitl-card.menselijk { border-top: 4px solid var(--bw-accent) !important; }
+    .hitl-card.auto { border-top: 4px solid var(--bw-primary) !important; }
+    .hitl-card.besparing { border-top: 4px solid var(--bw-green) !important; }
     .cat-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.2rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        margin-bottom: 0.8rem;
+        background: var(--bw-card) !important; border-radius: 12px !important;
+        padding: 1.2rem !important; border: 1px solid var(--bw-border) !important;
+        margin-bottom: 0.8rem !important;
     }
-    .cat-card .cat-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.5rem;
-    }
-    .cat-card .cat-naam {
-        font-weight: 600;
-        color: #0A1628;
-    }
-    .cat-card .cat-hitl {
-        font-size: 0.85rem;
-        color: #666;
-    }
-    .cat-card .cat-getallen {
-        display: flex;
-        gap: 2rem;
-        font-size: 0.85rem;
-        color: #444;
-        margin-bottom: 0.3rem;
-    }
+    .cat-card .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .cat-card .cat-naam { font-weight: 600; color: var(--bw-text) !important; }
+    .cat-card .cat-hitl { font-size: 0.85rem; color: var(--bw-text-muted) !important; }
+    .cat-card .cat-getallen { display: flex; gap: 2rem; font-size: 0.85rem; color: var(--bw-text-secondary) !important; margin-bottom: 0.3rem; }
+    .stProgress > div > div { background: var(--bw-primary) !important; }
+    .stApp hr { border-color: var(--bw-border) !important; }
+    #MainMenu {visibility: hidden !important;} footer {visibility: hidden !important;} .stDeployButton {display: none !important;}
 </style>
 """, unsafe_allow_html=True)
 
 # ─── Header ──────────────────────────────────────────────
-st.title(f"👤 Human In The Loop — {data.get('logo', '')} {klant_naam}")
+st.title(f"👤 Human In The Loop — {klant_naam}")
 st.caption("BigWaves' USP: AI die veilig meedenkt, processen versterkt en de mens centraal stelt.")
 
 # ─── Why HITL ────────────────────────────────────────────
@@ -145,20 +134,19 @@ if hitl:
         value=hitl_ratio,
         delta={"reference": hitl_doel, "decreasing": {"color": "#00C853"}, "increasing": {"color": "#D50000"}},
         domain={"x": [0, 1], "y": [0, 1]},
-        title={"text": f"HITL-ratio (doel: ≤{hitl_doel}%)", "font": {"size": 14}},
+        title={"text": f"HITL-ratio (doel: ≤{hitl_doel}%)", "font": {"size": 14, "color": "#fafafa"}},
         gauge={
-            "axis": {"range": [None, 50], "tickwidth": 1, "tickcolor": "darkblue"},
+            "axis": {"range": [None, 50], "tickwidth": 1, "tickcolor": "#898989"},
             "bar": {"color": "#0A4DA4"},
-            "bgcolor": "white",
-            "borderwidth": 2,
-            "bordercolor": "gray",
+            "bgcolor": "#1a1a1a",
+            "borderwidth": 0,
             "steps": [
-                {"range": [0, hitl_doel], "color": "#E8F5E9"},
-                {"range": [hitl_doel, 35], "color": "#FFF3E0"},
-                {"range": [35, 50], "color": "#FFEBEE"},
+                {"range": [0, hitl_doel], "color": "rgba(0, 200, 83, 0.15)"},
+                {"range": [hitl_doel, 35], "color": "rgba(255, 145, 0, 0.15)"},
+                {"range": [35, 50], "color": "rgba(213, 0, 0, 0.15)"},
             ],
             "threshold": {
-                "line": {"color": "red", "width": 3},
+                "line": {"color": "#D50000", "width": 3},
                 "thickness": 0.75,
                 "value": hitl_doel,
             },
@@ -167,8 +155,8 @@ if hitl:
     fig.update_layout(
         height=280,
         margin=dict(l=20, r=20, t=40, b=20),
-        paper_bgcolor="white",
-        font={"color": "darkblue", "family": "Arial"},
+        paper_bgcolor="#1a1a1a",
+        font={"color": "#b4b4b4", "family": "Inter"},
     )
     st.plotly_chart(fig, use_container_width=True)
 
@@ -178,13 +166,12 @@ if hitl:
     cat_cols = st.columns(2)
     for idx, (cat, info) in enumerate(categorien.items()):
         pct = info.get("percentage", 0)
-        bar_color = "#00C853" if pct <= 20 else "#FF9100" if pct <= 30 else "#D50000"
         with cat_cols[idx % 2]:
             st.markdown(f"""
             <div class="cat-card">
                 <div class="cat-header">
                     <span class="cat-naam">{cat}</span>
-                    <span class="cat-hitl">HITL: <strong>{pct}%</strong></span>
+                    <span class="cat-hitl">HITL: <strong style="color:var(--bw-text)">{pct}%</strong></span>
                 </div>
                 <div class="cat-getallen">
                     <span>📥 Totaal: {info['totaal']:,}</span>
@@ -211,6 +198,7 @@ if hitl:
             marker_color="#00B4D8",
             text=[f"{p}%" for p in cat_pct],
             textposition="outside",
+            textfont=dict(color="#b4b4b4"),
         ))
         fig2.add_hline(
             y=hitl_doel,
@@ -218,16 +206,18 @@ if hitl:
             line_color="#FF9100",
             annotation_text=f"Doel: ≤{hitl_doel}%",
             annotation_position="top left",
+            annotation_font=dict(color="#FF9100"),
         )
         fig2.update_layout(
             title="HITL-percentage per categorie",
             height=350,
             margin=dict(l=20, r=20, t=40, b=20),
-            paper_bgcolor="white",
-            plot_bgcolor="white",
-            font=dict(size=11),
-            yaxis=dict(title="HITL %", gridcolor="#eee", range=[0, max(cat_pct) * 1.3]),
-            xaxis=dict(gridcolor="#eee"),
+            paper_bgcolor="#1a1a1a",
+            plot_bgcolor="#1a1a1a",
+            font=dict(size=11, color="#b4b4b4"),
+            title_font=dict(color="#fafafa"),
+            yaxis=dict(title="HITL %", gridcolor="#2e2e2e", color="#898989", range=[0, max(cat_pct) * 1.3]),
+            xaxis=dict(gridcolor="#2e2e2e", color="#898989"),
         )
         st.plotly_chart(fig2, use_container_width=True)
 

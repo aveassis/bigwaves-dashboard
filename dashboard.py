@@ -17,87 +17,187 @@ st.set_page_config(
 )
 
 # ─── Styling ─────────────────────────────────────────────
-st.markdown("""
+st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    /* BigWaves brand colors */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
+
     :root {
-        --bigwaves-primary: #0A4DA4;
-        --bigwaves-accent: #00B4D8;
-        --bigwaves-dark: #0A1628;
-        --bigwaves-card: #f8f9fa;
+        --bw-primary: #0A4DA4;
+        --bw-accent: #00B4D8;
+        --bw-dark: #0f0f0f;
+        --bw-surface: #171717;
+        --bw-card: #1a1a1a;
+        --bw-border: #2e2e2e;
+        --bw-border-light: #363636;
+        --bw-text: #fafafa;
+        --bw-text-secondary: #b4b4b4;
+        --bw-text-muted: #898989;
+        --bw-green: #00C853;
+        --bw-orange: #FF9100;
+        --bw-red: #D50000;
     }
-    .stApp {
-        background: #f4f6f9;
+
+    .stApp { background: var(--bw-surface) !important; }
+    .main > div { padding-top: 1.5rem; }
+
+    .stApp, .st-emotion-cache-1avcm0n, .st-emotion-cache-1r4qj8v {
+        background: var(--bw-surface) !important;
     }
-    .main > div {
-        padding-top: 1.5rem;
+
+    section[data-testid="stSidebar"] {
+        background: var(--bw-dark) !important;
+        border-right: 1px solid var(--bw-border) !important;
     }
-    /* KPI metric cards */
+    section[data-testid="stSidebar"] .st-emotion-cache-1wmy9hl {
+        background: var(--bw-dark) !important;
+    }
+
+    .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6 {
+        color: var(--bw-text) !important;
+        font-weight: 500 !important;
+    }
+    .stApp p, .stApp li, .stApp span, .stApp label {
+        color: var(--bw-text-secondary) !important;
+    }
+    .stApp .st-caption, .stApp caption, .stApp .caption {
+        color: var(--bw-text-muted) !important;
+    }
+
     .kpi-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.2rem 1.5rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        border-left: 4px solid #0A4DA4;
-        margin-bottom: 0.8rem;
+        background: var(--bw-card) !important;
+        border-radius: 12px !important;
+        padding: 1.2rem 1.5rem !important;
+        border: 1px solid var(--bw-border) !important;
+        border-left: 4px solid var(--bw-primary) !important;
+        margin-bottom: 0.8rem !important;
     }
-    .kpi-card.groen { border-left-color: #00C853; }
-    .kpi-card.oranje { border-left-color: #FF9100; }
-    .kpi-card.rood { border-left-color: #D50000; }
-    .kpi-label { font-size: 0.85rem; color: #666; font-weight: 500; }
-    .kpi-waarde { font-size: 1.8rem; font-weight: 700; color: #0A1628; }
-    .kpi-doel { font-size: 0.8rem; color: #999; }
-    .kpi-trend { font-size: 0.75rem; margin-top: 2px; }
-    .kpi-trend.positief { color: #00C853; }
-    .kpi-trend.negatief { color: #D50000; }
-    /* Status badges */
+    .kpi-card.groen { border-left-color: var(--bw-green) !important; }
+    .kpi-card.oranje { border-left-color: var(--bw-orange) !important; }
+    .kpi-card.rood { border-left-color: var(--bw-red) !important; }
+    .kpi-label {
+        font-size: 0.8rem !important;
+        color: var(--bw-text-muted) !important;
+        font-weight: 500 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+    .kpi-waarde {
+        font-size: 1.8rem !important;
+        font-weight: 600 !important;
+        color: var(--bw-text) !important;
+        margin-top: 4px !important;
+    }
+    .kpi-doel {
+        font-size: 0.75rem !important;
+        color: var(--bw-text-muted) !important;
+        margin-top: 2px !important;
+    }
+    .kpi-trend {
+        font-size: 0.75rem !important;
+        margin-top: 4px !important;
+        font-weight: 500 !important;
+    }
+    .kpi-trend.positief { color: var(--bw-green) !important; }
+    .kpi-trend.negatief { color: var(--bw-red) !important; }
+
     .status-badge {
-        display: inline-block;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 0.7rem;
-        font-weight: 600;
+        display: inline-block !important;
+        padding: 2px 12px !important;
+        border-radius: 9999px !important;
+        font-size: 0.7rem !important;
+        font-weight: 500 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
     }
-    .status-badge.groen { background: #E8F5E9; color: #2E7D32; }
-    .status-badge.oranje { background: #FFF3E0; color: #E65100; }
-    .status-badge.rood { background: #FFEBEE; color: #C62828; }
-    /* Bottleneck cards */
+    .status-badge.groen { background: rgba(0, 200, 83, 0.15) !important; color: var(--bw-green) !important; }
+    .status-badge.oranje { background: rgba(255, 145, 0, 0.15) !important; color: var(--bw-orange) !important; }
+    .status-badge.rood { background: rgba(213, 0, 0, 0.15) !important; color: var(--bw-red) !important; }
+
     .bottleneck-card {
-        background: white;
-        border-radius: 12px;
-        padding: 1.2rem;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        border-left: 4px solid #FF9100;
-        margin: 1rem 0;
+        background: var(--bw-card) !important;
+        border-radius: 12px !important;
+        padding: 1.2rem !important;
+        border: 1px solid var(--bw-border) !important;
+        border-left: 4px solid var(--bw-orange) !important;
+        margin: 1rem 0 !important;
+        color: var(--bw-text-secondary) !important;
     }
-    .bottleneck-card.hoog { border-left-color: #D50000; }
-    .bottleneck-card.medium { border-left-color: #FF9100; }
-    .bottleneck-card.laag { border-left-color: #00C853; }
-    /* Section headers */
+    .bottleneck-card.hoog { border-left-color: var(--bw-red) !important; }
+    .bottleneck-card.medium { border-left-color: var(--bw-orange) !important; }
+    .bottleneck-card.laag { border-left-color: var(--bw-green) !important; }
+    .bottleneck-card strong { color: var(--bw-text) !important; }
+
     .section-header {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #0A1628;
-        margin: 1.5rem 0 1rem 0;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #00B4D8;
+        font-size: 1.1rem !important;
+        font-weight: 500 !important;
+        color: var(--bw-text) !important;
+        margin: 1.5rem 0 1rem 0 !important;
+        padding-bottom: 0.5rem !important;
+        border-bottom: 1px solid var(--bw-border) !important;
     }
-    /* Login */
+
     .login-box {
-        max-width: 380px;
-        margin: 6rem auto;
-        padding: 2.5rem;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.1);
-        text-align: center;
+        max-width: 400px !important;
+        margin: 6rem auto !important;
+        padding: 2.5rem !important;
+        background: var(--bw-card) !important;
+        border-radius: 16px !important;
+        border: 1px solid var(--bw-border) !important;
+        text-align: center !important;
     }
-    .login-box h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
-    .login-box p { color: #666; margin-bottom: 2rem; }
-    /* Hide Streamlit branding */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    .stDeployButton {display:none;}
+    .login-box h2, .login-box h3, .login-box h4 {
+        color: var(--bw-text) !important;
+    }
+    .login-box p {
+        color: var(--bw-text-muted) !important;
+        margin-bottom: 2rem !important;
+    }
+
+    .stTextInput input {
+        background: var(--bw-dark) !important;
+        color: var(--bw-text) !important;
+        border-color: var(--bw-border) !important;
+    }
+    .stTextInput input:focus {
+        border-color: var(--bw-primary) !important;
+    }
+
+    .stButton button {
+        border-radius: 9999px !important;
+        font-weight: 500 !important;
+        font-size: 0.875rem !important;
+    }
+    .stButton button[kind="primary"] {
+        background: var(--bw-primary) !important;
+        border: 1px solid var(--bw-primary) !important;
+        color: white !important;
+    }
+    .stButton button[kind="primary"]:hover {
+        background: #0B5BCC !important;
+    }
+
+    [data-testid="stMetricLabel"] p {
+        color: var(--bw-text-muted) !important;
+        font-size: 0.8rem !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: var(--bw-text) !important;
+        font-weight: 600 !important;
+    }
+    [data-testid="stMetricDelta"] {
+        color: var(--bw-text-secondary) !important;
+    }
+
+    .stApp hr { border-color: var(--bw-border) !important; }
+    .stProgress > div > div { background: var(--bw-primary) !important; }
+
+    #MainMenu {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    .stDeployButton {display: none !important;}
+
+    ::selection { background: rgba(10, 77, 164, 0.3); }
 </style>
 """, unsafe_allow_html=True)
 
@@ -125,7 +225,7 @@ def login_screen():
         st.stop()
     klant_naam = st.selectbox("Selecteer klant", list(klanten.keys()))
     ww = st.text_input("Wachtwoord", type="password", placeholder="Voer je wachtwoord in")
-    if st.button("Inloggen", type="primary", width='stretch'):
+    if st.button("Inloggen", type="primary", use_container_width=True):
         data = klanten[klant_naam]
         if ww == data.get("wachtwoord", "demo"):
             st.session_state.ingelogd = True
@@ -147,16 +247,16 @@ klant_naam = st.session_state.klant_naam
 
 # ─── Sidebar ─────────────────────────────────────────────
 with st.sidebar:
-    st.markdown(f"### {data.get('logo', '🌊')} {klant_naam}")
+    st.markdown(f"### 🌊 {klant_naam}")
     st.caption(f"Periode: {data.get('periode', 'Huidige maand')}")
     st.caption(f"Laatste update: {data.get('laatste_update', '—')}")
     st.divider()
     st.markdown("**Navigatie**")
-    st.page_link("dashboard.py", label="📊  Overzicht", width='stretch')
-    st.page_link("pages/1_HITL.py", label="👤  HITL-detail", width='stretch')
+    st.page_link("dashboard.py", label="📊  Overzicht", use_container_width=True)
+    st.page_link("pages/1_HITL.py", label="👤  HITL-detail", use_container_width=True)
 
     st.divider()
-    if st.button("🚪 Uitloggen", width='stretch'):
+    if st.button("🚪 Uitloggen", use_container_width=True):
         for key in ["ingelogd", "klant_naam", "data"]:
             if key in st.session_state:
                 del st.session_state[key]
@@ -167,7 +267,7 @@ with st.sidebar:
     st.caption("datagedreven · menselijk gecheckt")
 
 # ─── Hoofdpagina: Overzicht ──────────────────────────────
-st.title(f"📊 {data.get('logo', '')} {klant_naam}")
+st.title(f"🌊 {klant_naam}")
 st.caption(f"Performance overzicht • {data['periode']}")
 
 # ─── KPI-kaartjes in rows van 3 ────────────────────────
@@ -228,11 +328,12 @@ if grafieken:
             title=g["titel"],
             height=280,
             margin=dict(l=20, r=20, t=40, b=20),
-            paper_bgcolor="white",
-            plot_bgcolor="white",
-            font=dict(size=11),
-            yaxis=dict(gridcolor="#eee"),
-            xaxis=dict(gridcolor="#eee"),
+            paper_bgcolor="#1a1a1a",
+            plot_bgcolor="#1a1a1a",
+            font=dict(size=11, color="#b4b4b4"),
+            title_font=dict(color="#fafafa"),
+            yaxis=dict(gridcolor="#2e2e2e", color="#898989"),
+            xaxis=dict(gridcolor="#2e2e2e", color="#898989"),
         )
         with gcols[idx % 2]:
             st.plotly_chart(fig, use_container_width=True)
@@ -279,7 +380,7 @@ if data.get("kosten_besparing"):
 st.divider()
 dl_cols = st.columns([3, 1, 1])
 with dl_cols[1]:
-    if st.button("📄 Download PDF-rapport", type="primary", width='stretch'):
+    if st.button("📄 Download PDF-rapport", type="primary", use_container_width=True):
         try:
             pdf_bytes = genereer_pdf(data)
             st.download_button(
@@ -287,7 +388,7 @@ with dl_cols[1]:
                 data=pdf_bytes,
                 file_name=f"BigWaves_Rapport_{data['naam'].replace(' ', '_')}_{data.get('periode', '').replace(' ', '_')}.pdf",
                 mime="application/pdf",
-                width='stretch',
+                use_container_width=True,
             )
         except Exception as e:
             st.error(f"Fout bij genereren PDF: {e}")
