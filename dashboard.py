@@ -256,7 +256,7 @@ with hcol2:
         }
         </style>
         """, unsafe_allow_html=True)
-        _,b1,b2,b3=st.columns([0.05,2.5,2.5,2.8])
+        _,b1,b2,b3=st.columns([0.05,3.0,3.0,3.5])
         with b1:
             if st.button("📄 PDF", type="secondary", use_container_width=True):
                 try:
