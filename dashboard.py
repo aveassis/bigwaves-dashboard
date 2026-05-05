@@ -162,6 +162,30 @@ def login_screen():
 if "ingelogd" not in st.session_state or not st.session_state.ingelogd: login_screen()
 data=st.session_state.data; kn=st.session_state.klant_naam
 
+# ─── Periode selector ─────────────────────────────────────
+# Check of de data periodes heeft (nieuw formaat) of plat (oud formaat)
+periodes = data.get("periodes", None)
+if periodes:
+    periode_lijst = list(periodes.keys())
+    # Eerste keer of bij switchen
+    if "huidige_periode" not in st.session_state or st.session_state.klant_naam != kn:
+        st.session_state.huidige_periode = periode_lijst[0]
+    # Selector in sidebar
+    with st.sidebar:
+        gekozen = st.selectbox("Periode", periode_lijst,
+            index=periode_lijst.index(st.session_state.huidige_periode) if st.session_state.huidige_periode in periode_lijst else 0,
+            key="periode_selector")
+        if gekozen != st.session_state.huidige_periode:
+            st.session_state.huidige_periode = gekozen
+            st.rerun()
+    # Data uit gekozen periode halen
+    pd = periodes[st.session_state.huidige_periode]
+    data.update(pd)  # voeg periode-data toe aan hoofd-data
+    data["periode"] = st.session_state.huidige_periode
+else:
+    # Oud formaat: platte data, geen periodes
+    pass
+
 # ─── Sidebar ─────────────────────────────────────────────
 with st.sidebar:
     st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)

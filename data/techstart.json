@@ -1,96 +1,27 @@
 {
-  "naam": "TechStart B.V.",
-  "logo": "🚀",
-  "periode": "Mei 2026",
-  "laatste_update": "2026-05-03",
+  "naam": "TechStart",
+  "logo": "💻",
   "wachtwoord": "techstart",
-  "kpis": {
-    "Verwerkte items": {
-      "waarde": 1240,
-      "doel": 1000,
-      "eenheid": "items",
-      "status": "groen",
-      "trend": "+18% vs vorige maand"
-    },
-    "Gem. responstijd": {
-      "waarde": 1.8,
-      "doel": 2.5,
-      "eenheid": "seconden",
-      "status": "groen",
-      "trend": "-0.7s vs vorige maand"
-    },
-    "Nauwkeurigheid": {
-      "waarde": 98,
-      "doel": 95,
-      "eenheid": "%",
-      "status": "groen",
-      "trend": "+2% vs vorige maand"
-    },
-    "Uptime": {
-      "waarde": 99.9,
-      "doel": 99.0,
-      "eenheid": "%",
-      "status": "groen",
-      "trend": "Gelijk"
-    },
-    "HITL-ratio": {
-      "waarde": 12,
-      "doel": 15,
-      "eenheid": "%",
-      "status": "groen",
-      "trend": "-5% vs vorige maand"
-    },
-    "Kostenbesparing": {
-      "waarde": 5200,
-      "doel": 4500,
-      "eenheid": "euro",
-      "status": "groen",
-      "trend": "+€700 vs vorige maand"
+  "periodes": {
+    "Mei 2026": {
+      "laatste_update": "2026-05-03",
+      "kpis": {
+        "Verwerkte items": {"waarde": 560, "doel": 500, "eenheid": "items", "status": "groen", "trend": "+12% vs vorige maand"},
+        "Gem. responstijd": {"waarde": 1.2, "doel": 2.0, "eenheid": "seconden", "status": "groen", "trend": "-0.5s vs vorige maand"},
+        "Nauwkeurigheid": {"waarde": 98, "doel": 95, "eenheid": "%", "status": "groen", "trend": "+3% vs vorige maand"},
+        "Uptime": {"waarde": 100.0, "doel": 99.0, "eenheid": "%", "status": "groen", "trend": "+0.5% vs vorige maand"},
+        "HITL-ratio": {"waarde": 8, "doel": 15, "eenheid": "%", "status": "groen", "trend": "-5% vs vorige maand"},
+        "Kostenbesparing": {"waarde": 2800, "doel": 2500, "eenheid": "euro", "status": "groen", "trend": "+€300 vs vorige maand"}
+      },
+      "grafieken": {
+        "verwerkte_items_per_dag": {"titel": "Verwerkte items per dag", "labels": ["Ma","Di","Wo","Do","Vr","Za","Zo"], "waarden": [95,110,105,120,98,22,10], "doel": 71},
+        "responstijd_per_dag": {"titel": "Gemiddelde responstijd per dag (s)", "labels": ["Ma","Di","Wo","Do","Vr","Za","Zo"], "waarden": [1.0,1.1,1.3,1.2,1.1,1.5,1.8], "doel": 2.0},
+        "hitl_trend": {"titel": "HITL-ratio per week", "labels": ["W1","W2","W3","W4","W5"], "waarden": [13,11,10,9,8], "doel": 15}
+      },
+      "bottleneck": {"actief": false, "tekst": "Alles verloopt volgens plan.", "prioriteit": "laag"},
+      "hitl_detail": {"totaal_acties": 560, "menselijke_check": 45, "geautomatiseerd": 515, "bespaarde_uren": 12.8, "categorieen": {}},
+      "kosten_besparing": 2800,
+      "doelen_vorige_maand": {"kosten_besparing": 2500}
     }
-  },
-  "grafieken": {
-    "verwerkte_items_per_dag": {
-      "titel": "Verwerkte items per dag",
-      "labels": ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"],
-      "waarden": [210, 195, 230, 205, 190, 120, 90],
-      "doel": 143
-    },
-    "responstijd_per_dag": {
-      "titel": "Gemiddelde responstijd per dag (seconden)",
-      "labels": ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"],
-      "waarden": [1.6, 1.9, 1.7, 1.5, 2.0, 2.2, 2.4],
-      "doel": 2.5
-    },
-    "hitl_trend": {
-      "titel": "HITL-ratio per week (lager = meer geautomatiseerd)",
-      "labels": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
-      "waarden": [18, 16, 15, 13, 12],
-      "doel": 15
-    }
-  },
-  "bottleneck": {
-      "actief": true,
-      "tekst": "Klantinteractie is de grootste bottleneck — 14% HITL. Overweeg een snellere review queue of batch-verwerking.",
-      "prioriteit": "medium"
-  },
-  "hitl_detail": {
-    "totaal_acties": 1240,
-    "menselijke_check": 149,
-    "geautomatiseerd": 1091,
-    "bespaarde_uren": 26.2,
-    "categorieen": {
-      "Klantinteractie": {"totaal": 480, "hitl": 55, "percentage": 11},
-      "Facturatie": {"totaal": 200, "hitl": 22, "percentage": 11},
-      "Dataverwerking": {"totaal": 380, "hitl": 42, "percentage": 11},
-      "Rapportage": {"totaal": 180, "hitl": 30, "percentage": 17}
-    }
-  },
-  "kosten_besparing": 5200,
-  "doelen_vorige_maand": {
-    "verwerkte_items": 1050,
-    "responstijd": 2.5,
-    "nauwkeurigheid": 96,
-    "hitl_ratio": 17,
-    "kosten_besparing": 3800
   }
 }

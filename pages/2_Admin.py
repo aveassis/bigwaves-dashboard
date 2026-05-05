@@ -115,31 +115,28 @@ def opslaan_klant(klant_data, bestand_naam=None):
     return bestand_naam
 
 def maak_lege_klant(naam, wachtwoord):
-    """Maak een nieuwe klant met standaard structuur"""
+    from datetime import datetime
     return {
         "naam": naam,
         "wachtwoord": wachtwoord,
         "logo": "🌊",
-        "periode": "Huidige maand",
-        "laatste_update": datetime.now().strftime("%Y-%m-%d"),
-        "kpis": {
-            "Verwerkte items": {"waarde": 0, "doel": 0, "eenheid": "items", "trend": "Nieuw", "status": "groen"},
-            "Uptime": {"waarde": 99.9, "doel": 99.0, "eenheid": "%", "trend": "Nieuw", "status": "groen"},
-            "Gem. responstijd": {"waarde": 2.0, "doel": 3.0, "eenheid": "seconden", "trend": "Nieuw", "status": "groen"},
-            "HITL-ratio": {"waarde": 15, "doel": 20, "eenheid": "%", "trend": "Nieuw", "status": "groen"},
-            "Nauwkeurigheid": {"waarde": 95, "doel": 95, "eenheid": "%", "trend": "Nieuw", "status": "groen"},
-            "Kostenbesparing": {"waarde": 0, "doel": 0, "eenheid": "euro", "trend": "Nieuw", "status": "groen"},
-        },
-        "kosten_besparing": 0,
-        "doelen_vorige_maand": {"kosten_besparing": 0},
-        "grafieken": {},
-        "bottleneck": {"prioriteit": "laag", "tekst": "Nieuwe klant — nog geen data beschikbaar."},
-        "hitl_detail": {
-            "totaal_acties": 0,
-            "menselijke_check": 0,
-            "geautomatiseerd": 0,
-            "bespaarde_uren": 0,
-            "categorieen": {}
+        "periodes": {
+            "Huidige maand": {
+                "laatste_update": datetime.now().strftime("%Y-%m-%d"),
+                "kpis": {
+                    "Verwerkte items": {"waarde": 0, "doel": 0, "eenheid": "items", "trend": "Nieuw", "status": "groen"},
+                    "Uptime": {"waarde": 99.9, "doel": 99.0, "eenheid": "%", "trend": "Nieuw", "status": "groen"},
+                    "Gem. responstijd": {"waarde": 2.0, "doel": 3.0, "eenheid": "seconden", "trend": "Nieuw", "status": "groen"},
+                    "HITL-ratio": {"waarde": 15, "doel": 20, "eenheid": "%", "trend": "Nieuw", "status": "groen"},
+                    "Nauwkeurigheid": {"waarde": 95, "doel": 95, "eenheid": "%", "trend": "Nieuw", "status": "groen"},
+                    "Kostenbesparing": {"waarde": 0, "doel": 0, "eenheid": "euro", "trend": "Nieuw", "status": "groen"},
+                },
+                "kosten_besparing": 0,
+                "doelen_vorige_maand": {"kosten_besparing": 0},
+                "grafieken": {},
+                "bottleneck": {"prioriteit": "laag", "tekst": "Nieuwe klant — nog geen data beschikbaar."},
+                "hitl_detail": {"totaal_acties": 0, "menselijke_check": 0, "geautomatiseerd": 0, "bespaarde_uren": 0, "categorieen": {}}
+            }
         }
     }
 

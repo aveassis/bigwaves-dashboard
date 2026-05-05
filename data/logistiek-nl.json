@@ -1,96 +1,27 @@
 {
   "naam": "Logistiek NL",
-  "logo": "📦",
-  "periode": "Mei 2026",
-  "laatste_update": "2026-05-03",
+  "logo": "🚚",
   "wachtwoord": "logistiek",
-  "kpis": {
-    "Verwerkte items": {
-      "waarde": 2150,
-      "doel": 2000,
-      "eenheid": "items",
-      "status": "groen",
-      "trend": "+5% vs vorige maand"
-    },
-    "Gem. responstijd": {
-      "waarde": 4.2,
-      "doel": 3.0,
-      "eenheid": "seconden",
-      "status": "rood",
-      "trend": "+0.8s vs vorige maand"
-    },
-    "Nauwkeurigheid": {
-      "waarde": 91,
-      "doel": 95,
-      "eenheid": "%",
-      "status": "oranje",
-      "trend": "-2% vs vorige maand"
-    },
-    "Uptime": {
-      "waarde": 98.5,
-      "doel": 99.0,
-      "eenheid": "%",
-      "status": "oranje",
-      "trend": "-0.3% vs vorige maand"
-    },
-    "HITL-ratio": {
-      "waarde": 25,
-      "doel": 20,
-      "eenheid": "%",
-      "status": "oranje",
-      "trend": "+3% vs vorige maand"
-    },
-    "Kostenbesparing": {
-      "waarde": 2800,
-      "doel": 3500,
-      "eenheid": "euro",
-      "status": "rood",
-      "trend": "-€400 vs vorige maand"
+  "periodes": {
+    "Mei 2026": {
+      "laatste_update": "2026-05-03",
+      "kpis": {
+        "Verwerkte items": {"waarde": 1230, "doel": 1100, "eenheid": "items", "status": "groen", "trend": "+11.8% vs vorige maand"},
+        "Gem. responstijd": {"waarde": 1.8, "doel": 2.5, "eenheid": "seconden", "status": "groen", "trend": "-0.3s vs vorige maand"},
+        "Nauwkeurigheid": {"waarde": 97, "doel": 95, "eenheid": "%", "status": "groen", "trend": "+2% vs vorige maand"},
+        "Uptime": {"waarde": 99.9, "doel": 99.0, "eenheid": "%", "status": "groen", "trend": "+0.1% vs vorige maand"},
+        "HITL-ratio": {"waarde": 12, "doel": 15, "eenheid": "%", "status": "groen", "trend": "-3% vs vorige maand"},
+        "Kostenbesparing": {"waarde": 5200, "doel": 4500, "eenheid": "euro", "status": "groen", "trend": "+€700 vs vorige maand"}
+      },
+      "grafieken": {
+        "verwerkte_items_per_dag": {"titel": "Verwerkte items per dag", "labels": ["Ma","Di","Wo","Do","Vr","Za","Zo"], "waarden": [210,235,198,245,220,65,57], "doel": 157},
+        "responstijd_per_dag": {"titel": "Gemiddelde responstijd per dag (s)", "labels": ["Ma","Di","Wo","Do","Vr","Za","Zo"], "waarden": [1.5,1.7,1.9,1.6,1.8,2.1,2.3], "doel": 2.5},
+        "hitl_trend": {"titel": "HITL-ratio per week", "labels": ["W1","W2","W3","W4","W5"], "waarden": [15,14,13,12,12], "doel": 15}
+      },
+      "bottleneck": {"actief": false, "tekst": "Geen knelpunten. Processen verlopen soepel.", "prioriteit": "laag"},
+      "hitl_detail": {"totaal_acties": 1230, "menselijke_check": 148, "geautomatiseerd": 1082, "bespaarde_uren": 24.5, "categorieen": {}},
+      "kosten_besparing": 5200,
+      "doelen_vorige_maand": {"kosten_besparing": 4500}
     }
-  },
-  "grafieken": {
-    "verwerkte_items_per_dag": {
-      "titel": "Verwerkte items per dag",
-      "labels": ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"],
-      "waarden": [380, 410, 395, 420, 350, 120, 75],
-      "doel": 286
-    },
-    "responstijd_per_dag": {
-      "titel": "Gemiddelde responstijd per dag (seconden)",
-      "labels": ["Ma", "Di", "Wo", "Do", "Vr", "Za", "Zo"],
-      "waarden": [3.8, 4.1, 4.5, 3.9, 4.3, 4.8, 5.2],
-      "doel": 3.0
-    },
-    "hitl_trend": {
-      "titel": "HITL-ratio per week (lager = meer geautomatiseerd)",
-      "labels": ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
-      "waarden": [22, 23, 24, 24, 25],
-      "doel": 20
-    }
-  },
-  "bottleneck": {
-      "actief": true,
-      "tekst": "Responstijd loopt op (4.2s, doel < 3.0s). De piekuren (di/woe) hebben te veel handmatige controles. Advies: verhoog batch-processing en stel prioriteitsregels in.",
-      "prioriteit": "hoog"
-  },
-  "hitl_detail": {
-    "totaal_acties": 2150,
-    "menselijke_check": 538,
-    "geautomatiseerd": 1612,
-    "bespaarde_uren": 14.0,
-    "categorieen": {
-      "Klantinteractie": {"totaal": 650, "hitl": 195, "percentage": 30},
-      "Facturatie": {"totaal": 400, "hitl": 100, "percentage": 25},
-      "Dataverwerking": {"totaal": 750, "hitl": 150, "percentage": 20},
-      "Rapportage": {"totaal": 350, "hitl": 93, "percentage": 27}
-    }
-  },
-  "kosten_besparing": 2800,
-  "doelen_vorige_maand": {
-    "verwerkte_items": 2050,
-    "responstijd": 3.4,
-    "nauwkeurigheid": 93,
-    "hitl_ratio": 22,
-    "kosten_besparing": 3200
   }
 }
