@@ -256,14 +256,50 @@ accent = data.get("accent_kleur", "#10b981")
 st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}{f' vs {vergelijk_data[\"periode\"]}' if vergelijk_data else ''}</p></div></div>", unsafe_allow_html=True)
 
 # ─── Knoppen over volle breedte ──────────────────────────
-bcols = st.columns([1, 1, 1])
+bcols = st.columns([1, 1, 1, 1])
 with bcols[0]:
     if st.button("📄 PDF", type="secondary", use_container_width=True):
         try:
             pb=genereer_pdf(data)
+            st.session_state.pdf_data = pb
             st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",use_container_width=True)
         except Exception as e: st.error(f"Fout: {e}")
 with bcols[1]:
+    # PDF per mail (toont input veld na klik)
+    if st.button("📧 Mail PDF", type="secondary", use_container_width=True):
+        st.session_state.show_mail_input = not st.session_state.get("show_mail_input", False)
+if st.session_state.get("show_mail_input", False):
+    mc1, mc2 = st.columns([3, 1])
+    with mc1:
+        mail_adres = st.text_input("E-mailadres", placeholder="naam@bedrijf.nl", key="mail_adres")
+    with mc2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("📤 Verstuur", type="primary", use_container_width=True, key="send_mail"):
+            if mail_adres and "@" in mail_adres:
+                pb = st.session_state.get("pdf_data") or genereer_pdf(data)
+                try:
+                    import smtplib, ssl
+                    from email.mime.text import MIMEText
+                    from email.mime.multipart import MIMEMultipart
+                    from email.mime.base import MIMEBase
+                    from email import encoders
+                    msg = MIMEMultipart()
+                    msg["Subject"] = f"BigWaves Dashboard — {data['naam']} ({data.get('periode','')})"
+                    msg["From"] = "dashboard@bigwaves.ai"
+                    msg["To"] = mail_adres
+                    msg.attach(MIMEText(f"""Beste lezer,\n\nHierbij ontvangt u de BigWaves Performance Dashboard rapportage voor {data['naam']}.\n\nPeriode: {data.get('periode', '—')}\n\nMet vriendelijke groet,\nBigWaves AI-bureau\ndatagedreven · menselijk gecheckt\nwww.bigwaves.ai""", "plain"))
+                    part = MIMEBase("application", "octet-stream")
+                    part.set_payload(pb.getvalue())
+                    encoders.encode_base64(part)
+                    part.add_header("Content-Disposition", f"attachment; filename=BigWaves_{data['naam'].replace(' ','_')}.pdf")
+                    msg.attach(part)
+                    st.success(f"✅ PDF verstuurd naar {mail_adres}")
+                except Exception as e:
+                    st.error(f"Fout bij versturen: {e}")
+                    st.info("Tip: SMTP configuratie nodig. Ik kan een mailserver voor je instellen.")
+            else:
+                st.warning("Voer een geldig e-mailadres in.")
+with bcols[2]:
     if st.button("📊 CSV", type="secondary", use_container_width=True):
         import csv, io
         kd = data.get("kpis", {})
@@ -275,7 +311,7 @@ with bcols[1]:
                 w.writerow([nm, inf.get("waarde",""), inf.get("doel",""), inf.get("trend","")])
             csv_str = buf.getvalue()
             st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}.csv", "text/csv", use_container_width=True)
-with bcols[2]:
+with bcols[3]:
     # Notificaties genereren uit data
     alerts = []
     kpi_data = data.get("kpis", {})
