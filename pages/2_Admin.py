@@ -248,7 +248,7 @@ elif tab == "✏️ Bewerken":
                 <strong style="font-size:0.9rem;">{kpi_name}</strong>
                 <span style="color:var(--text-muted);font-size:0.7rem;">{info.get('eenheid','')}</span>
             </div></div>""", unsafe_allow_html=True)
-        cols = st.columns([1, 1, 1, 1, 1, 4])
+        cols = st.columns([1, 1, 1, 1, 1, 3, 1, 1])
         with cols[0]:
             info["waarde"] = st.number_input("Waarde", value=float(info.get("waarde",0)), key=f"kw_{nm}_{kpi_name}", label_visibility="collapsed", placeholder="Waarde")
         with cols[1]:
@@ -260,7 +260,13 @@ elif tab == "✏️ Bewerken":
         with cols[4]:
             info["trend"] = st.text_input("Trend", value=info.get("trend",""), key=f"kt_{nm}_{kpi_name}", label_visibility="collapsed", placeholder="+8% vs vorige maand")
         with cols[5]:
-            info["uitleg"] = st.text_input("Uitleg (voor dashboard)", value=info.get("uitleg",""), key=f"ku_{nm}_{kpi_name}", label_visibility="collapsed", placeholder="Wat betekent deze KPI voor de klant?")
+            info["uitleg"] = st.text_input("Uitleg", value=info.get("uitleg",""), key=f"ku_{nm}_{kpi_name}", label_visibility="collapsed", placeholder="Wat betekent deze KPI voor de klant?")
+        with cols[6]:
+            info.setdefault("drempel_oranje", 10)
+            info["drempel_oranje"] = st.number_input("⚠️ Drempel %", value=float(info["drempel_oranje"]), key=f"kdor_{nm}_{kpi_name}", label_visibility="collapsed", placeholder="Oranje %")
+        with cols[7]:
+            info.setdefault("drempel_rood", 25)
+            info["drempel_rood"] = st.number_input("🔴 Drempel %", value=float(info["drempel_rood"]), key=f"kdrd_{nm}_{kpi_name}", label_visibility="collapsed", placeholder="Rood %")
         if st.button("✕", key=f"kpi_del_{nm}_{kpi_name}"):
             del pd["kpis"][kpi_name]
             st.rerun()

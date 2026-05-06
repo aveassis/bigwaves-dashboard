@@ -316,7 +316,19 @@ with bcols[3]:
     alerts = []
     kpi_data = data.get("kpis", {})
     for name, info in kpi_data.items():
+        d_ora_not = info.get("drempel_oranje", 10)
+        d_rood_not = info.get("drempel_rood", 25)
+        w = info.get("waarde", 0)
+        doel = info.get("doel", 0)
         sts = info.get("status", "groen")
+        if isinstance(w, (int,float)) and isinstance(doel, (int,float)) and doel > 0:
+            pct_afwijking = max(0, round((doel - w) / doel * 100, 1))
+            if pct_afwijking >= d_rood_not:
+                sts = "rood"
+            elif pct_afwijking >= d_ora_not:
+                sts = "oranje"
+            else:
+                sts = "groen"
         if sts == "rood":
             alerts.append(("🔴", f"**{name}** is onder doel! {info.get('waarde','')} vs doel {info.get('doel','')}"))
         elif sts == "oranje":
@@ -361,7 +373,20 @@ if kpis:
     kpi_cols = st.columns(4)
     colors = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}
     for i, (kpi, info) in enumerate(list(kpis.items())[:4]):
+        # Bepaal status op basis van drempelwaarden
+        d_ora = info.get("drempel_oranje", 10)
+        d_rood = info.get("drempel_rood", 25)
         sts = info.get("status", "groen")
+        w = info.get("waarde", 0)
+        doel = info.get("doel", 0)
+        if isinstance(w, (int,float)) and isinstance(doel, (int,float)) and doel > 0:
+            pct_afwijking = max(0, round((doel - w) / doel * 100, 1))
+            if pct_afwijking >= d_rood:
+                sts = "rood"
+            elif pct_afwijking >= d_ora:
+                sts = "oranje"
+            else:
+                sts = "groen"
         w = info["waarde"]
         e = info.get("eenheid", "")
         dsp = f"{w:,}" if isinstance(w, int) else str(w)
