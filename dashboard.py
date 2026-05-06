@@ -105,6 +105,9 @@ button[aria-label*="sidebar"] { display: none !important; }
 .kpi-foot.down { color: #ef4444; }
 .kpi-foot.neutral { color: #64748b; }
 .kpi-uitleg { font-size: 0.68rem; color: var(--text-sec); margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border); }
+.kpi-vs { font-size: 0.72rem; color: var(--text-sec); margin: 2px 0; }
+.kpi-vs-label { color: var(--text-muted); font-size: 0.65rem; }
+.kpi-vs-diff { font-weight: 600; color: var(--primary); }
 </style>
 """, unsafe_allow_html=True)
 
@@ -172,11 +175,30 @@ if periodes:
             key="periode_selector")
         if gekozen != st.session_state.huidige_periode:
             st.session_state.huidige_periode = gekozen
+            st.session_state.vergelijk_modus = False
             st.rerun()
+        # Vergelijk toggle
+        vergelijk_aan = st.toggle("🔁 Vergelijk met...", value=st.session_state.get("vergelijk_modus", False), key="vergelijk_toggle")
+        if vergelijk_aan != st.session_state.get("vergelijk_modus", False):
+            st.session_state.vergelijk_modus = vergelijk_aan
+            st.rerun()
+        if vergelijk_aan and len(periode_lijst) > 1:
+            andere = st.selectbox("Vergelijk met", [p for p in periode_lijst if p != st.session_state.huidige_periode],
+                key="vergelijk_periode")
     # Data uit gekozen periode halen
     pd = periodes[st.session_state.huidige_periode]
     data.update(pd)  # voeg periode-data toe aan hoofd-data
     data["periode"] = st.session_state.huidige_periode
+    # Vergelijk-data laden
+    vergelijk_data = None
+    vergelijk_pd = None
+    if st.session_state.get("vergelijk_modus", False) and len(periode_lijst) > 1:
+        v_periode = st.session_state.get("vergelijk_periode", "")
+        if v_periode and v_periode in periodes:
+            vergelijk_pd = periodes[v_periode]
+            vergelijk_data = {k: v for k, v in data.items()}
+            vergelijk_data.update(vergelijk_pd)
+            vergelijk_data["periode"] = v_periode
 else:
     # Oud formaat: platte data, geen periodes
     pass
@@ -231,7 +253,7 @@ with st.sidebar:
 # ─── Header ──────────────────────────────────────────────
 logo = data.get("logo", "🌊")
 accent = data.get("accent_kleur", "#10b981")
-st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}</p></div></div>", unsafe_allow_html=True)
+st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}{f' vs {vergelijk_data[\"periode\"]}' if vergelijk_data else ''}</p></div></div>", unsafe_allow_html=True)
 
 # ─── Knoppen over volle breedte ──────────────────────────
 bcols = st.columns([1, 1, 1])
@@ -312,14 +334,32 @@ if kpis:
         tc = "up" if "+" in info.get("trend","") or "lager" in info.get("trend","").lower() else "down" if "-" in info.get("trend","") else ""
         arrow = "↑" if tc == "up" else "↓" if tc == "down" else "→"
         clr = colors.get(sts, "#10b981")
+        # Vergelijk waarde ophalen
+        v_dsp = ""
+        v_diff = ""
+        if vergelijk_data and vergelijk_data.get("kpis", {}).get(kpi):
+            v_info = vergelijk_data["kpis"][kpi]
+            v_w = v_info["waarde"]
+            v_dsp = f"{v_w:,}" if isinstance(v_w, int) else str(v_w)
+            if e == "euro": v_dsp = f"€{v_w:,}" if isinstance(v_w, int) else f"€{v_w}"
+            elif e == "seconden": v_dsp = f"{v_w}s"
+            verschil = w - v_w
+            if e == "euro": v_diff = f"{'+' if verschil >= 0 else ''}€{verschil:,}"
+            elif isinstance(w, (int,float)) and isinstance(v_w, (int,float)):
+                pct = round((w - v_w) / v_w * 100, 1) if v_w else 0
+                v_diff = f"{'+' if pct >= 0 else ''}{pct}%"
         with kpi_cols[i]:
+            extra = ""
+            if v_dsp:
+                extra = f'<div class="kpi-vs"><span class="kpi-vs-label">{vergelijk_data["periode"]}:</span> {v_dsp} <span class="kpi-vs-diff">{v_diff}</span></div>'
             st.markdown(f"""<div class="kpi-box">
                 <div class="kpi-top"><div class="kpi-icon">{se(sts)}</div><div class="kpi-dots">⋯</div></div>
                 <div class="kpi-label">{kpi}</div>
                 <div class="kpi-val">{dsp}</div>
+                {extra}
                 <div class="kpi-target">Doel: {info['doel']}</div>
                 <div class="kpi-foot {tc}">{arrow} {info.get('trend','')}</div>
-                {f'<div class="kpi-uitleg">ⓘ {info.get(\"uitleg\",\"\")}</div>' if info.get('uitleg') else ''}
+                {f'<div class="kpi-uitleg">ⓘ {info.get("uitleg","")}</div>' if info.get('uitleg') else ''}
             </div>""", unsafe_allow_html=True)
 
 # ─── Grafieken ──────────────────────────────────────────
