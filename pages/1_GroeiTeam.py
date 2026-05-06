@@ -9,7 +9,7 @@ from groei_team_ui import (
     render_hitl_samenvatting, bereken_health_score, GROEI_TEAM_CSS
 )
 
-st.set_page_config(page_title="Mijn GroeiTeam", page_icon="🌊", layout="wide")
+# Geen set_page_config hier — overgenomen van dashboard.py
 
 # Check login
 if "ingelogd" not in st.session_state or not st.session_state.ingelogd:
