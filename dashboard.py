@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from io import BytesIO
 from pdf_export import genereer_pdf
+from groei_team_ui import render_pakket_badge, GROEI_TEAM_CSS
 
 DATA_DIR = Path(__file__).parent / "data"
 st.set_page_config(
@@ -144,7 +145,7 @@ def login_screen():
         st.stop()
     kn=st.selectbox("Klant", list(klanten.keys()))
     ww=st.text_input("Wachtwoord", type="password", placeholder="Voer wachtwoord in")
-    if st.button("Inloggen", type="primary", use_container_width=True):
+    if st.button("Inloggen", type="primary", width="stretch"):
         d=klanten[kn]
         if ww==d.get("wachtwoord","demo"):
             st.session_state.ingelogd=True; st.session_state.klant_naam=kn; st.session_state.data=d; st.rerun()
@@ -153,12 +154,32 @@ def login_screen():
     st.caption("🌊 BigWaves — datagedreven, menselijk gecheckt")
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown("<div style='text-align:center;margin-top:1rem;'>", unsafe_allow_html=True)
-    if st.button("🔐 Admin", use_container_width=True): st.switch_page("pages/2_Admin.py")
+    if st.button("🔐 Admin", width="stretch"): st.switch_page("pages/2_Admin.py")
     st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
 
 if "ingelogd" not in st.session_state or not st.session_state.ingelogd: login_screen()
 data=st.session_state.data; kn=st.session_state.klant_naam
+
+# ─── GroeiTeam sidebar badge ─────────────────────────────
+gt = data.get("groei_team", {})
+if gt:
+    pakket = gt.get("pakket", "")
+    if pakket:
+        st.sidebar.markdown(
+            f'<div style="padding:0.5rem 0.5rem 0.3rem 0.5rem;">'
+            f'{render_pakket_badge(pakket)}</div>',
+            unsafe_allow_html=True,
+        )
+    health = gt.get("health_score")
+    if health is not None:
+        c = "#10b981" if health >= 80 else "#f59e0b" if health >= 60 else "#ef4444"
+        st.sidebar.markdown(
+            f'<div style="padding:0 0.5rem;font-size:0.72rem;color:#64748b;margin-bottom:0.5rem;">'
+            f'Health: <span style="color:{c};font-weight:600;">{health}%</span>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
 
 # ─── Periode selector ─────────────────────────────────────
 # Check of de data periodes heeft (nieuw formaat) of plat (oud formaat)
@@ -207,13 +228,13 @@ else:
 with st.sidebar:
     st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-sec">Main</div>', unsafe_allow_html=True)
-    st.page_link("dashboard.py", label="📊  Dashboard", use_container_width=True)
+    st.page_link("dashboard.py", label="📊  Dashboard", width="stretch")
     st.markdown('<div class="sidebar-sec">Klant</div>', unsafe_allow_html=True)
     st.markdown(f"<div style='padding:0.3rem 0;font-size:0.85rem;color:var(--text);font-weight:500;'>{data.get('logo','🌊')} {kn}</div>", unsafe_allow_html=True)
     st.caption(f"Periode: {data.get('periode','—')}")
     st.caption(f"Update: {data.get('laatste_update','—')}")
     st.divider()
-    if st.button("🚪 Uitloggen", use_container_width=True):
+    if st.button("🚪 Uitloggen", width="stretch"):
         for k in["ingelogd","klant_naam","data"]:
             if k in st.session_state: del st.session_state[k]
         st.rerun()
@@ -253,20 +274,20 @@ with st.sidebar:
 # ─── Header ──────────────────────────────────────────────
 logo = data.get("logo", "🌊")
 accent = data.get("accent_kleur", "#10b981")
-st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}{f' vs {vergelijk_data[\"periode\"]}' if vergelijk_data else ''}</p></div></div>", unsafe_allow_html=True)
+st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}{' vs ' + vergelijk_data.get('periode','') if vergelijk_data else ''}</p></div></div>", unsafe_allow_html=True)
 
 # ─── Knoppen over volle breedte ──────────────────────────
 bcols = st.columns([1, 1, 1, 1])
 with bcols[0]:
-    if st.button("📄 PDF", type="secondary", use_container_width=True):
+    if st.button("📄 PDF", type="secondary", width="stretch"):
         try:
             pb=genereer_pdf(data)
             st.session_state.pdf_data = pb
-            st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",use_container_width=True)
+            st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",width="stretch")
         except Exception as e: st.error(f"Fout: {e}")
 with bcols[1]:
     # PDF per mail (toont input veld na klik)
-    if st.button("📧 Mail PDF", type="secondary", use_container_width=True):
+    if st.button("📧 Mail PDF", type="secondary", width="stretch"):
         st.session_state.show_mail_input = not st.session_state.get("show_mail_input", False)
 if st.session_state.get("show_mail_input", False):
     mc1, mc2 = st.columns([3, 1])
@@ -274,7 +295,7 @@ if st.session_state.get("show_mail_input", False):
         mail_adres = st.text_input("E-mailadres", placeholder="naam@bedrijf.nl", key="mail_adres")
     with mc2:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("📤 Verstuur", type="primary", use_container_width=True, key="send_mail"):
+        if st.button("📤 Verstuur", type="primary", width="stretch", key="send_mail"):
             if mail_adres and "@" in mail_adres:
                 pb = st.session_state.get("pdf_data") or genereer_pdf(data)
                 try:
@@ -300,7 +321,7 @@ if st.session_state.get("show_mail_input", False):
             else:
                 st.warning("Voer een geldig e-mailadres in.")
 with bcols[2]:
-    if st.button("📊 CSV", type="secondary", use_container_width=True):
+    if st.button("📊 CSV", type="secondary", width="stretch"):
         import csv, io
         kd = data.get("kpis", {})
         if kd:
@@ -310,7 +331,7 @@ with bcols[2]:
             for nm, inf in kd.items():
                 w.writerow([nm, inf.get("waarde",""), inf.get("doel",""), inf.get("trend","")])
             csv_str = buf.getvalue()
-            st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}.csv", "text/csv", use_container_width=True)
+            st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}.csv", "text/csv", width="stretch")
 with bcols[3]:
     # Notificaties genereren uit data
     alerts = []
@@ -346,7 +367,7 @@ with bcols[3]:
     # Badge alleen als niet gelezen
     show_badge = not st.session_state.get("notifications_read", False) and len(alerts) > 0
     badge = f" ({len(alerts)})" if show_badge else ""
-    if st.button(f"🔔 Notificaties{badge}", type="secondary", use_container_width=True):
+    if st.button(f"🔔 Notificaties{badge}", type="secondary", width="stretch"):
         st.session_state.show_notifications = not st.session_state.get("show_notifications", False)
 
 # Notificatie paneel (buiten de kolom, over volle breedte)
@@ -356,7 +377,7 @@ if st.session_state.get("show_notifications", False):
             <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:0.5rem;">🔔 Meldingen</div>
             {''.join([f'<div style="padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;color:var(--text-sec);">{a[0]} {a[1]}</div>' for a in alerts[:8]])}
         </div>""", unsafe_allow_html=True)
-        if st.button("✅ Markeer als gelezen", use_container_width=True):
+        if st.button("✅ Markeer als gelezen", width="stretch"):
             st.session_state.notifications_read = True
             st.session_state.show_notifications = False
             st.rerun()
@@ -442,7 +463,7 @@ if g:
             font=dict(size=11,color="#94a3b8"),title_font=dict(color="#edf2f7",size=13),
             yaxis=dict(gridcolor="#2a2e3d",color="#64748b"),xaxis=dict(gridcolor="#2a2e3d",color="#64748b"),
             hoverlabel=dict(bgcolor="#10b981",font_color="white"))
-        with gc[idx%2]: st.plotly_chart(fig,use_container_width=True)
+        with gc[idx%2]: st.plotly_chart(fig,width="stretch")
 
 # ─── Bottleneck ─────────────────────────────────────────
 bn=data.get("bottleneck",{})
@@ -509,4 +530,4 @@ if periodes and len(periode_lijst) > 1:
             yaxis=dict(gridcolor="#2a2e3d", color="#64748b"),
             xaxis=dict(gridcolor="#2a2e3d", color="#64748b"),
             showlegend=False, hovermode="x unified")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")

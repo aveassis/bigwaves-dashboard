@@ -79,7 +79,7 @@ if not st.session_state.admin_logged_in:
     c1, c2, c3 = st.columns([1, 2, 1])
     with c2:
         ww = st.text_input("Admin wachtwoord", type="password", placeholder="Voer admin wachtwoord in")
-        if st.button("Inloggen", type="primary", use_container_width=True):
+        if st.button("Inloggen", type="primary", width="stretch"):
             if ww == ADMIN_PASS:
                 st.session_state.admin_logged_in = True
                 st.rerun()
@@ -99,15 +99,15 @@ with st.sidebar:
     st.markdown("### 🔐 Admin Paneel")
     st.caption("BigWaves beheeromgeving")
     st.divider()
-    tabs = ["📋 Overzicht", "✏️ Bewerken", "➕ Nieuwe klant", "📦 JSON Editor"]
+    tabs = ["📋 Overzicht", "✏️ Bewerken", "🌊 GroeiTeam", "➕ Nieuwe klant", "📦 JSON Editor"]
     for t in tabs:
-        if st.button(t, use_container_width=True, key=f"tab_{t}"):
+        if st.button(t, width="stretch", key=f"tab_{t}"):
             st.session_state.admin_tab = t
             st.rerun()
     st.divider()
-    if st.button("← Dashboard", use_container_width=True):
+    if st.button("← Dashboard", width="stretch"):
         st.switch_page("dashboard.py")
-    if st.button("🚪 Uitloggen", use_container_width=True):
+    if st.button("🚪 Uitloggen", width="stretch"):
         for k in ["admin_logged_in", "edit_klant", "admin_tab"]:
             st.session_state.pop(k, None)
         st.rerun()
@@ -164,7 +164,7 @@ elif tab == "➕ Nieuwe klant":
     with c2:
         logo = st.text_input("Logo (emoji)", value="🌊")
         accent = st.color_picker("Accentkleur", value="#10b981")
-    if st.button("✅ Aanmaken", type="primary", use_container_width=True):
+    if st.button("✅ Aanmaken", type="primary", width="stretch"):
         if nm and ww:
             if nm in klanten:
                 st.error(f"Klant '{nm}' bestaat al!")
@@ -177,6 +177,135 @@ elif tab == "➕ Nieuwe klant":
                 st.rerun()
         else:
             st.warning("Vul naam en wachtwoord in.")
+
+elif tab == "🌊 GroeiTeam":
+    if "edit_klant" not in st.session_state or st.session_state.edit_klant not in klanten:
+        if klanten:
+            st.session_state.edit_klant = list(klanten.keys())[0]
+            st.rerun()
+        else:
+            st.info("Geen klanten om te bewerken.")
+            st.stop()
+    nm = st.session_state.edit_klant
+    data, fn = klanten[nm]
+    
+    st.title(f"🌊 GroeiTeam — {nm}")
+    st.caption(f"Bestand: {fn}")
+    
+    # Init groei_team data
+    gt = data.setdefault("groei_team", {
+        "pakket": "Start",
+        "sinds": datetime.now().strftime("%Y-%m-%d"),
+        "status": "actief",
+        "contact_frequentie": "wekelijks",
+        "laatste_checkin": datetime.now().strftime("%Y-%m-%d"),
+        "volgende_checkin": "",
+        "health_score": 80,
+        "workflows": [],
+        "hitl_samenvatting": {"deze_maand_goedgekeurd": 0, "deze_maand_geweigerd": 0, "wachttijd_gemiddeld": "—"},
+        "kpi_koppeling": {"opvolging_binnen_24u": "", "gemiste_kansen": "", "conversie": ""},
+        "checkin_historie": []
+    })
+    
+    with st.expander("Pakket & Status", expanded=True):
+        c1, c2, c3, c4 = st.columns(4)
+        with c1:
+            gt["pakket"] = st.selectbox("Pakket", ["Pilot", "Start", "Groei", "Pro"],
+                index=["Pilot", "Start", "Groei", "Pro"].index(gt.get("pakket", "Start")),
+                key=f"gt_pakket_{nm}")
+        with c2:
+            gt["status"] = st.selectbox("Status", ["actief", "pauze", "inactief"],
+                index=["actief", "pauze", "inactief"].index(gt.get("status", "actief")),
+                key=f"gt_status_{nm}")
+        with c3:
+            gt["contact_frequentie"] = st.selectbox("Contact", ["wekelijks", "maandelijks"],
+                index=["wekelijks", "maandelijks"].index(gt.get("contact_frequentie", "wekelijks")),
+                key=f"gt_freq_{nm}")
+        with c4:
+            gt["sinds"] = st.text_input("Actief sinds", value=gt.get("sinds", ""), key=f"gt_sinds_{nm}")
+    
+    c1, c2 = st.columns(2)
+    with c1: gt["laatste_checkin"] = st.text_input("Laatste check-in", value=gt.get("laatste_checkin", ""), key=f"gt_last_{nm}")
+    with c2: gt["volgende_checkin"] = st.text_input("Volgende check-in", value=gt.get("volgende_checkin", ""), key=f"gt_next_{nm}")
+    
+    st.markdown('<div class="admin-sectie">Health Score</div>', unsafe_allow_html=True)
+    c1, c2 = st.columns([1, 4])
+    with c1:
+        gt["health_score"] = st.slider("Score", 0, 100, int(gt.get("health_score", 80)), key=f"gt_health_{nm}")
+    with c2:
+        c_h = "#10b981" if gt["health_score"] >= 80 else "#f59e0b" if gt["health_score"] >= 60 else "#ef4444"
+        st.markdown(f'<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.5rem 1rem;text-align:center;"><span style="font-size:2rem;font-weight:700;color:{c_h};">{gt["health_score"]}%</span></div>', unsafe_allow_html=True)
+    
+    st.markdown('<div class="admin-sectie">Workflows</div>', unsafe_allow_html=True)
+    workflows = gt.setdefault("workflows", [])
+    for i, wf in enumerate(workflows):
+        c1, c2, c3, c4, c5 = st.columns([2, 1, 1, 1, 1])
+        with c1: wf["naam"] = st.text_input("Naam", value=wf.get("naam",""), key=f"wf_name_{nm}_{i}", label_visibility="collapsed", placeholder="Lead opvolging")
+        with c2: wf["type"] = st.selectbox("Type", ["lead", "kandidaat", "custom"], index=["lead","kandidaat","custom"].index(wf.get("type","lead")), key=f"wf_type_{nm}_{i}", label_visibility="collapsed")
+        with c3: wf["status"] = st.selectbox("Status", ["groen","oranje","rood"], index=["groen","oranje","rood"].index(wf.get("status","groen")), key=f"wf_status_{nm}_{i}", label_visibility="collapsed")
+        with c4: wf["items_verwerkt"] = st.number_input("Verwerkt", value=int(wf.get("items_verwerkt",0)), key=f"wf_items_{nm}_{i}", label_visibility="collapsed")
+        with c5:
+            if st.button("✕", key=f"wf_del_{nm}_{i}"): workflows.pop(i); st.rerun()
+    
+    with st.expander("Workflow toevoegen"):
+        c1, c2, c3, c4 = st.columns(4)
+        with c1: nwf_name = st.text_input("Naam", key=f"nwf_name_{nm}", placeholder="Lead opvolging")
+        with c2: nwf_type = st.selectbox("Type", ["lead", "kandidaat", "custom"], key=f"nwf_type_{nm}")
+        with c3: nwf_items = st.number_input("Items", value=0, key=f"nwf_items_{nm}")
+        with c4: nwf_stappen = st.number_input("Stappen", value=1, key=f"nwf_stap_{nm}")
+        if st.button("Toevoegen", key=f"add_wf_{nm}") and nwf_name:
+            workflows.append({"naam": nwf_name, "type": nwf_type, "actief": True, "items_verwerkt": nwf_items, "opvolgmomenten": nwf_stappen, "laatste_actie": datetime.now().strftime("%Y-%m-%d"), "status": "groen"})
+            st.rerun()
+    
+    st.markdown('<div class="admin-sectie">HITL Samenvatting</div>', unsafe_allow_html=True)
+    hitl_gt = gt.setdefault("hitl_samenvatting", {"deze_maand_goedgekeurd": 0, "deze_maand_geweigerd": 0, "wachttijd_gemiddeld": "—"})
+    c1, c2, c3 = st.columns(3)
+    with c1: hitl_gt["deze_maand_goedgekeurd"] = st.number_input("Goedgekeurd", value=int(hitl_gt.get("deze_maand_goedgekeurd",0)), key=f"gt_hitl_ok_{nm}")
+    with c2: hitl_gt["deze_maand_geweigerd"] = st.number_input("Geweigerd", value=int(hitl_gt.get("deze_maand_geweigerd",0)), key=f"gt_hitl_no_{nm}")
+    with c3: hitl_gt["wachttijd_gemiddeld"] = st.text_input("Gem. wachttijd", value=hitl_gt.get("wachttijd_gemiddeld","—"), key=f"gt_hitl_wt_{nm}", placeholder="2.4 uur")
+    
+    st.markdown('<div class="admin-sectie">KPI Koppeling</div>', unsafe_allow_html=True)
+    st.caption("Koppel GroeiTeam metrics aan bestaande KPI's.")
+    kpi_kopp = gt.setdefault("kpi_koppeling", {"opvolging_binnen_24u": "", "gemiste_kansen": "", "conversie": ""})
+    beschikbare_kpis = set()
+    for p_name, p_data in data.get("periodes", {}).items():
+        for kpi_name in p_data.get("kpis", {}).keys(): beschikbare_kpis.add(kpi_name)
+    kpi_opties = [""] + sorted(beschikbare_kpis)
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        kpi_kopp["opvolging_binnen_24u"] = st.selectbox("Opvolging 24u", kpi_opties, index=kpi_opties.index(kpi_kopp.get("opvolging_binnen_24u","")) if kpi_kopp.get("opvolging_binnen_24u","") in kpi_opties else 0, key=f"gt_kpi_24u_{nm}")
+    with c2:
+        kpi_kopp["gemiste_kansen"] = st.selectbox("Gemiste kansen", kpi_opties, index=kpi_opties.index(kpi_kopp.get("gemiste_kansen","")) if kpi_kopp.get("gemiste_kansen","") in kpi_opties else 0, key=f"gt_kpi_miss_{nm}")
+    with c3:
+        kpi_kopp["conversie"] = st.selectbox("Conversie", kpi_opties, index=kpi_opties.index(kpi_kopp.get("conversie","")) if kpi_kopp.get("conversie","") in kpi_opties else 0, key=f"gt_kpi_conv_{nm}")
+    
+    st.markdown('<div class="admin-sectie">Check-in Historie</div>', unsafe_allow_html=True)
+    checkins = gt.setdefault("checkin_historie", [])
+    for i, ci in enumerate(checkins):
+        c1, c2, c3, c4 = st.columns([1.5, 1.5, 3, 0.5])
+        with c1: ci["datum"] = st.text_input("Datum", value=ci.get("datum",""), key=f"ci_date_{nm}_{i}", label_visibility="collapsed", placeholder="2026-04-28")
+        with c2: ci["type"] = st.text_input("Type", value=ci.get("type",""), key=f"ci_type_{nm}_{i}", label_visibility="collapsed", placeholder="wekelijkse check-in")
+        with c3: ci["notities"] = st.text_input("Notities", value=ci.get("notities",""), key=f"ci_note_{nm}_{i}", label_visibility="collapsed", placeholder="Wat is besproken?")
+        with c4:
+            if st.button("✕", key=f"ci_del_{nm}_{i}"): checkins.pop(i); st.rerun()
+    
+    with st.expander("Check-in toevoegen"):
+        c1, c2, c3 = st.columns(3)
+        with c1: nci_datum = st.text_input("Datum", key=f"nci_date_{nm}", placeholder="2026-04-28")
+        with c2: nci_type = st.text_input("Type", key=f"nci_type_{nm}", placeholder="wekelijkse check-in")
+        with c3: nci_notities = st.text_input("Notities", key=f"nci_note_{nm}", placeholder="Lead opvolging loopt goed.")
+        if st.button("Toevoegen", key=f"add_ci_{nm}") and nci_datum:
+            checkins.append({"datum": nci_datum, "type": nci_type or "check-in", "notities": nci_notities or "", "status": "groen"})
+            st.rerun()
+    
+    st.divider()
+    if st.button("GroeiTeam opslaan", type="primary", use_container_width=True):
+        opslaan_klant(data, fn)
+        st.success(f"GroeiTeam voor '{nm}' opgeslagen!")
+        st.rerun()
+    if st.button("Terug naar overzicht"):
+        st.session_state.admin_tab = "Overzicht"
+        st.rerun()
 
 elif tab == "✏️ Bewerken":
     if "edit_klant" not in st.session_state or st.session_state.edit_klant not in klanten:
@@ -210,13 +339,13 @@ elif tab == "✏️ Bewerken":
             gekozen_periode = None
     with c2:
         nieuwe_pn = st.text_input("Nieuwe periode naam", placeholder="Mei 2026", key="nieuwe_periode_input", label_visibility="collapsed")
-        if st.button("➕ Toevoegen", use_container_width=True) and nieuwe_pn:
+        if st.button("➕ Toevoegen", width="stretch") and nieuwe_pn:
             if nieuwe_pn not in periodes:
                 periodes[nieuwe_pn] = lege_periode()
                 st.success(f"Periode '{nieuwe_pn}' toegevoegd!")
                 st.rerun()
     with c3:
-        if gekozen_periode and st.button("🗑️ Verwijder", use_container_width=True, key="del_periode"):
+        if gekozen_periode and st.button("🗑️ Verwijder", width="stretch", key="del_periode"):
             if len(periodes) > 1:
                 del periodes[gekozen_periode]
                 st.rerun()
@@ -278,7 +407,7 @@ elif tab == "✏️ Bewerken":
         with c2: n_kpi_waarde = st.number_input("Waarde", value=0.0, key="nk_val")
         with c3: n_kpi_doel = st.number_input("Doel", value=0.0, key="nk_tgt")
         with c4: n_kpi_eenheid = st.selectbox("Eenheid", ["items","%","euro","seconden","minuten","uren","aantal"], key="nk_unit")
-        if st.button("✅ KPI toevoegen", use_container_width=True, key="add_kpi") and n_kpi:
+        if st.button("✅ KPI toevoegen", width="stretch", key="add_kpi") and n_kpi:
             pd["kpis"][n_kpi] = {"waarde": int(n_kpi_waarde) if n_kpi_eenheid in ["items","euro","aantal"] else round(n_kpi_waarde,1), "doel": int(n_kpi_doel) if n_kpi_eenheid in ["items","euro","aantal"] else round(n_kpi_doel,1), "eenheid": n_kpi_eenheid, "trend": "", "status": "groen", "uitleg": ""}
             st.rerun()
 
@@ -314,7 +443,7 @@ elif tab == "✏️ Bewerken":
         with c2:
             ng_waarden = st.text_input("Waarden (komma)", key="ng_waarden", placeholder="100,120,110,130")
             ng_doel = st.number_input("Doellijn (0 = uit)", value=0.0, key="ng_doel")
-        if st.button("✅ Grafiek toevoegen", use_container_width=True, key="add_graf") and ng_key and ng_titel:
+        if st.button("✅ Grafiek toevoegen", width="stretch", key="add_graf") and ng_key and ng_titel:
             try:
                 pd["grafieken"][ng_key] = {
                     "titel": ng_titel,
@@ -373,7 +502,7 @@ elif tab == "✏️ Bewerken":
     # ─── Update & opslaan ──────────────────────────────────
     st.divider()
     pd["laatste_update"] = datetime.now().strftime("%Y-%m-%d")
-    if st.button("💾 Alles opslaan", type="primary", use_container_width=True):
+    if st.button("💾 Alles opslaan", type="primary", width="stretch"):
         opslaan_klant(data, fn)
         st.success(f"✅ '{nm}' opgeslagen!")
         st.rerun()
@@ -393,7 +522,7 @@ elif tab == "📦 JSON Editor":
     json_str = st.text_area("JSON inhoud", value=json.dumps(data, indent=2, ensure_ascii=False), height=500, key="json_editor")
     c1, c2, c3 = st.columns([1, 1, 8])
     with c1:
-        if st.button("💾 Opslaan", type="primary", use_container_width=True):
+        if st.button("💾 Opslaan", type="primary", width="stretch"):
             try:
                 parsed = json.loads(json_str)
                 opslaan_klant(parsed, fn)

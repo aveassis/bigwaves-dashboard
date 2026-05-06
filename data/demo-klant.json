@@ -2,6 +2,52 @@
   "naam": "Demo Klant B.V.",
   "logo": "🌊",
   "accent_kleur": "#10b981",
+  "wachtwoord": "demo",
+  "groei_team": {
+    "pakket": "Groei",
+    "sinds": "2026-03-01",
+    "status": "actief",
+    "contact_frequentie": "wekelijks",
+    "laatste_checkin": "2026-04-28",
+    "volgende_checkin": "2026-05-05",
+    "health_score": 87,
+    "workflows": [
+      {
+        "naam": "Lead opvolging",
+        "type": "lead",
+        "actief": true,
+        "items_verwerkt": 124,
+        "opvolgmomenten": 3,
+        "laatste_actie": "2026-04-30",
+        "status": "groen"
+      },
+      {
+        "naam": "Kandidaat opvolging",
+        "type": "kandidaat",
+        "actief": true,
+        "items_verwerkt": 89,
+        "opvolgmomenten": 2,
+        "laatste_actie": "2026-04-29",
+        "status": "groen"
+      }
+    ],
+    "hitl_samenvatting": {
+      "deze_maand_goedgekeurd": 156,
+      "deze_maand_geweigerd": 3,
+      "wachttijd_gemiddeld": "2.4 uur"
+    },
+    "kpi_koppeling": {
+      "opvolging_binnen_24u": "Gem. responstijd",
+      "gemiste_kansen": "Verwerkte items",
+      "conversie": "Nauwkeurigheid"
+    },
+    "checkin_historie": [
+      {"datum": "2026-04-28", "type": "wekelijkse check-in", "notities": "Lead opvolging loopt goed. KPI's op groen.", "status": "groen"},
+      {"datum": "2026-04-21", "type": "wekelijkse check-in", "notities": "Nieuwe workflow kandidaatopvolging gestart.", "status": "groen"},
+      {"datum": "2026-04-14", "type": "wekelijkse check-in", "notities": "Kostenbesparing zichtbaar. Doel €3.000 gehaald.", "status": "groen"},
+      {"datum": "2026-04-07", "type": "wekelijkse check-in", "notities": "Eerste check-in. Workflows draaien stabiel.", "status": "groen"}
+    ]
+  },
   "periodes": {
     "Mei 2026": {
       "laatste_update": "2026-05-03",
@@ -46,7 +92,7 @@
         "responstijd_per_dag": {"titel": "Gemiddelde responstijd per dag (s)", "labels": ["Ma","Di","Wo","Do","Vr","Za","Zo"], "waarden": [2.5,2.6,2.8,2.4,2.7,3.0,3.2], "doel": 3.0},
         "hitl_trend": {"titel": "HITL-ratio per week", "labels": ["W1","W2","W3","W4"], "waarden": [26,24,22,20], "doel": 20}
       },
-      "bottleneck": {"actief": true, "tekst": "Lichte stijging in responstijd aan het einde van de maand. Mogelijke capaciteitsuitbreiding nodig.", "prioriteit": "medium"},
+      "bottleneck": {"actief": true, "tekst": "Lichte stijging in responstijd aan einde van de maand. Mogelijke capaciteitsuitbreiding nodig.", "prioriteit": "medium"},
       "hitl_detail": {
         "totaal_acties": 782, "menselijke_check": 156, "geautomatiseerd": 626, "bespaarde_uren": 16.2,
         "categorieen": {

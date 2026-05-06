@@ -113,7 +113,7 @@ if hitl:
     ))
     fig.update_layout(height=260, margin=dict(l=20, r=20, t=40, b=20),
         paper_bgcolor="#1e2231", font={"color": "#94a3b8", "family": "Inter"})
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     st.markdown('<div class="sec-head">📋 Uitsplitsing per categorie</div>', unsafe_allow_html=True)
     cats = hitl.get("categorieen", {})
@@ -148,7 +148,7 @@ if hitl:
             paper_bgcolor="#1e2231", plot_bgcolor="#1e2231",
             font=dict(size=11, color="#94a3b8"), title_font=dict(color="#edf2f7"),
             yaxis=dict(gridcolor="#2a2e3d", color="#64748b"), xaxis=dict(gridcolor="#2a2e3d", color="#64748b"))
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width="stretch")
 else:
     st.info("Geen HITL-data beschikbaar voor deze klant.")
 
