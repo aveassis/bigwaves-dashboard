@@ -463,7 +463,7 @@ if g:
             font=dict(size=11,color="#94a3b8"),title_font=dict(color="#edf2f7",size=13),
             yaxis=dict(gridcolor="#2a2e3d",color="#64748b"),xaxis=dict(gridcolor="#2a2e3d",color="#64748b"),
             hoverlabel=dict(bgcolor="#10b981",font_color="white"))
-        with gc[idx%2]: st.plotly_chart(fig,width="stretch")
+        with gc[idx%2]: st.plotly_chart(fig, use_container_width=True)
 
 # ─── Bottleneck ─────────────────────────────────────────
 bn=data.get("bottleneck",{})
@@ -530,4 +530,4 @@ if periodes and len(periode_lijst) > 1:
             yaxis=dict(gridcolor="#2a2e3d", color="#64748b"),
             xaxis=dict(gridcolor="#2a2e3d", color="#64748b"),
             showlegend=False, hovermode="x unified")
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(fig, use_container_width=True)
