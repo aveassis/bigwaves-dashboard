@@ -2,6 +2,7 @@
 import streamlit as st
 from pathlib import Path
 import json
+import sqlite3
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
 from groei_team_ui import (
@@ -173,6 +174,50 @@ if kpi_koppeling and data.get("periodes"):
                     """,
                         unsafe_allow_html=True,
                     )
+
+# === LINKEDIN OUTREACH (alleen Pro) ===
+if pakket == "Pro":
+    st.markdown("<hr class='gt-divider'>", unsafe_allow_html=True)
+    st.markdown("<div class='gt-section-title'>&#128279; LinkedIn Outreach</div>", unsafe_allow_html=True)
+
+    # Probeer data uit linkedin db
+    linkedin_db = Path(__file__).parent.parent / "linkedin-outreach" / "data" / "linkedin.db"
+    li_stats = {}
+    if linkedin_db.exists():
+        try:
+            conn = sqlite3.connect(str(linkedin_db))
+            c = conn.cursor()
+            c.execute("SELECT COUNT(*) FROM prospects")
+            li_stats["totaal"] = c.fetchone()[0]
+            c.execute("SELECT status, COUNT(*) FROM prospects GROUP BY status")
+            li_stats["per_status"] = dict(c.fetchall())
+            c.execute("SELECT COUNT(*) FROM actions WHERE action_date >= date('now', '-7 days')")
+            li_stats["acties_7d"] = c.fetchone()[0]
+            c.execute("SELECT COUNT(*) FROM messages WHERE reply_received = 1")
+            li_stats["replies"] = c.fetchone()[0]
+            conn.close()
+        except Exception:
+            li_stats = {}
+
+    if li_stats:
+        li_cols = st.columns(4)
+        with li_cols[0]:
+            st.markdown(f'<div class="kpi-box" style="text-align:center;"><div class="kpi-label">Prospects</div><div class="kpi-val" style="font-size:1.6rem;">{li_stats.get("totaal", 0)}</div></div>', unsafe_allow_html=True)
+        with li_cols[1]:
+            connected = li_stats.get("per_status", {}).get("connected", 0)
+            st.markdown(f'<div class="kpi-box" style="text-align:center;"><div class="kpi-label">Verbonden</div><div class="kpi-val" style="font-size:1.6rem;">{connected}</div></div>', unsafe_allow_html=True)
+        with li_cols[2]:
+            st.markdown(f'<div class="kpi-box" style="text-align:center;"><div class="kpi-label">Reacties</div><div class="kpi-val" style="font-size:1.6rem;">{li_stats.get("replies", 0)}</div></div>', unsafe_allow_html=True)
+        with li_cols[3]:
+            st.markdown(f'<div class="kpi-box" style="text-align:center;"><div class="kpi-label">Acties (7d)</div><div class="kpi-val" style="font-size:1.6rem;">{li_stats.get("acties_7d", 0)}</div></div>', unsafe_allow_html=True)
+        st.markdown(
+            '<div style="text-align:center;margin-top:0.3rem;">'
+            '<a href="/pages/3_LinkedIn" target="_blank" style="color:#10b981;font-size:0.78rem;text-decoration:none;">'
+            '&#8599; Open volledig LinkedIn overzicht</a></div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        st.info("LinkedIn outreach nog niet gestart. De cronjob draait automatisch op werkdagen.")
 
 # === RAPPORTAGE KNOP ===
 st.markdown("<hr class='gt-divider'>", unsafe_allow_html=True)

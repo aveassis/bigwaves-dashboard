@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 from io import BytesIO
 from pdf_export import genereer_pdf
-from groei_team_ui import render_pakket_badge, GROEI_TEAM_CSS
 
 DATA_DIR = Path(__file__).parent / "data"
 st.set_page_config(
@@ -15,6 +14,8 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+from groei_team_ui import render_pakket_badge, GROEI_TEAM_CSS
 
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
 # Accentkleur via aparte mini-style
@@ -229,6 +230,21 @@ with st.sidebar:
     st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-sec">Main</div>', unsafe_allow_html=True)
     st.page_link("dashboard.py", label="📊  Dashboard", width="stretch")
+    # LinkedIn Outreach alleen voor Pro pakket
+    pakket_naam = gt.get("pakket", "") if gt else ""
+    if pakket_naam == "Pro":
+        st.page_link("pages/3_LinkedIn.py", label="🔗  LinkedIn Outreach", use_container_width=True)
+    else:
+        st.markdown(
+            f'<div style="padding:0.3rem 0.8rem;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(16,185,129,0.02));'
+            f'border:1px solid rgba(16,185,129,0.2);border-radius:10px;margin:0.2rem 0;font-size:0.78rem;">'
+            f'<div style="color:#64748b;font-size:0.72rem;">🔗 LinkedIn Outreach</div>'
+            f'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">'
+            f'<span style="color:#94a3b8;">Alleen in Pro</span>'
+            f'<span style="color:#10b981;font-weight:600;font-size:0.7rem;">⬆ Upgrade</span>'
+            f'</div></div>',
+            unsafe_allow_html=True,
+        )
     st.markdown('<div class="sidebar-sec">Klant</div>', unsafe_allow_html=True)
     st.markdown(f"<div style='padding:0.3rem 0;font-size:0.85rem;color:var(--text);font-weight:500;'>{data.get('logo','🌊')} {kn}</div>", unsafe_allow_html=True)
     st.caption(f"Periode: {data.get('periode','—')}")
@@ -434,15 +450,18 @@ if kpis:
             extra = ""
             if v_dsp:
                 extra = f'<div class="kpi-vs"><span class="kpi-vs-label">{vergelijk_data["periode"]}:</span> {v_dsp} <span class="kpi-vs-diff">{v_diff}</span></div>'
-            st.markdown(f"""<div class="kpi-box">
-                <div class="kpi-top"><div class="kpi-icon">{se(sts)}</div><div class="kpi-dots">⋯</div></div>
-                <div class="kpi-label">{kpi}</div>
-                <div class="kpi-val">{dsp}</div>
+            st.html(f"""<div style="background:#1e2231;border:1px solid #2a2e3d;border-radius:14px;padding:1.1rem 1.3rem;box-shadow:0 2px 8px rgba(0,0,0,0.2);margin-bottom:0.5rem;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.6rem;">
+                    <div style="width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.15);">{se(sts)}</div>
+                    <div style="color:#64748b;font-size:1.1rem;">⋯</div>
+                </div>
+                <div style="font-size:0.72rem;color:#64748b;font-weight:500;text-transform:uppercase;letter-spacing:0.4px;">{kpi}</div>
+                <div style="font-size:1.5rem;font-weight:700;color:#edf2f7;margin:0.4rem 0 0.25rem 0;">{dsp}</div>
                 {extra}
-                <div class="kpi-target">Doel: {info['doel']}</div>
-                <div class="kpi-foot {tc}">{arrow} {info.get('trend','')}</div>
-                {f'<div class="kpi-uitleg">ⓘ {info.get("uitleg","")}</div>' if info.get('uitleg') else ''}
-            </div>""", unsafe_allow_html=True)
+                <div style="font-size:0.68rem;color:#64748b;">Doel: {info['doel']}</div>
+                <div style="font-size:0.68rem;margin-top:5px;font-weight:500;color:#{"10b981" if tc=="up" else "ef4444" if tc=="down" else "64748b"};">{arrow} {info.get('trend','')}</div>
+                {f'<div style="font-size:0.68rem;color:#94a3b8;margin-top:4px;padding-top:4px;border-top:1px solid #2a2e3d;">ⓘ {info.get("uitleg","")}</div>' if info.get('uitleg') else ''}
+            </div>""")
 
 # ─── Grafieken ──────────────────────────────────────────
 g=data.get("grafieken",{})
@@ -464,6 +483,23 @@ if g:
             yaxis=dict(gridcolor="#2a2e3d",color="#64748b"),xaxis=dict(gridcolor="#2a2e3d",color="#64748b"),
             hoverlabel=dict(bgcolor="#10b981",font_color="white"))
         with gc[idx%2]: st.plotly_chart(fig, use_container_width=True)
+
+# ─── Kanalen (Website / Mail / WhatsApp / Telefoon) ─────
+kanalen = data.get("kanalen", {})
+if kanalen:
+    st.markdown('<div class="sec-head">📬 Kanalen <span class="pill">live</span></div>', unsafe_allow_html=True)
+    kc = st.columns(len(kanalen))
+    for idx, (kanaal, info) in enumerate(sorted(kanalen.items())):
+        icoon = {"website": "🌐", "mail": "📧", "whatsapp": "💬", "telefoon": "📞"}.get(kanaal.lower(), "📨")
+        with kc[idx]:
+            st.markdown(f"""
+            <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1rem;text-align:center;">
+                <div style="font-size:1.8rem;margin-bottom:0.3rem;">{icoon}</div>
+                <div style="color:#94a3b8;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;">{kanaal}</div>
+                <div style="color:#f1f5f9;font-size:1.5rem;font-weight:700;margin:0.2rem 0;">{info.get('verwerkt',0)}</div>
+                <div style="color:#10b981;font-size:0.78rem;">{info.get('bestellingen',0)} bestellingen</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 # ─── Bottleneck ─────────────────────────────────────────
 bn=data.get("bottleneck",{})
