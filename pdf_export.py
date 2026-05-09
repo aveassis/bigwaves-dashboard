@@ -196,7 +196,7 @@ def genereer_pdf(data: dict) -> bytes:
     pdf.cell(0, 6, "BigWaves -- datagedreven, menselijk gecheckt", align="C", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 6, "Gegenereerd op: " + datetime.now().strftime("%d-%m-%Y %H:%M"), align="C")
 
-    return pdf.output()
+    return bytes(pdf.output())
 
 
 def _ensure_fonts():
