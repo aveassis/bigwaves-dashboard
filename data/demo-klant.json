@@ -4,8 +4,15 @@
   "accent_kleur": "#10b981",
   "wachtwoord": "demo",
   "groei_team": {
-    "pakket": "Groei",
+    "pakket": "Pro",
     "sinds": "2026-03-01",
+     "prijs": {                                                                                                                              
+       "huidig": 2499,                                                                                                                       
+       "eenheid": "maand",                                                                                                                   
+       "setup": 2500,                                                                                                                        
+       "jaar": 24990,                                                                                                                        
+       "workflows": 5                                                                                                                        
+     },
     "status": "actief",
     "contact_frequentie": "wekelijks",
     "laatste_checkin": "2026-04-28",
