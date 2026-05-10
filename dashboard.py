@@ -38,7 +38,9 @@ st.markdown("""<style>
 --radius-sm: 10px;
 }
 .stApp { background: var(--bg) !important; }
-.main > div { padding: 1.2rem 1.8rem !important; max-width: 1440px; margin: 0 auto; }
+.block-container { padding: 1.2rem 1.8rem !important; max-width: 1440px; margin: 0 auto !important; }
+/* Als sidebar collapsed: smallere content + gecentreerd */
+section[data-testid="stSidebar"][aria-expanded="false"] ~ div .block-container { max-width: 900px; margin: 0 auto !important; }
 section[data-testid="stSidebar"] { background: var(--surface) !important; border-right: 1px solid var(--border) !important; min-width: 220px !important; max-width: 240px !important; }
 .stApp h1 { font-size: 1.4rem !important; font-weight: 700 !important; color: var(--text) !important; }
 .stApp h2 { font-size: 1.1rem !important; font-weight: 600 !important; color: var(--text) !important; }
@@ -57,10 +59,21 @@ section[data-testid="stSidebar"] { background: var(--surface) !important; border
 #MainMenu { visibility: hidden !important; }
 footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
-div[data-testid="stSidebarCollapsedControl"] { display: none !important; }
-button[title*="sidebar"] { display: none !important; }
-button[aria-label*="sidebar"] { display: none !important; }
-[data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
+
+/* Sidebar styling */
+.sidebar-logo { font-size:1.1rem; font-weight:700; color:var(--text); display:flex; align-items:center; gap:0.45rem; margin-bottom:0.1rem; }
+.sidebar-tagline { font-size:0.62rem; color:var(--text-muted); margin-bottom:0.2rem; }
+.sidebar-divider { height:1px; background:linear-gradient(to right,var(--border),transparent); margin:0.55rem 0; }
+.sidebar-sect { font-size:0.58rem; font-weight:600; color:#4a5568; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:0.35rem; padding-left:0.1rem; }
+.health-badge { display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-sec); padding:0.25rem 0; }
+.health-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+.client-name { font-size:0.85rem; color:var(--text); font-weight:500; padding:0.2rem 0; }
+.client-meta { font-size:0.68rem; color:var(--text-muted); padding:0.05rem 0; }
+/* Hide Streamlit's auto-generated page nav in sidebar */
+div[data-testid="stSidebar"] nav { display:none; }
+div[data-testid="stSidebar"] ul[role="list"] { display:none; }
+/* style page_link buttons compact */
+div[data-testid="stSidebar"] .st-emotion-cache-1ad0co7 a, div[data-testid="stSidebar"] .st-emotion-cache-1ikg392 a { padding:0.2rem 0.5rem !important; font-size:0.82rem !important; }
 
 /* KPI card styling */
 .kpi-box {
@@ -183,22 +196,42 @@ else:
 # ─── Sidebar ─────────────────────────────────────────────
 with st.sidebar:
     st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-sec">Main</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-tagline">datagedreven · menselijk gecheckt</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+    # ── Navigatie sectie ──
+    st.markdown('<div class="sidebar-sect">NAVIGATIE</div>', unsafe_allow_html=True)
     st.page_link("dashboard.py", label="📊  Dashboard", use_container_width=True)
-    st.markdown('<div class="sidebar-sec">Klant</div>', unsafe_allow_html=True)
-    st.markdown(f"<div style='padding:0.3rem 0;font-size:0.85rem;color:var(--text);font-weight:500;'>{data.get('logo','🌊')} {kn}</div>", unsafe_allow_html=True)
-    st.caption(f"Periode: {data.get('periode','—')}")
-    st.caption(f"Update: {data.get('laatste_update','—')}")
-    st.divider()
-    if st.button("🚪 Uitloggen", use_container_width=True):
+    st.page_link("pages/1_GroeiTeam.py", label="📈  GroeiTeam", use_container_width=True)
+    st.page_link("pages/2_HITL.py", label="👤  HITL", use_container_width=True)
+    st.page_link("pages/3_LinkedIn.py", label="🔗  LinkedIn Outreach", use_container_width=True)
+    st.page_link("pages/4_Admin.py", label="🔐  Admin", use_container_width=True)
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+    # ── Groei Health badge ──
+    gh = data.get("groei_health", None)
+    if gh is not None:
+        st.markdown(f'<div class="health-badge"><span class="health-dot" style="background:{"#10b981" if gh>=70 else "#f59e0b" if gh>=40 else "#ef4444"}"></span> Groei Health: <strong>{gh}%</strong></div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+    # ── Klant sectie ──
+    st.markdown('<div class="sidebar-sect">KLANT</div>', unsafe_allow_html=True)
+    st.markdown(f"<div class='client-name'>{data.get('logo','🌊')} {kn}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='client-meta'>Periode: {data.get('periode','—')}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='client-meta'>Update: {data.get('laatste_update','—')}</div>", unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+    # ── Uitloggen ──
+    if st.button("🚪  Uitloggen", use_container_width=True):
         for k in["ingelogd","klant_naam","data"]:
             if k in st.session_state: del st.session_state[k]
         st.rerun()
-    st.divider()
-    # Dark/light toggle
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+    # ── Dark/light toggle ──
     if "dark_mode" not in st.session_state:
         st.session_state.dark_mode = True
-    dark = st.toggle("🌙 Donker", value=st.session_state.dark_mode, key="dark_toggle")
+    dark = st.toggle("🌙  Donker thema", value=st.session_state.dark_mode, key="dark_toggle")
     if dark != st.session_state.dark_mode:
         st.session_state.dark_mode = dark
         st.rerun()
@@ -207,25 +240,24 @@ with st.sidebar:
     if not st.session_state.dark_mode:
         st.markdown("""<style>
         :root {
-        --bg: #f5f7fa !important;
-        --surface: #ffffff !important;
-        --card: #ffffff !important;
-        --border: #e8ecf1 !important;
-        --border-light: #d1d5db !important;
-        --text: #1a1d23 !important;
-        --text-sec: #6b7280 !important;
-        --text-muted: #9ca3af !important;
+        --bg: #f5f7fa;
+        --surface: #ffffff;
+        --card: #ffffff;
+        --border: #e8ecf1;
+        --border-light: #d1d5db;
+        --text: #1a1d23;
+        --text-sec: #6b7280;
+        --text-muted: #9ca3af;
         }
-        section[data-testid="stSidebar"] { background: var(--surface) !important; }
-        .kpi-box { background: var(--card) !important; }
-        .kpi-val { color: var(--text) !important; }
-        .kpi-label { color: var(--text-muted) !important; }
-        .kpi-target { color: var(--text-muted) !important; }
-        div[data-testid="column"]:nth-child(2) button { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
+        section[data-testid="stSidebar"] { background: var(--surface); }
+        .kpi-box { background: var(--card); }
+        .kpi-val { color: var(--text); }
+        .kpi-label { color: var(--text-muted); }
+        .kpi-target { color: var(--text-muted); }
+        div[data-testid="column"]:nth-child(2) button { background: var(--surface); border-color: var(--border); color: var(--text); }
         </style>""", unsafe_allow_html=True)
-    st.divider()
-    st.caption("🌊 BigWaves AI-bureau")
-    st.caption("datagedreven · menselijk gecheckt")
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+    st.caption("🌊 BigWaves AI-bureau · datagedreven · menselijk gecheckt")
 
 # ─── Header ──────────────────────────────────────────────
 logo = data.get("logo", "🌊")
