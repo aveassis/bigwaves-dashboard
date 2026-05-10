@@ -2,6 +2,44 @@
   "naam": "Demo Klant B.V.",
   "logo": "🌊",
   "accent_kleur": "#10b981",
+  "groei_team": {
+    "pakket": "Pro",
+    "sinds": "2026-01-15",
+    "status": "actief",
+    "contact_frequentie": "wekelijks",
+    "laatste_checkin": "2026-05-05",
+    "volgende_checkin": "2026-05-12",
+    "health_score": 87,
+    "prijs": {
+      "maand": 2499,
+      "setup": 2500,
+      "jaar": 24990,
+      "valuta": "EUR"
+    },
+    "workflows": [
+      {"naam": "Lead opvolging", "type": "lead", "actief": true, "items_verwerkt": 847, "opvolgmomenten": 3, "laatste_actie": "2026-05-03", "status": "groen"},
+      {"naam": "Klantinteractie", "type": "support", "actief": true, "items_verwerkt": 320, "opvolgmomenten": 5, "laatste_actie": "2026-05-03", "status": "groen"},
+      {"naam": "Facturatie", "type": "finance", "actief": true, "items_verwerkt": 180, "opvolgmomenten": 2, "laatste_actie": "2026-05-02", "status": "groen"},
+      {"naam": "Dataverwerking", "type": "data", "actief": true, "items_verwerkt": 260, "opvolgmomenten": 4, "laatste_actie": "2026-05-03", "status": "groen"},
+      {"naam": "Rapportage", "type": "reporting", "actief": true, "items_verwerkt": 87, "opvolgmomenten": 1, "laatste_actie": "2026-05-01", "status": "oranje"}
+    ],
+    "hitl_samenvatting": {
+      "deze_maand_goedgekeurd": 152,
+      "deze_maand_geweigerd": 3,
+      "wachttijd_gemiddeld": "2.4 uur"
+    },
+    "kpi_koppeling": {
+      "opvolging_binnen_24u": "Gem. responstijd",
+      "gemiste_kansen": "Verwerkte items",
+      "conversie": "Nauwkeurigheid"
+    },
+    "checkin_historie": [
+      {"datum": "2026-05-05", "type": "wekelijkse check-in", "notities": "Alles op koers. Facturatie-automatisering loopt soepel.", "status": "groen"},
+      {"datum": "2026-04-28", "type": "wekelijkse check-in", "notities": "Lichte toename in support tickets, team ingepland.", "status": "groen"},
+      {"datum": "2026-04-21", "type": "wekelijkse check-in", "notities": "Lead opvolging geoptimaliseerd, responstijd omlaag.", "status": "groen"},
+      {"datum": "2026-04-14", "type": "wekelijkse check-in", "notities": "Nieuwe KPI-koppeling ingesteld voor rapportage.", "status": "oranje"}
+    ]
+  },
   "periodes": {
     "Mei 2026": {
       "laatste_update": "2026-05-03",

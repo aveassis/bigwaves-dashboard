@@ -16,9 +16,10 @@ st.set_page_config(
 )
 
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
-# Accentkleur via aparte mini-style
-accent = data.get("accent_kleur", "#10b981") if "data" in dir() else "#10b981"
-st.markdown(f"<style>:root{{--primary:{accent};--primary-glow:rgba(16,185,129,0.15);--primary-light:rgba(16,185,129,0.1);}}</style>", unsafe_allow_html=True)
+st.markdown(f"<style>:root{{--primary:#10b981;--primary-glow:rgba(16,185,129,0.15);--primary-light:rgba(16,185,129,0.1);}}</style>", unsafe_allow_html=True)
+
+# GroeiTeam UI — import na set_page_config (Streamlit Cloud fix)
+from groei_team_ui import render_pakket_badge, GROEI_TEAM_CSS
 st.markdown("""<style>
 :root {
 --bg: #0f1117;
@@ -213,6 +214,16 @@ with st.sidebar:
     if gh is not None:
         st.markdown(f'<div class="health-badge"><span class="health-dot" style="background:{"#10b981" if gh>=70 else "#f59e0b" if gh>=40 else "#ef4444"}"></span> Groei Health: <strong>{gh}%</strong></div>', unsafe_allow_html=True)
         st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+    # ── GroeiTeam badge in sidebar ──
+    gt = data.get("groei_team", {})
+    if gt:
+        pk = gt.get("pakket", "")
+        hs = gt.get("health_score", 0)
+        if pk:
+            st.markdown('<div class="sidebar-sect">ABONNEMENT</div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">{render_pakket_badge(pk)} <span style="font-size:0.72rem;color:var(--text-muted);">Health: {hs}%</span></div>', unsafe_allow_html=True)
+            st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
 
     # ── Klant sectie ──
     st.markdown('<div class="sidebar-sect">KLANT</div>', unsafe_allow_html=True)
