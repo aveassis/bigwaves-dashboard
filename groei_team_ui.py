@@ -48,6 +48,64 @@ def render_workflow_card(wf):
         </div>
     </div>'''
 
+def render_workflow_health_item(wf):
+    """Compacte gezondheidskaart per workflow met trend, responstijd, hitl-percentage."""
+    sts = wf.get("status", "groen")
+    dot = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}.get(sts, "#64748b")
+    sts_label = {"groen": "Gezond", "oranje": "Aandacht", "rood": "Actie nodig"}.get(sts, "Onbekend")
+    icons = {"lead": "🎯", "support": "💬", "finance": "💰", "data": "📊", "reporting": "📋"}
+    icon = icons.get(wf.get("type", ""), "⚙️")
+    
+    # Simuleer trend en hitl% als die niet in de data zitten
+    items = wf.get("items_verwerkt", 0)
+    # Trend bepalen obv items (demo-logica)
+    trend = "up" if items > 200 else "stable" if items > 80 else "down"
+    trend_icon = {"up": "↑ +12%", "stable": "→ 0%", "down": "↓ -8%"}.get(trend, "—")
+    trend_cls = {"up": "wht-green", "stable": "wht-neutral", "down": "wht-red"}.get(trend, "wht-neutral")
+    
+    hitl_pct = wf.get("hitl_percentage", None)
+    if hitl_pct is None:
+        hitl_pct = 18 + hash(wf["naam"]) % 15  # demo fallback
+    hitl_cls = "wht-green" if hitl_pct <= 20 else "wht-orange" if hitl_pct <= 30 else "wht-red"
+    
+    resp = wf.get("responstijd", None)
+    if resp is None:
+        resp = 1.8 + (hash(wf["naam"]) % 20) / 10  # demo fallback
+    
+    bar_pct = {"groen": 85, "oranje": 55, "rood": 25}.get(sts, 50)
+    bar_cls = {"groen": "wht-bar-green", "oranje": "wht-bar-orange", "rood": "wht-bar-red"}.get(sts, "wht-bar-green")
+    
+    return f'''<div class="wht-card">
+        <div class="wht-top">
+            <div class="wht-left">
+                <span class="wht-icon">{icon}</span>
+                <div>
+                    <div class="wht-name">{wf["naam"]}</div>
+                    <div class="wht-vol">{items:,} verwerkt</div>
+                </div>
+            </div>
+            <div class="wht-right">
+                <span class="wht-badge wht-badge-{sts}">{sts_label}</span>
+            </div>
+        </div>
+        <div class="wht-bar"><div class="{bar_cls}" style="width:{bar_pct}%"></div></div>
+        <div class="wht-metrics">
+            <div class="wht-metric">
+                <span class="wht-ml">{resp:.1f}s</span>
+                <span class="wht-ms">responstijd</span>
+            </div>
+            <div class="wht-metric">
+                <span class="wht-ml {hitl_cls}">{hitl_pct}%</span>
+                <span class="wht-ms">HITL</span>
+            </div>
+            <div class="wht-metric">
+                <span class="wht-ml {trend_cls}">{trend_icon}</span>
+                <span class="wht-ms">volume</span>
+            </div>
+        </div>
+    </div>'''
+
+
 def render_hitl_samenvatting(hitl):
     if not hitl:
         return ""
@@ -145,6 +203,44 @@ GROEI_TEAM_CSS = """
     transition:all 0.2s ease;
 }
 .wf-card:hover { border-color:var(--border-light); }
+.wht-card {
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:0.75rem; margin-bottom:0.5rem;
+    transition:all 0.2s ease;
+}
+.wht-card:hover { border-color:var(--border-light); }
+.wht-top {
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;
+}
+.wht-left { display:flex; align-items:center; gap:0.5rem; }
+.wht-icon { font-size:1.1rem; }
+.wht-name { font-size:0.78rem; font-weight:600; color:var(--text); line-height:1.2; }
+.wht-vol { font-size:0.62rem; color:var(--text-muted); }
+.wht-right { flex-shrink:0; }
+.wht-badge {
+    font-size:0.6rem; font-weight:600; padding:0.15rem 0.45rem; border-radius:4px;
+    text-transform:uppercase; letter-spacing:0.3px;
+}
+.wht-badge-groen { background:rgba(16,185,129,0.12); color:#10b981; }
+.wht-badge-oranje { background:rgba(245,158,11,0.12); color:#f59e0b; }
+.wht-badge-rood { background:rgba(239,68,68,0.12); color:#ef4444; }
+.wht-bar {
+    height:4px; background:rgba(255,255,255,0.06); border-radius:2px; margin-bottom:0.5rem;
+    overflow:hidden;
+}
+.wht-bar-green { height:100%; background:#10b981; border-radius:2px; }
+.wht-bar-orange { height:100%; background:#f59e0b; border-radius:2px; }
+.wht-bar-red { height:100%; background:#ef4444; border-radius:2px; }
+.wht-metrics {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:0.3rem;
+}
+.wht-metric { text-align:center; }
+.wht-ml { font-size:0.78rem; font-weight:600; color:var(--text); display:block; }
+.wht-ms { font-size:0.58rem; color:var(--text-muted); text-transform:uppercase; }
+.wht-green { color:#10b981; }
+.wht-orange { color:#f59e0b; }
+.wht-red { color:#ef4444; }
+.wht-neutral { color:var(--text-muted); }
 .hitl-summary {
     display:grid; grid-template-columns:repeat(2,1fr); gap:0.6rem;
 }

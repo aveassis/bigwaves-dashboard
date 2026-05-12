@@ -8,7 +8,7 @@ from groei_team_ui import (
     PAKKETTEN,
     render_pakket_badge,
     render_health_ring,
-    render_workflow_card,
+    render_workflow_health_item,
     render_hitl_samenvatting,
     render_checkin_item,
     render_roi_card,
@@ -99,7 +99,7 @@ if wf:
     wcols = st.columns(2)
     for i, w in enumerate(wf):
         with wcols[i % 2]:
-            st.markdown(render_workflow_card(w), unsafe_allow_html=True)
+            st.markdown(render_workflow_health_item(w), unsafe_allow_html=True)
 else:
     st.info("Geen workflows geconfigureerd.")
 
