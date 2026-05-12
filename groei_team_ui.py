@@ -59,8 +59,50 @@ def render_hitl_samenvatting(hitl):
         <div class="hitl-stat"><span class="hitl-num">{ratio:.0f}%</span><span class="hitl-lab">accuraatheid</span></div>
         <div class="hitl-stat"><span class="hitl-num">{hitl.get("wachttijd_gemiddeld","—")}</span><span class="hitl-lab">gem. wachttijd</span></div>
     </div>'''
+def render_roi_card(maandprijs, besparing=None, vorige_besparing=None):
+    """Prominente ROI-kaart: kosten vs besparing vs netto winst."""
+    if besparing is None:
+        return ""  # geen data, toon niets
 
-def render_checkin_item(item):
+    netto = besparing - maandprijs
+    rendement = (besparing / maandprijs * 100) if maandprijs > 0 else 0
+    trend_pct = None
+    if vorige_besparing is not None and vorige_besparing > 0:
+        trend_pct = ((besparing - vorige_besparing) / vorige_besparing) * 100
+
+    netto_cls = "roi-positive" if netto >= 0 else "roi-negative"
+    netto_icon = "▲" if netto >= 0 else "▼"
+    trend_cls = "roi-positive" if trend_pct is not None and trend_pct >= 0 else ("roi-negative" if trend_pct is not None else "roi-neutral")
+    trend_icon = "↑" if trend_pct is not None and trend_pct >= 0 else ("↓" if trend_pct is not None else "→")
+    trend_txt = f"{trend_icon} {abs(trend_pct):.0f}% vs vorige maand" if trend_pct is not None else "—"
+
+    return f'''<div class="roi-card">
+    <div class="roi-grid">
+        <div class="roi-item">
+            <div class="roi-label">Investering</div>
+            <div class="roi-value">€{maandprijs:,}</div>
+            <div class="roi-spark">/maand</div>
+        </div>
+        <div class="roi-item">
+            <div class="roi-label">Besparing</div>
+            <div class="roi-value roi-positive">€{besparing:,}</div>
+            <div class="roi-spark">deze maand</div>
+        </div>
+        <div class="roi-item roi-net">
+            <div class="roi-label">Netto resultaat</div>
+            <div class="roi-value {netto_cls}">{netto_icon} €{abs(netto):,}</div>
+            <div class="roi-spark">{rendement:.0f}% rendement</div>
+        </div>
+        <div class="roi-item">
+            <div class="roi-label">Trend</div>
+            <div class="roi-value {trend_cls}">{trend_txt}</div>
+            <div class="roi-spark">besparing</div>
+        </div>
+    </div>
+</div>'''
+
+
+
     sts = item.get("status", "groen")
     dot = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}.get(sts, "#64748b")
     return f'''<div class="checkin-item">
@@ -115,6 +157,40 @@ GROEI_TEAM_CSS = """
 .checkin-item {
     background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm);
     padding:0.7rem; margin-bottom:0.4rem;
+}
+.roi-card {
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:1rem 1.2rem;
+    margin-bottom:1.2rem;
+}
+.roi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+}
+.roi-item { text-align: center; }
+.roi-item .roi-label {
+    font-size:0.62rem; color:var(--text-muted);
+    text-transform:uppercase; letter-spacing:0.5px;
+    margin-bottom:0.15rem;
+}
+.roi-item .roi-value {
+    font-size:1.1rem; font-weight:700; line-height:1.3;
+}
+.roi-item .roi-trend { font-size:0.68rem; margin-top:0.1rem; }
+.roi-positive { color:#10b981; }
+.roi-negative { color:#ef4444; }
+.roi-neutral  { color:var(--text-muted); }
+.roi-net {
+    border-left:1px solid var(--border);
+    padding-left:0.8rem;
+}
+.roi-spark { font-size:0.68rem; color:var(--text-muted); }
+@media (max-width:600px) {
+    .roi-grid { grid-template-columns:repeat(2,1fr); }
+    .roi-net { border-left:none; padding-left:0; }
 }
 .gt-footer {
     text-align:center; margin-top:1.5rem;

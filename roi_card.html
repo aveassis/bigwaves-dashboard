@@ -1,0 +1,49 @@
+<!-- ROI Card template for GroeiTeam page -->
+<style>
+.roi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.2rem;
+}
+.roi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+}
+.roi-item {
+    text-align: center;
+}
+.roi-item .roi-label {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.15rem;
+}
+.roi-item .roi-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+.roi-item .roi-trend {
+    font-size: 0.68rem;
+    margin-top: 0.1rem;
+}
+.roi-positive { color: #10b981; }
+.roi-negative { color: #ef4444; }
+.roi-neutral  { color: var(--text-muted); }
+.roi-net {
+    border-left: 1px solid var(--border);
+    padding-left: 0.8rem;
+}
+.roi-spark {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+}
+@media (max-width: 600px) {
+    .roi-grid { grid-template-columns: repeat(2, 1fr); }
+    .roi-net { border-left: none; padding-left: 0; }
+}
+</style>

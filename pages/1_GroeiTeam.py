@@ -11,6 +11,7 @@ from groei_team_ui import (
     render_workflow_card,
     render_hitl_samenvatting,
     render_checkin_item,
+    render_roi_card,
     GROEI_TEAM_CSS,
 )
 
@@ -48,6 +49,28 @@ st.markdown(f"""
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# ─── ROI Counter ────────────────────────────────────────────
+kosten_besparing = next(
+    (p["kpis"]["Kostenbesparing"]["waarde"] for p in data.get("periodes", {}).values()
+     if "Kostenbesparing" in p.get("kpis", {})),
+    None
+)
+vorige_besparing = None
+periodes = data.get("periodes", {})
+periodenamen = sorted(periodes.keys(), reverse=True)
+if len(periodenamen) >= 2:
+    vorige = periodes[periodenamen[1]]
+    vorige_besparing = vorige.get("kpis", {}).get("Kostenbesparing", {}).get("waarde", None)
+
+st.markdown(
+    render_roi_card(
+        maandprijs=cfg["prijs_maand"],
+        besparing=kosten_besparing,
+        vorige_besparing=vorige_besparing,
+    ),
+    unsafe_allow_html=True,
+)
 
 # ─── Snelle stats ─────────────────────────────────────────
 col1, col2, col3, col4, col5 = st.columns(5)
