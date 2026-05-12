@@ -102,7 +102,7 @@ def render_roi_card(maandprijs, besparing=None, vorige_besparing=None):
 </div>'''
 
 
-
+def render_checkin_item(item):
     sts = item.get("status", "groen")
     dot = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}.get(sts, "#64748b")
     return f'''<div class="checkin-item">
