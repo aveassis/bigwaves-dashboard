@@ -205,7 +205,21 @@ with st.sidebar:
     st.page_link("dashboard.py", label="📊  Dashboard", use_container_width=True)
     st.page_link("pages/1_GroeiTeam.py", label="📈  GroeiTeam", use_container_width=True)
     st.page_link("pages/2_HITL.py", label="👤  HITL", use_container_width=True)
-    st.page_link("pages/3_LinkedIn.py", label="🔗  LinkedIn Outreach", use_container_width=True)
+
+    # ── LinkedIn — alleen voor Pro klanten ──
+    gt = data.get("groei_team", {})
+    linkedin_pakket = gt.get("pakket", "")
+    if linkedin_pakket == "Pro":
+        st.page_link("pages/3_LinkedIn.py", label="🔗  LinkedIn Outreach", use_container_width=True)
+    else:
+        st.markdown(
+            '<a href="/LinkedIn_Outreach" style="display:block;padding:0.2rem 0.5rem;'
+            'font-size:0.82rem;color:var(--text-muted);text-decoration:none;border-radius:6px;'
+            'border:1px dashed var(--border);text-align:center;">'
+            '🔗 LinkedIn — <span style="color:var(--primary);">Upgrade naar Pro</span></a>',
+            unsafe_allow_html=True
+        )
+
     st.page_link("pages/4_Admin.py", label="🔐  Admin", use_container_width=True)
     st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
 
