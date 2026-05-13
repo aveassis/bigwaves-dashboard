@@ -6,8 +6,8 @@ import sqlite3
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
 from groei_team_ui import (
-    render_health_ring, render_pakket_badge, render_workflow_card,
-    render_hitl_samenvatting, bereken_health_score, GROEI_TEAM_CSS
+    render_health_ring, render_pakket_badge, render_workflow_health_item,
+    render_roi_card, render_hitl_samenvatting, bereken_health_score, GROEI_TEAM_CSS
 )
 
 # Geen set_page_config hier — overgenomen van dashboard.py
@@ -72,6 +72,27 @@ with cols[2]:
 
 st.markdown("<hr class='gt-divider'>", unsafe_allow_html=True)
 
+# ─── ROI Counter ────────────────────────────────────────────
+periodes = data.get("periodes", {})
+kosten_besparing = next(
+    (p.get("kosten_besparing", 0) for p in periodes.values()
+     if isinstance(p, dict)),
+    0
+)
+periodenamen = sorted([k for k in periodes.keys() if periodes[k]], reverse=True)
+vorige_besparing = None
+if len(periodenamen) >= 2 and isinstance(periodes.get(periodenamen[1]), dict):
+    vorige_besparing = periodes[periodenamen[1]].get("kosten_besparing", None)
+
+st.markdown(
+    render_roi_card(
+        maandprijs=gt.get("prijs", {}).get("maand", 2499),
+        besparing=kosten_besparing,
+        vorige_besparing=vorige_besparing,
+    ),
+    unsafe_allow_html=True,
+)
+
 # === WORKFLOWS ===
 st.markdown("<div class='gt-section-title'>&#9881;&#65039; Actieve Workflows</div>", unsafe_allow_html=True)
 workflows = gt.get("workflows", [])
@@ -79,7 +100,7 @@ if workflows:
     wf_cols = st.columns(min(len(workflows), 3))
     for i, wf in enumerate(workflows):
         with wf_cols[i % len(wf_cols)]:
-            st.markdown(render_workflow_card(wf), unsafe_allow_html=True)
+            st.markdown(render_workflow_health_item(wf), unsafe_allow_html=True)
 else:
     st.info("Nog geen workflows ingesteld. Neem contact op met je accountmanager.")
 
