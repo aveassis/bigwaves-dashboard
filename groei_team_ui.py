@@ -1,3 +1,4 @@
+
 # groei_team_ui.py — GroeiTeam UI componenten voor Streamlit dashboard
 import streamlit as st
 from datetime import datetime, date
@@ -144,6 +145,77 @@ GROEI_TEAM_CSS = """
     transition: all 0.2s ease;
 }
 .wf-card:hover { border-color: var(--border-light); transform: translateY(-1px); }
+.wht-card {                                                                                                                             
+         background:var(--card); border:1px solid var(--border); border-radius:var(--radius-sm);                                             
+         padding:0.75rem; margin-bottom:0.5rem;                                                                                              
+         transition:all 0.2s ease;                                                                                                           
+     }                                                                                                                                       
+     .wht-card:hover { border-color:var(--border-light); }                                                                                   
+     .wht-top {                                                                                                                              
+         display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;                                              
+     }                                                                                                                                       
+     .wht-left { display:flex; align-items:center; gap:0.5rem; }                                                                             
+     .wht-icon { font-size:1.1rem; }                                                                                                         
+     .wht-name { font-size:0.78rem; font-weight:600; color:var(--text); line-height:1.2; }                                                   
+     .wht-vol { font-size:0.62rem; color:var(--text-muted); }                                                                                
+     .wht-right { flex-shrink:0; }                                                                                                           
+     .wht-badge {                                                                                                                            
+         font-size:0.6rem; font-weight:600; padding:0.15rem 0.45rem; border-radius:4px;                                                      
+         text-transform:uppercase; letter-spacing:0.3px;                                                                                     
+     }                                                                                                                                       
+     .wht-badge-groen { background:rgba(16,185,129,0.12); color:#10b981; }                                                                   
+     .wht-badge-oranje { background:rgba(245,158,11,0.12); color:#f59e0b; }                                                                  
+     .wht-badge-rood { background:rgba(239,68,68,0.12); color:#ef4444; }                                                                     
+     .wht-bar {                                                                                                                              
+         height:4px; background:rgba(255,255,255,0.06); border-radius:2px; margin-bottom:0.5rem;                                             
+         overflow:hidden;                                                                                                                    
+     }                                                                                                                                       
+     .wht-bar-green { height:100%; background:#10b981; border-radius:2px; }                                                                  
+     .wht-bar-orange { height:100%; background:#f59e0b; border-radius:2px; }                                                                 
+     .wht-bar-red { height:100%; background:#ef4444; border-radius:2px; }                                                                    
+     .wht-metrics {                                                                                                                          
+         display:grid; grid-template-columns:repeat(3,1fr); gap:0.3rem;                                                                      
+     }                                                                                                                                       
+     .wht-metric { text-align:center; }                                                                                                      
+     .wht-ml { font-size:0.78rem; font-weight:600; color:var(--text); display:block; }                                                       
+     .wht-ms { font-size:0.58rem; color:var(--text-muted); text-transform:uppercase; }                                                       
+     .wht-green { color:#10b981; }                                                                                                           
+     .wht-orange { color:#f59e0b; }                                                                                                          
+     .wht-red { color:#ef4444; }                                                                                                             
+     .wht-neutral { color:var(--text-muted); }                                                                                               
+     .roi-card {                                                                                                                             
+         background:var(--card);                                                                                                             
+         border:1px solid var(--border);                                                                                                     
+         border-radius:var(--radius);                                                                                                        
+         padding:1rem 1.2rem;                                                                                                                
+         margin-bottom:1.2rem;                                                                                                               
+     }                                                                                                                                       
+     .roi-grid {                                                                                                                             
+         display: grid;                                                                                                                      
+         grid-template-columns: repeat(4, 1fr);                                                                                              
+         gap: 0.8rem;                                                                                                                        
+     }                                                                                                                                       
+     .roi-item { text-align: center; }                                                                                                       
+     .roi-item .roi-label {                                                                                                                  
+         font-size:0.62rem; color:var(--text-muted);                                                                                         
+         text-transform:uppercase; letter-spacing:0.5px;                                                                                     
+         margin-bottom:0.15rem;                                                                                                              
+     }                                                                                                                                       
+     .roi-item .roi-value {                                                                                                                  
+         font-size:1.1rem; font-weight:700; line-height:1.3;                                                                                 
+     }                                                                                                                                       
+     .roi-positive { color:#10b981; }                                                                                                        
+     .roi-negative { color:#ef4444; }                                                                                                        
+     .roi-neutral  { color:var(--text-muted); }                                                                                              
+     .roi-net {                                                                                                                              
+         border-left:1px solid var(--border);                                                                                                
+         padding-left:0.8rem;                                                                                                                
+     }                                                                                                                                       
+     .roi-spark { font-size:0.68rem; color:var(--text-muted); }                                                                              
+     @media (max-width:600px) {                                                                                                              
+         .roi-grid { grid-template-columns:repeat(2,1fr); }                                                                                  
+         .roi-net { border-left:none; padding-left:0; }                                                                                      
+     }
 .wf-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .wf-icon { font-size: 1.1rem; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(16,185,129,0.1); border-radius: 8px; }
 .wf-name { font-size: 0.85rem; font-weight: 600; color: var(--text); flex: 1; }
