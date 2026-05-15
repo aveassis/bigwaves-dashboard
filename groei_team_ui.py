@@ -4,6 +4,15 @@ import streamlit as st
 from datetime import datetime, date
 import json
 
+# ─── Pakket configuratie ───────────────────────────────
+PAKKETTEN = {
+    "Pilot": {"prijs": 0, "setup": 0, "workflows": 1, "label": "Gratis, 2 weken"},
+    "Start": {"prijs": 997, "setup": 2500, "workflows": 1, "label": "€997/maand"},
+    "Groei": {"prijs": 1497, "setup": 2500, "workflows": 2, "label": "€1.497/maand"},
+    "Pro": {"prijs": 2499, "setup": 2500, "workflows": 5, "label": "€2.499/maand"},
+}
+PAKKET_KLEUREN = {"Pilot": "#64748b", "Start": "#10b981", "Groei": "#f59e0b", "Pro": "#8b5cf6"}
+
 def render_health_ring(score: int) -> str:
     """Genereer HTML voor een SVG health ring (donut chart)."""
     pct = min(score, 100)
@@ -12,7 +21,7 @@ def render_health_ring(score: int) -> str:
     omtrek = 2 * 3.14159 * straal
     offset = omtrek - (pct / 100) * omtrek
     return f"""
-    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+    return f"""<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">"""
         <svg width="90" height="90" viewBox="0 0 90 90">
             <circle cx="45" cy="45" r="{straal}" fill="none" stroke="#2a2e3d" stroke-width="6"/>
             <circle cx="45" cy="45" r="{straal}" fill="none" stroke="{kleur}" stroke-width="6"
@@ -26,16 +35,20 @@ def render_health_ring(score: int) -> str:
     </div>
     """
 
-def render_pakket_badge(pakket: str) -> str:
+def render_pakket_badge(pakket: str, groot: bool = False) -> str:
     """Genereer HTML voor een pakket badge."""
     kleuren = {
         "Pilot": "#8b5cf6",
         "Start": "#3b82f6",
         "Groei": "#f59e0b",
-        "Pro": "#10b981"
+        "Pro": "#10b981",
+        "Basic": "#64748b",
     }
     k = kleuren.get(pakket, "#64748b")
-    return f'<span style="background:{k}20;color:{k};border:1px solid {k}40;border-radius:6px;padding:2px 10px;font-size:0.75rem;font-weight:600;">{pakket}</span>'
+    size = "0.85rem;padding:4px 14px" if groot else "0.75rem;padding:2px 10px"
+    return f'<span style="background:{k}20;color:{k};border:1px solid {k}40;border-radius:6px;font-size:{size};font-weight:600;">{pakket}</span>'
+    size = "0.85rem;padding:4px 14px" if groot else "0.75rem;padding:2px 10px"
+    return f'<span style="background:{k}20;color:{k};border:1px solid {k}40;border-radius:6px;font-size:{size};font-weight:600;">{pakket}</span>'
 
 
 def render_workflow_card(wf: dict) -> str:
@@ -121,7 +134,7 @@ def bereken_health_score(data: dict) -> int:
             pass
 
     # Check KPI statussen
-    if periodes:
+if periodes:
         huidige = list(periodes.keys())[-1] if periodes else None
         if huidige:
             for kpi, info in periodes[huidige].get("kpis", {}).items():
@@ -131,6 +144,91 @@ def bereken_health_score(data: dict) -> int:
                     score -= 5
 
     return max(0, min(100, score))
+
+
+def render_workflow_health_item(wf: dict) -> str:
+    s = wf.get("status", "onbekend")
+    kleur = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}.get(s, "#64748b")
+    icoon = {"groen": "🟢", "oranje": "🟠", "rood": "🔴"}.get(s, "⚪")
+    return f"""<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
+        <span>{icoon}</span>
+        <span style="color:var(--text);flex:1;">{wf.get('naam','Workflow')}</span>
+        <span style="color:{kleur};font-weight:600;">{wf.get('volume',0)}</span>
+    </div>"""
+
+
+def render_checkin_item(ch: dict) -> str:
+    s = ch.get("status", "groen")
+    cls = "timeline-item"
+    if s == "oranje": cls += " amber"
+    elif s == "rood": cls += " red"
+    icoon = {"groen": "🟢", "oranje": "🟠", "rood": "🔴"}.get(s, "⚪")
+    return f"""<div class="{cls}">
+        <div style="display:flex;justify-content:space-between">
+            <strong style="color:var(--text)">{ch.get('datum','')}</strong>
+            <span>{icoon} {s.title()}</span>
+        </div>
+        <div style="font-size:0.78rem;color:var(--text-sec);margin-top:4px">{ch.get('notitie','')}</div>
+    </div>"""
+
+
+def render_roi_card(data: dict) -> str:
+    gt = data.get("groei_team", {})
+    kosten = gt.get("maandprijs", 997)
+    besparing = data.get("kosten_besparing", 0)
+    if not besparing:
+        return ""
+    roi = round((besparing - kosten) / kosten * 100) if kosten > 0 else 0
+    kleur = "#10b981" if roi >= 100 else "#f59e0b" if roi >= 50 else "#ef4444"
+    return f"""<div class="insight-card" style="margin-top:0.6rem;text-align:center">
+        <div class="label">💰 ROI</div>
+        <div class="big-number" style="color:{kleur}">{roi}%</div>
+        <div style="font-size:0.72rem;color:var(--text-sec)">€{besparing:,} bespaard · €{kosten} kosten</div>
+    </div>"""
+
+
+# CSS voor GroeiTeam componenten
+GROEI_TEAM_CSS = """
+    s = wf.get("status", "onbekend")
+    kleur = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}.get(s, "#64748b")
+    icoon = {"groen": "🟢", "oranje": "🟠", "rood": "🔴"}.get(s, "⚪")
+    return f"""<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
+        <span>{icoon}</span>
+        <span style="color:var(--text);flex:1;">{wf.get('naam','Workflow')}</span>
+        <span style="color:{kleur};font-weight:600;">{wf.get('volume',0)}</span>
+    </div>"""
+
+
+def render_checkin_item(ch: dict) -> str:
+    """Genereer HTML voor een check-in item in de timeline."""
+    s = ch.get("status", "groen")
+    cls = "timeline-item"
+    if s == "oranje": cls += " amber"
+    elif s == "rood": cls += " red"
+    icoon = {"groen": "🟢", "oranje": "🟠", "rood": "🔴"}.get(s, "⚪")
+    return f"""<div class="{cls}">
+        <div style="display:flex;justify-content:space-between">
+            <strong style="color:var(--text)">{ch.get('datum','')}</strong>
+            <span>{icoon} {s.title()}</span>
+        </div>
+        <div style="font-size:0.78rem;color:var(--text-sec);margin-top:4px">{ch.get('notitie','')}</div>
+    </div>"""
+
+
+def render_roi_card(data: dict) -> str:
+    """Genereer HTML voor een ROI samenvatting."""
+    gt = data.get("groei_team", {})
+    kosten = gt.get("maandprijs", 997)
+    besparing = data.get("kosten_besparing", 0)
+    if not besparing:
+        return ""
+    roi = round((besparing - kosten) / kosten * 100) if kosten > 0 else 0
+    kleur = "#10b981" if roi >= 100 else "#f59e0b" if roi >= 50 else "#ef4444"
+    return f"""<div class="insight-card" style="margin-top:0.6rem;text-align:center">
+        <div class="label">💰 ROI</div>
+        <div class="big-number" style="color:{kleur}">{roi}%</div>
+        <div style="font-size:0.72rem;color:var(--text-sec)">€{besparing:,} bespaard · €{kosten} kosten</div>
+    </div>"""
 
 
 # CSS voor GroeiTeam componenten

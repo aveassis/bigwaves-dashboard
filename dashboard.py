@@ -9,11 +9,22 @@ from pdf_export import genereer_pdf
 
 DATA_DIR = Path(__file__).parent / "data"
 st.set_page_config(
-    page_title="BigWaves Performance Dashboard",
+    page_title="BigWaves Conversiebureau",
     page_icon="🌊",
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+# Detect mobiel via JavaScript — sluit sidebar in als small screen
+st.markdown("""<script>
+if (window.innerWidth < 768) {
+    const sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
+    if (sidebar) {
+        const btn = parent.document.querySelector('[data-testid="stSidebarCollapsedControl"]');
+        if (btn) btn.click();
+    }
+}
+</script>""", unsafe_allow_html=True)
 
 from groei_team_ui import render_pakket_badge, GROEI_TEAM_CSS
 
@@ -59,10 +70,13 @@ section[data-testid="stSidebar"] { background: var(--surface) !important; border
 #MainMenu { visibility: hidden !important; }
 footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
-div[data-testid="stSidebarCollapsedControl"] { display: none !important; }
-button[title*="sidebar"] { display: none !important; }
-button[aria-label*="sidebar"] { display: none !important; }
-[data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
+/* Sidebar collapse — verborgen op desktop, zichtbaar op mobiel */
+@media screen and (min-width: 769px) {
+    div[data-testid="stSidebarCollapsedControl"] { display: none !important; }
+    button[title*="sidebar"] { display: none !important; }
+    button[aria-label*="sidebar"] { display: none !important; }
+    [data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
+}
 
 /* KPI card styling */
 .kpi-box {
@@ -110,6 +124,29 @@ button[aria-label*="sidebar"] { display: none !important; }
 .kpi-vs { font-size: 0.72rem; color: var(--text-sec); margin: 2px 0; }
 .kpi-vs-label { color: var(--text-muted); font-size: 0.65rem; }
 .kpi-vs-diff { font-weight: 600; color: var(--primary); }
+
+/* ─── Responsive — Mobiel & Tablet ────────────────── */
+@media screen and (max-width: 768px) {
+    .main > div { padding: 0.6rem 0.8rem !important; }
+    section[data-testid="stSidebar"] { min-width: 100% !important; max-width: 100% !important; }
+    .stApp h1 { font-size: 1.1rem !important; }
+    .stApp h2 { font-size: 0.95rem !important; }
+    .kpi-val { font-size: 1.2rem !important; }
+    .kpi-box { padding: 0.8rem 1rem !important; }
+    div[data-testid="column"] { min-width: 45% !important; flex: 1 1 45% !important; }
+    div.stButton button { font-size: 0.78rem !important; padding: 0.3rem 0.6rem !important; }
+}
+@media screen and (max-width: 480px) {
+    .main > div { padding: 0.4rem 0.5rem !important; }
+    .stApp h1 { font-size: 1rem !important; }
+    .stApp h2 { font-size: 0.85rem !important; }
+    .kpi-val { font-size: 1rem !important; }
+    .kpi-box { padding: 0.6rem 0.8rem !important; }
+    .kpi-icon { width: 30px; height: 30px; font-size: 0.9rem; }
+    div[data-testid="column"] { min-width: 100% !important; flex: 1 1 100% !important; }
+    .insight-card { padding: 0.8rem !important; }
+    .big-number { font-size: 1.4rem !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -134,6 +171,9 @@ def login_screen():
     header[data-testid="stHeader"] { display: none !important; }
     div[data-testid="stToolbar"] { display: none !important; }
     section.main { margin-left: 0 !important; }
+    @media screen and (max-width: 768px) {
+        .main > div { padding: 0.6rem 0.8rem !important; }
+    }
     </style>
     """, unsafe_allow_html=True)
     st.markdown('<div class="login-box">', unsafe_allow_html=True)
@@ -230,6 +270,7 @@ with st.sidebar:
     st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
     st.markdown('<div class="sidebar-sec">Main</div>', unsafe_allow_html=True)
     st.page_link("dashboard.py", label="📊  Dashboard", width="stretch")
+    st.page_link("pages/1_Inzichten.py", label="📈  Inzichten", width="stretch")
     # LinkedIn Outreach alleen voor Pro pakket
     pakket_naam = gt.get("pakket", "") if gt else ""
     if pakket_naam == "Pro":
@@ -328,16 +369,33 @@ if st.session_state.get("show_mail_input", False):
                     part = MIMEBase("application", "octet-stream")
                     part.set_payload(pb.getvalue())
                     encoders.encode_base64(part)
-                    part.add_header("Content-Disposition", f"attachment; filename=BigWaves_{data['naam'].replace(' ','_')}.pdf")
-                    msg.attach(part)
-                    st.success(f"✅ PDF verstuurd naar {mail_adres}")
-                except Exception as e:
-                    st.error(f"Fout bij versturen: {e}")
-                    st.info("Tip: SMTP configuratie nodig. Ik kan een mailserver voor je instellen.")
-            else:
-                st.warning("Voer een geldig e-mailadres in.")
-with bcols[2]:
-    if st.button("📊 CSV", type="secondary", width="stretch"):
+# ─── Knoppen over volle breedte ──────────────────────────
+bcols = st.columns([1, 1, 1])
+with bcols[0]:
+    if st.button("📄 PDF", type="secondary", use_container_width=True):
+        try:
+            st.session_state["pdf_data"] = genereer_pdf(data)
+        except Exception as e:
+            st.error(f"Fout: {e}")
+    if st.session_state.get("pdf_data"):
+        st.download_button(
+            "📥 Download PDF",
+            st.session_state["pdf_data"],
+# ─── Knoppen over volle breedte ──────────────────────────
+bcols = st.columns([1, 1, 1])
+with bcols[0]:
+    if st.button("📄 PDF", type="secondary", use_container_width=True):
+        try:
+            st.session_state["pdf_data"] = genereer_pdf(data)
+        except Exception as e:
+            st.error(f"Fout: {e}")
+    if st.session_state.get("pdf_data"):
+        st.download_button("📥 Download PDF", st.session_state["pdf_data"], file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf", mime="application/pdf", use_container_width=True, key="pdf_dl")
+        if st.button("✕ Sluit", key="pdf_close", use_container_width=True):
+            del st.session_state["pdf_data"]
+            st.rerun()
+with bcols[1]:
+    if st.button("📊 CSV", type="secondary", use_container_width=True):
         import csv, io
         kd = data.get("kpis", {})
         if kd:
@@ -347,7 +405,24 @@ with bcols[2]:
             for nm, inf in kd.items():
                 w.writerow([nm, inf.get("waarde",""), inf.get("doel",""), inf.get("trend","")])
             csv_str = buf.getvalue()
-            st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}.csv", "text/csv", width="stretch")
+            st.session_state["csv_data"] = csv_str
+    if st.session_state.get("csv_data"):
+        st.download_button("📥 Download CSV", st.session_state["csv_data"], file_name=f"BigWaves_{data['naam'].replace(' ','_')}.csv", mime="text/csv", use_container_width=True, key="csv_dl")
+        if st.button("✕ Sluit", key="csv_close", use_container_width=True):
+            del st.session_state["csv_data"]
+            st.rerun()
+with bcols[2]:
+        st.download_button(
+            "📥 Download CSV",
+            st.session_state["csv_data"],
+            file_name=f"BigWaves_{data['naam'].replace(' ','_')}.csv",
+            mime="text/csv",
+            use_container_width=True,
+            key="csv_dl"
+        )
+        if st.button("✕ Sluit", key="csv_close", use_container_width=True):
+            del st.session_state["csv_data"]
+            st.rerun()
 with bcols[3]:
     # Notificaties genereren uit data
     alerts = []
@@ -407,7 +482,8 @@ def tc(t):
     return "neutral"
 
 if kpis:
-    kpi_cols = st.columns(4)
+    kpi_ncols = 2 if st.session_state.get("mobile", False) else 4
+    kpi_cols = st.columns(kpi_ncols)
     colors = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}
     for i, (kpi, info) in enumerate(list(kpis.items())[:4]):
         # Bepaal status op basis van drempelwaarden
@@ -507,21 +583,32 @@ if bn and bn.get("tekst"):
     p=bn.get("prioriteit","laag")
     st.markdown(f"""<div class="bn-card {p}"><strong>🔍 Bottleneck-analyse</strong> <span class="s-badge {'grn' if p=='laag' else 'org' if p=='medium' else 'red'}">{p.upper()} PRIORITEIT</span><br>{bn['tekst']}</div>""", unsafe_allow_html=True)
 
-# ─── HITL + Kosten in 2 kolommen ────────────────────────
+# ─── Inzichten + Kosten in 2 kolommen ────────────────────
 cl,cr=st.columns([1,1])
 with cl:
-    hitl=data.get("hitl_detail")
-    if hitl:
-        st.markdown('<div class="sec-head">👤 Human In The Loop</div>', unsafe_allow_html=True)
-        hr=data.get("kpis",{}).get("HITL-ratio",{}).get("waarde",0)
-        hc=st.columns(4)
-        with hc[0]: st.metric("Totaal",f"{hitl['totaal_acties']:,}")
-        with hc[1]: st.metric("👤 Check",f"{hitl['menselijke_check']:,}")
-        with hc[2]: st.metric("🤖 Auto",f"{hitl['geautomatiseerd']:,}")
-        with hc[3]: st.metric("⏱ Uren",f"{hitl['bespaarde_uren']}u")
-        st.progress(min(int(hr)/100,1.0))
-        st.caption(f"HITL-ratio: {hr}% — {'✅ onder doel' if hr<=data.get('kpis',{}).get('HITL-ratio',{}).get('doel',100) else '⚠️ boven doel'}")
-        st.caption("👤 Bekijk HITL-detailpagina voor uitsplitsing per categorie.")
+    st.markdown('<div class="sec-head">📈 Inzichten</div>', unsafe_allow_html=True)
+    # Voortgang check-in
+    gt_local = data.get("groei_team", {})
+    checkins_local = gt_local.get("checkin_historie", []) if gt_local else []
+    if checkins_local:
+        laatste = checkins_local[0]
+        s = laatste.get("status", "groen")
+        c = "#10b981" if s == "groen" else "#f59e0b" if s == "oranje" else "#ef4444"
+        st.markdown(
+            f'<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.8rem 1rem;">'
+            f'<div style="font-size:0.72rem;color:var(--text-muted);">Laatste check-in ({laatste.get("datum","")})</div>'
+            f'<div style="font-size:0.82rem;color:var(--text);margin-top:4px;">{laatste.get("notities","")}</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    # Kostenbesparing
+    if data.get("kosten_besparing"):
+        st.metric(
+            "Kostenbesparing",
+            f"€{data['kosten_besparing']:,}",
+            delta=f"+{data['kosten_besparing'] - data.get('doelen_vorige_maand',{}).get('kosten_besparing',0):,}"
+        )
+    st.caption("📈 Bekijk alle inzichten op de Inzichten-pagina.")
 with cr:
     if data.get("kosten_besparing"):
         st.markdown('<div class="sec-head">💰 Kostenbesparing</div>', unsafe_allow_html=True)
