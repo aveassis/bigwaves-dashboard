@@ -30,8 +30,7 @@ def lege_periode():
         "kosten_besparing": 0,
         "doelen_vorige_maand": {"kosten_besparing": 0},
         "grafieken": {},
-        "bottleneck": {"tekst": "Geen knelpunten.", "prioriteit": "laag"},
-        "hitl_detail": {"totaal_acties": 0, "menselijke_check": 0, "geautomatiseerd": 0, "bespaarde_uren": 0, "categorieen": {}}
+        "bottleneck": {"tekst": "Geen knelpunten.", "prioriteit": "laag"}
     }
 
 def lege_klant(naam, ww):
@@ -360,7 +359,6 @@ elif tab == "✏️ Bewerken":
     pd.setdefault("kpis", {})
     pd.setdefault("grafieken", {})
     pd.setdefault("bottleneck", {"tekst": "", "prioriteit": "laag"})
-    pd.setdefault("hitl_detail", {"totaal_acties": 0, "menselijke_check": 0, "geautomatiseerd": 0, "bespaarde_uren": 0, "categorieen": {}})
     pd.setdefault("kosten_besparing", 0)
     pd.setdefault("doelen_vorige_maand", {"kosten_besparing": 0})
 
@@ -453,38 +451,6 @@ elif tab == "✏️ Bewerken":
                 }
                 st.rerun()
             except: st.error("Ongeldige waarden.")
-
-    # ─── HITL Detail ────────────────────────────────────────
-    st.markdown(f'<div class="admin-sectie">👤 HITL Detail — {gekozen_periode}</div>', unsafe_allow_html=True)
-    hitl = pd["hitl_detail"]
-    c1, c2, c3, c4 = st.columns(4)
-    with c1: hitl["totaal_acties"] = st.number_input("Totaal acties", value=int(hitl.get("totaal_acties",0)), key=f"ht_{nm}_{gekozen_periode}")
-    with c2: hitl["menselijke_check"] = st.number_input("Menselijke checks", value=int(hitl.get("menselijke_check",0)), key=f"hm_{nm}_{gekozen_periode}")
-    with c3: hitl["geautomatiseerd"] = st.number_input("Geautomatiseerd", value=int(hitl.get("geautomatiseerd",0)), key=f"ha_{nm}_{gekozen_periode}")
-    with c4: hitl["bespaarde_uren"] = st.number_input("Bespaarde uren", value=float(hitl.get("bespaarde_uren",0)), key=f"hu_{nm}_{gekozen_periode}")
-
-    st.markdown('<div class="admin-label">Categorieën</div>', unsafe_allow_html=True)
-    cats = hitl.setdefault("categorieen", {})
-    for cat_name in list(cats.keys()):
-        ci = cats[cat_name]
-        c1, c2, c3 = st.columns([2, 1, 1])
-        with c1: st.markdown(f"**{cat_name}**")
-        with c2: ci["totaal"] = st.number_input("Totaal", value=int(ci.get("totaal",0)), key=f"hct_{nm}_{cat_name}", label_visibility="collapsed")
-        with c3: ci["hitl"] = st.number_input("HITL", value=int(ci.get("hitl",0)), key=f"hch_{nm}_{cat_name}", label_visibility="collapsed")
-        ci["percentage"] = round(ci["hitl"] / ci["totaal"] * 100, 0) if ci["totaal"] else 0
-        if st.button("✕", key=f"cat_del_{nm}_{cat_name}"):
-            del cats[cat_name]
-            st.rerun()
-
-    with st.expander("➕ Categorie toevoegen"):
-        c1, c2, c3 = st.columns(3)
-        with c1: nc_naam = st.text_input("Naam", key=f"nc_name_{nm}_{gekozen_periode}", placeholder="Klantinteractie")
-        with c2: nc_totaal = st.number_input("Totaal", value=0, key=f"nc_tot_{nm}_{gekozen_periode}")
-        with c3: nc_hitl = st.number_input("HITL", value=0, key=f"nc_hitl_{nm}_{gekozen_periode}")
-        if st.button("✅ Toevoegen", key=f"add_cat_{nm}") and nc_naam:
-            pct = round(nc_hitl / nc_totaal * 100, 0) if nc_totaal else 0
-            cats[nc_naam] = {"totaal": nc_totaal, "hitl": nc_hitl, "percentage": pct}
-            st.rerun()
 
     # ─── Kosten en bottleneck ──────────────────────────────
     st.markdown(f'<div class="admin-sectie">💰 Kosten & Bottleneck — {gekozen_periode}</div>', unsafe_allow_html=True)
