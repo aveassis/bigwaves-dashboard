@@ -1,18 +1,11 @@
 {
-  "naam": "Demo Klant B.V.",
+  "naam": "Pro Klant B.V.",
   "logo": "🌊",
-  "accent_kleur": "#10b981",
-  "wachtwoord": "demo",
+  "accent_kleur": "#8b5cf6",
+  "wachtwoord": "pro",
   "groei_team": {
     "pakket": "Pro",
     "sinds": "2026-03-01",
-     "prijs": {                                                                                                                              
-       "huidig": 2499,                                                                                                                       
-       "eenheid": "maand",                                                                                                                   
-       "setup": 2500,                                                                                                                        
-       "jaar": 24990,                                                                                                                        
-       "workflows": 5                                                                                                                        
-     },
     "status": "actief",
     "contact_frequentie": "wekelijks",
     "laatste_checkin": "2026-04-28",
@@ -49,37 +42,11 @@
       "conversie": "Nauwkeurigheid"
     },
     "checkin_historie": [
-      {
-        "datum": "2026-04-28",
-        "type": "wekelijkse check-in",
-        "notities": "Lead opvolging loopt goed. KPI's op groen.",
-        "status": "groen"
-      },
-      {
-        "datum": "2026-04-21",
-        "type": "wekelijkse check-in",
-        "notities": "Nieuwe workflow kandidaatopvolging gestart.",
-        "status": "groen"
-      },
-      {
-        "datum": "2026-04-14",
-        "type": "wekelijkse check-in",
-        "notities": "Kostenbesparing zichtbaar. Doel €3.000 gehaald.",
-        "status": "groen"
-      },
-      {
-        "datum": "2026-04-07",
-        "type": "wekelijkse check-in",
-        "notities": "Eerste check-in. Workflows draaien stabiel.",
-        "status": "groen"
-      }
+      {"datum": "2026-04-28", "type": "wekelijkse check-in", "notities": "Lead opvolging loopt goed. KPI's op groen.", "status": "groen"},
+      {"datum": "2026-04-21", "type": "wekelijkse check-in", "notities": "Nieuwe workflow kandidaatopvolging gestart.", "status": "groen"},
+      {"datum": "2026-04-14", "type": "wekelijkse check-in", "notities": "Kostenbesparing zichtbaar. Doel €3.000 gehaald.", "status": "groen"},
+      {"datum": "2026-04-07", "type": "wekelijkse check-in", "notities": "Eerste check-in. Workflows draaien stabiel.", "status": "groen"}
     ]
-  },
-  "kanalen": {
-    "website": { "verwerkt": 847, "bestellingen": 320 },
-    "mail": { "verwerkt": 150, "bestellingen": 55 },
-    "whatsapp": { "verwerkt": 89, "bestellingen": 40 },
-    "telefoon": { "verwerkt": 210, "bestellingen": 35 }
   },
   "periodes": {
     "Mei 2026": {

@@ -112,7 +112,8 @@ if hitl:
                 pct = info.get("percentage", 0)
                 c1.markdown(f"**{naam}**")
                 c1.markdown(f"📥 {info['totaal']:,}  👤 {info['hitl']:,}  🤖 {info['totaal'] - info['hitl']:,}")
-                c2.markdown(f"<h3 style='color:{\"#10b981\" if pct <= 20 else \"#f59e0b\" if pct <= 30 else \"#ef4444\"};'>{pct}%</h3>", unsafe_allow_html=True)
+                kleur = "#10b981" if pct <= 20 else "#f59e0b" if pct <= 30 else "#ef4444"
+                c2.markdown(f"<h3 style='color:{kleur};'>{pct}%</h3>", unsafe_allow_html=True)
                 st.progress(min(pct / 100, 1.0))
                 st.caption(f"HITL {pct}%")
 

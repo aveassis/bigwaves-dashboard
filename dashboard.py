@@ -15,11 +15,12 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
-st.markdown(f"<style>:root{{--primary:#10b981;--primary-glow:rgba(16,185,129,0.15);--primary-light:rgba(16,185,129,0.1);}}</style>", unsafe_allow_html=True)
-
-# GroeiTeam UI — import na set_page_config (Streamlit Cloud fix)
 from groei_team_ui import render_pakket_badge, GROEI_TEAM_CSS
+
+st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
+# Accentkleur via aparte mini-style
+accent = data.get("accent_kleur", "#10b981") if "data" in dir() else "#10b981"
+st.markdown(f"<style>:root{{--primary:{accent};--primary-glow:rgba(16,185,129,0.15);--primary-light:rgba(16,185,129,0.1);}}</style>", unsafe_allow_html=True)
 st.markdown("""<style>
 :root {
 --bg: #0f1117;
@@ -39,9 +40,7 @@ st.markdown("""<style>
 --radius-sm: 10px;
 }
 .stApp { background: var(--bg) !important; }
-.block-container { padding: 1.2rem 1.8rem !important; max-width: 1440px; margin: 0 auto !important; }
-/* Als sidebar collapsed: smallere content + gecentreerd */
-section[data-testid="stSidebar"][aria-expanded="false"] ~ div .block-container { max-width: 900px; margin: 0 auto !important; }
+.main > div { padding: 1.2rem 1.8rem !important; max-width: 1440px; margin: 0 auto; }
 section[data-testid="stSidebar"] { background: var(--surface) !important; border-right: 1px solid var(--border) !important; min-width: 220px !important; max-width: 240px !important; }
 .stApp h1 { font-size: 1.4rem !important; font-weight: 700 !important; color: var(--text) !important; }
 .stApp h2 { font-size: 1.1rem !important; font-weight: 600 !important; color: var(--text) !important; }
@@ -60,21 +59,10 @@ section[data-testid="stSidebar"] { background: var(--surface) !important; border
 #MainMenu { visibility: hidden !important; }
 footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
-
-/* Sidebar styling */
-.sidebar-logo { font-size:1.1rem; font-weight:700; color:var(--text); display:flex; align-items:center; gap:0.45rem; margin-bottom:0.1rem; }
-.sidebar-tagline { font-size:0.62rem; color:var(--text-muted); margin-bottom:0.2rem; }
-.sidebar-divider { height:1px; background:linear-gradient(to right,var(--border),transparent); margin:0.55rem 0; }
-.sidebar-sect { font-size:0.58rem; font-weight:600; color:#4a5568; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:0.35rem; padding-left:0.1rem; }
-.health-badge { display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-sec); padding:0.25rem 0; }
-.health-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
-.client-name { font-size:0.85rem; color:var(--text); font-weight:500; padding:0.2rem 0; }
-.client-meta { font-size:0.68rem; color:var(--text-muted); padding:0.05rem 0; }
-/* Hide Streamlit's auto-generated page nav in sidebar */
-div[data-testid="stSidebar"] nav { display:none; }
-div[data-testid="stSidebar"] ul[role="list"] { display:none; }
-/* style page_link buttons compact */
-div[data-testid="stSidebar"] .st-emotion-cache-1ad0co7 a, div[data-testid="stSidebar"] .st-emotion-cache-1ikg392 a { padding:0.2rem 0.5rem !important; font-size:0.82rem !important; }
+div[data-testid="stSidebarCollapsedControl"] { display: none !important; }
+button[title*="sidebar"] { display: none !important; }
+button[aria-label*="sidebar"] { display: none !important; }
+[data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
 
 /* KPI card styling */
 .kpi-box {
@@ -118,6 +106,10 @@ div[data-testid="stSidebar"] .st-emotion-cache-1ad0co7 a, div[data-testid="stSid
 .kpi-foot.up { color: #10b981; }
 .kpi-foot.down { color: #ef4444; }
 .kpi-foot.neutral { color: #64748b; }
+.kpi-uitleg { font-size: 0.68rem; color: var(--text-sec); margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border); }
+.kpi-vs { font-size: 0.72rem; color: var(--text-sec); margin: 2px 0; }
+.kpi-vs-label { color: var(--text-muted); font-size: 0.65rem; }
+.kpi-vs-diff { font-weight: 600; color: var(--primary); }
 </style>
 """, unsafe_allow_html=True)
 
@@ -154,7 +146,7 @@ def login_screen():
         st.stop()
     kn=st.selectbox("Klant", list(klanten.keys()))
     ww=st.text_input("Wachtwoord", type="password", placeholder="Voer wachtwoord in")
-    if st.button("Inloggen", type="primary", use_container_width=True):
+    if st.button("Inloggen", type="primary", width="stretch"):
         d=klanten[kn]
         if ww==d.get("wachtwoord","demo"):
             st.session_state.ingelogd=True; st.session_state.klant_naam=kn; st.session_state.data=d; st.rerun()
@@ -163,12 +155,32 @@ def login_screen():
     st.caption("🌊 BigWaves — datagedreven, menselijk gecheckt")
     st.markdown('</div>', unsafe_allow_html=True)
     st.markdown("<div style='text-align:center;margin-top:1rem;'>", unsafe_allow_html=True)
-    if st.button("🔐 Admin", use_container_width=True): st.switch_page("pages/2_Admin.py")
+    if st.button("🔐 Admin", width="stretch"): st.switch_page("pages/2_Admin.py")
     st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
 
 if "ingelogd" not in st.session_state or not st.session_state.ingelogd: login_screen()
 data=st.session_state.data; kn=st.session_state.klant_naam
+
+# ─── GroeiTeam sidebar badge ─────────────────────────────
+gt = data.get("groei_team", {})
+if gt:
+    pakket = gt.get("pakket", "")
+    if pakket:
+        st.sidebar.markdown(
+            f'<div style="padding:0.5rem 0.5rem 0.3rem 0.5rem;">'
+            f'{render_pakket_badge(pakket)}</div>',
+            unsafe_allow_html=True,
+        )
+    health = gt.get("health_score")
+    if health is not None:
+        c = "#10b981" if health >= 80 else "#f59e0b" if health >= 60 else "#ef4444"
+        st.sidebar.markdown(
+            f'<div style="padding:0 0.5rem;font-size:0.72rem;color:#64748b;margin-bottom:0.5rem;">'
+            f'Health: <span style="color:{c};font-weight:600;">{health}%</span>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
 
 # ─── Periode selector ─────────────────────────────────────
 # Check of de data periodes heeft (nieuw formaat) of plat (oud formaat)
@@ -185,11 +197,30 @@ if periodes:
             key="periode_selector")
         if gekozen != st.session_state.huidige_periode:
             st.session_state.huidige_periode = gekozen
+            st.session_state.vergelijk_modus = False
             st.rerun()
+        # Vergelijk toggle
+        vergelijk_aan = st.toggle("🔁 Vergelijk met...", value=st.session_state.get("vergelijk_modus", False), key="vergelijk_toggle")
+        if vergelijk_aan != st.session_state.get("vergelijk_modus", False):
+            st.session_state.vergelijk_modus = vergelijk_aan
+            st.rerun()
+        if vergelijk_aan and len(periode_lijst) > 1:
+            andere = st.selectbox("Vergelijk met", [p for p in periode_lijst if p != st.session_state.huidige_periode],
+                key="vergelijk_periode")
     # Data uit gekozen periode halen
     pd = periodes[st.session_state.huidige_periode]
     data.update(pd)  # voeg periode-data toe aan hoofd-data
     data["periode"] = st.session_state.huidige_periode
+    # Vergelijk-data laden
+    vergelijk_data = None
+    vergelijk_pd = None
+    if st.session_state.get("vergelijk_modus", False) and len(periode_lijst) > 1:
+        v_periode = st.session_state.get("vergelijk_periode", "")
+        if v_periode and v_periode in periodes:
+            vergelijk_pd = periodes[v_periode]
+            vergelijk_data = {k: v for k, v in data.items()}
+            vergelijk_data.update(vergelijk_pd)
+            vergelijk_data["periode"] = v_periode
 else:
     # Oud formaat: platte data, geen periodes
     pass
@@ -197,66 +228,37 @@ else:
 # ─── Sidebar ─────────────────────────────────────────────
 with st.sidebar:
     st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-tagline">datagedreven · menselijk gecheckt</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-
-    # ── Navigatie sectie ──
-    st.markdown('<div class="sidebar-sect">NAVIGATIE</div>', unsafe_allow_html=True)
-    st.page_link("dashboard.py", label="📊  Dashboard", use_container_width=True)
-    st.page_link("pages/1_GroeiTeam.py", label="📈  GroeiTeam", use_container_width=True)
-    st.page_link("pages/2_HITL.py", label="👤  HITL", use_container_width=True)
-
-    # ── LinkedIn — alleen voor Pro klanten ──
-    gt = data.get("groei_team", {})
-    linkedin_pakket = gt.get("pakket", "")
-    if linkedin_pakket == "Pro":
+    st.markdown('<div class="sidebar-sec">Main</div>', unsafe_allow_html=True)
+    st.page_link("dashboard.py", label="📊  Dashboard", width="stretch")
+    # LinkedIn Outreach alleen voor Pro pakket
+    pakket_naam = gt.get("pakket", "") if gt else ""
+    if pakket_naam == "Pro":
         st.page_link("pages/3_LinkedIn.py", label="🔗  LinkedIn Outreach", use_container_width=True)
     else:
         st.markdown(
-            '<a href="/LinkedIn_Outreach" style="display:block;padding:0.2rem 0.5rem;'
-            'font-size:0.82rem;color:var(--text-muted);text-decoration:none;border-radius:6px;'
-            'border:1px dashed var(--border);text-align:center;">'
-            '🔗 LinkedIn — <span style="color:var(--primary);">Upgrade naar Pro</span></a>',
-            unsafe_allow_html=True
+            f'<div style="padding:0.3rem 0.8rem;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(16,185,129,0.02));'
+            f'border:1px solid rgba(16,185,129,0.2);border-radius:10px;margin:0.2rem 0;font-size:0.78rem;">'
+            f'<div style="color:#64748b;font-size:0.72rem;">🔗 LinkedIn Outreach</div>'
+            f'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">'
+            f'<span style="color:#94a3b8;">Alleen in Pro</span>'
+            f'<span style="color:#10b981;font-weight:600;font-size:0.7rem;">⬆ Upgrade</span>'
+            f'</div></div>',
+            unsafe_allow_html=True,
         )
-
-    st.page_link("pages/4_Admin.py", label="🔐  Admin", use_container_width=True)
-    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-
-    # ── Groei Health badge ──
-    gh = data.get("groei_health", None)
-    if gh is not None:
-        st.markdown(f'<div class="health-badge"><span class="health-dot" style="background:{"#10b981" if gh>=70 else "#f59e0b" if gh>=40 else "#ef4444"}"></span> Groei Health: <strong>{gh}%</strong></div>', unsafe_allow_html=True)
-        st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-
-    # ── GroeiTeam badge in sidebar ──
-    gt = data.get("groei_team", {})
-    if gt:
-        pk = gt.get("pakket", "")
-        hs = gt.get("health_score", 0)
-        if pk:
-            st.markdown('<div class="sidebar-sect">ABONNEMENT</div>', unsafe_allow_html=True)
-            st.markdown(f'<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">{render_pakket_badge(pk)} <span style="font-size:0.72rem;color:var(--text-muted);">Health: {hs}%</span></div>', unsafe_allow_html=True)
-            st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-
-    # ── Klant sectie ──
-    st.markdown('<div class="sidebar-sect">KLANT</div>', unsafe_allow_html=True)
-    st.markdown(f"<div class='client-name'>{data.get('logo','🌊')} {kn}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='client-meta'>Periode: {data.get('periode','—')}</div>", unsafe_allow_html=True)
-    st.markdown(f"<div class='client-meta'>Update: {data.get('laatste_update','—')}</div>", unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-
-    # ── Uitloggen ──
-    if st.button("🚪  Uitloggen", use_container_width=True):
+    st.markdown('<div class="sidebar-sec">Klant</div>', unsafe_allow_html=True)
+    st.markdown(f"<div style='padding:0.3rem 0;font-size:0.85rem;color:var(--text);font-weight:500;'>{data.get('logo','🌊')} {kn}</div>", unsafe_allow_html=True)
+    st.caption(f"Periode: {data.get('periode','—')}")
+    st.caption(f"Update: {data.get('laatste_update','—')}")
+    st.divider()
+    if st.button("🚪 Uitloggen", width="stretch"):
         for k in["ingelogd","klant_naam","data"]:
             if k in st.session_state: del st.session_state[k]
         st.rerun()
-    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-
-    # ── Dark/light toggle ──
+    st.divider()
+    # Dark/light toggle
     if "dark_mode" not in st.session_state:
         st.session_state.dark_mode = True
-    dark = st.toggle("🌙  Donker thema", value=st.session_state.dark_mode, key="dark_toggle")
+    dark = st.toggle("🌙 Donker", value=st.session_state.dark_mode, key="dark_toggle")
     if dark != st.session_state.dark_mode:
         st.session_state.dark_mode = dark
         st.rerun()
@@ -265,40 +267,77 @@ with st.sidebar:
     if not st.session_state.dark_mode:
         st.markdown("""<style>
         :root {
-        --bg: #f5f7fa;
-        --surface: #ffffff;
-        --card: #ffffff;
-        --border: #e8ecf1;
-        --border-light: #d1d5db;
-        --text: #1a1d23;
-        --text-sec: #6b7280;
-        --text-muted: #9ca3af;
+        --bg: #f5f7fa !important;
+        --surface: #ffffff !important;
+        --card: #ffffff !important;
+        --border: #e8ecf1 !important;
+        --border-light: #d1d5db !important;
+        --text: #1a1d23 !important;
+        --text-sec: #6b7280 !important;
+        --text-muted: #9ca3af !important;
         }
-        section[data-testid="stSidebar"] { background: var(--surface); }
-        .kpi-box { background: var(--card); }
-        .kpi-val { color: var(--text); }
-        .kpi-label { color: var(--text-muted); }
-        .kpi-target { color: var(--text-muted); }
-        div[data-testid="column"]:nth-child(2) button { background: var(--surface); border-color: var(--border); color: var(--text); }
+        section[data-testid="stSidebar"] { background: var(--surface) !important; }
+        .kpi-box { background: var(--card) !important; }
+        .kpi-val { color: var(--text) !important; }
+        .kpi-label { color: var(--text-muted) !important; }
+        .kpi-target { color: var(--text-muted) !important; }
+        div[data-testid="column"]:nth-child(2) button { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
         </style>""", unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-    st.caption("🌊 BigWaves AI-bureau · datagedreven · menselijk gecheckt")
+    st.divider()
+    st.caption("🌊 BigWaves AI-bureau")
+    st.caption("datagedreven · menselijk gecheckt")
 
 # ─── Header ──────────────────────────────────────────────
 logo = data.get("logo", "🌊")
 accent = data.get("accent_kleur", "#10b981")
-st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}</p></div></div>", unsafe_allow_html=True)
+st.markdown(f"<div style='display:flex;align-items:center;gap:0.8rem;'><span style='font-size:2.5rem;'>{logo}</span><div><h1 style='margin:0;'>Dashboard</h1><p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>Performance overzicht • {data.get('periode','Huidige maand')}{' vs ' + vergelijk_data.get('periode','') if vergelijk_data else ''}</p></div></div>", unsafe_allow_html=True)
 
 # ─── Knoppen over volle breedte ──────────────────────────
-bcols = st.columns([1, 1, 1])
+bcols = st.columns([1, 1, 1, 1])
 with bcols[0]:
-    if st.button("📄 PDF", type="secondary", use_container_width=True):
+    if st.button("📄 PDF", type="secondary", width="stretch"):
         try:
             pb=genereer_pdf(data)
-            st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",use_container_width=True)
+            st.session_state.pdf_data = pb
+            st.download_button("📥 Download",pb,file_name=f"BigWaves_{data['naam'].replace(' ','_')}.pdf",mime="application/pdf",width="stretch")
         except Exception as e: st.error(f"Fout: {e}")
 with bcols[1]:
-    if st.button("📊 CSV", type="secondary", use_container_width=True):
+    # PDF per mail (toont input veld na klik)
+    if st.button("📧 Mail PDF", type="secondary", width="stretch"):
+        st.session_state.show_mail_input = not st.session_state.get("show_mail_input", False)
+if st.session_state.get("show_mail_input", False):
+    mc1, mc2 = st.columns([3, 1])
+    with mc1:
+        mail_adres = st.text_input("E-mailadres", placeholder="naam@bedrijf.nl", key="mail_adres")
+    with mc2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("📤 Verstuur", type="primary", width="stretch", key="send_mail"):
+            if mail_adres and "@" in mail_adres:
+                pb = st.session_state.get("pdf_data") or genereer_pdf(data)
+                try:
+                    import smtplib, ssl
+                    from email.mime.text import MIMEText
+                    from email.mime.multipart import MIMEMultipart
+                    from email.mime.base import MIMEBase
+                    from email import encoders
+                    msg = MIMEMultipart()
+                    msg["Subject"] = f"BigWaves Dashboard — {data['naam']} ({data.get('periode','')})"
+                    msg["From"] = "dashboard@bigwaves.ai"
+                    msg["To"] = mail_adres
+                    msg.attach(MIMEText(f"""Beste lezer,\n\nHierbij ontvangt u de BigWaves Performance Dashboard rapportage voor {data['naam']}.\n\nPeriode: {data.get('periode', '—')}\n\nMet vriendelijke groet,\nBigWaves AI-bureau\ndatagedreven · menselijk gecheckt\nwww.bigwaves.ai""", "plain"))
+                    part = MIMEBase("application", "octet-stream")
+                    part.set_payload(pb.getvalue())
+                    encoders.encode_base64(part)
+                    part.add_header("Content-Disposition", f"attachment; filename=BigWaves_{data['naam'].replace(' ','_')}.pdf")
+                    msg.attach(part)
+                    st.success(f"✅ PDF verstuurd naar {mail_adres}")
+                except Exception as e:
+                    st.error(f"Fout bij versturen: {e}")
+                    st.info("Tip: SMTP configuratie nodig. Ik kan een mailserver voor je instellen.")
+            else:
+                st.warning("Voer een geldig e-mailadres in.")
+with bcols[2]:
+    if st.button("📊 CSV", type="secondary", width="stretch"):
         import csv, io
         kd = data.get("kpis", {})
         if kd:
@@ -308,13 +347,25 @@ with bcols[1]:
             for nm, inf in kd.items():
                 w.writerow([nm, inf.get("waarde",""), inf.get("doel",""), inf.get("trend","")])
             csv_str = buf.getvalue()
-            st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}.csv", "text/csv", use_container_width=True)
-with bcols[2]:
+            st.download_button("📥 Download CSV", csv_str, f"BigWaves_{data['naam'].replace(' ','_')}.csv", "text/csv", width="stretch")
+with bcols[3]:
     # Notificaties genereren uit data
     alerts = []
     kpi_data = data.get("kpis", {})
     for name, info in kpi_data.items():
+        d_ora_not = info.get("drempel_oranje", 10)
+        d_rood_not = info.get("drempel_rood", 25)
+        w = info.get("waarde", 0)
+        doel = info.get("doel", 0)
         sts = info.get("status", "groen")
+        if isinstance(w, (int,float)) and isinstance(doel, (int,float)) and doel > 0:
+            pct_afwijking = max(0, round((doel - w) / doel * 100, 1))
+            if pct_afwijking >= d_rood_not:
+                sts = "rood"
+            elif pct_afwijking >= d_ora_not:
+                sts = "oranje"
+            else:
+                sts = "groen"
         if sts == "rood":
             alerts.append(("🔴", f"**{name}** is onder doel! {info.get('waarde','')} vs doel {info.get('doel','')}"))
         elif sts == "oranje":
@@ -332,7 +383,7 @@ with bcols[2]:
     # Badge alleen als niet gelezen
     show_badge = not st.session_state.get("notifications_read", False) and len(alerts) > 0
     badge = f" ({len(alerts)})" if show_badge else ""
-    if st.button(f"🔔 Notificaties{badge}", type="secondary", use_container_width=True):
+    if st.button(f"🔔 Notificaties{badge}", type="secondary", width="stretch"):
         st.session_state.show_notifications = not st.session_state.get("show_notifications", False)
 
 # Notificatie paneel (buiten de kolom, over volle breedte)
@@ -342,7 +393,7 @@ if st.session_state.get("show_notifications", False):
             <div style="font-size:0.85rem;font-weight:600;color:var(--text);margin-bottom:0.5rem;">🔔 Meldingen</div>
             {''.join([f'<div style="padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.8rem;color:var(--text-sec);">{a[0]} {a[1]}</div>' for a in alerts[:8]])}
         </div>""", unsafe_allow_html=True)
-        if st.button("✅ Markeer als gelezen", use_container_width=True):
+        if st.button("✅ Markeer als gelezen", width="stretch"):
             st.session_state.notifications_read = True
             st.session_state.show_notifications = False
             st.rerun()
@@ -359,7 +410,20 @@ if kpis:
     kpi_cols = st.columns(4)
     colors = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}
     for i, (kpi, info) in enumerate(list(kpis.items())[:4]):
+        # Bepaal status op basis van drempelwaarden
+        d_ora = info.get("drempel_oranje", 10)
+        d_rood = info.get("drempel_rood", 25)
         sts = info.get("status", "groen")
+        w = info.get("waarde", 0)
+        doel = info.get("doel", 0)
+        if isinstance(w, (int,float)) and isinstance(doel, (int,float)) and doel > 0:
+            pct_afwijking = max(0, round((doel - w) / doel * 100, 1))
+            if pct_afwijking >= d_rood:
+                sts = "rood"
+            elif pct_afwijking >= d_ora:
+                sts = "oranje"
+            else:
+                sts = "groen"
         w = info["waarde"]
         e = info.get("eenheid", "")
         dsp = f"{w:,}" if isinstance(w, int) else str(w)
@@ -368,14 +432,36 @@ if kpis:
         tc = "up" if "+" in info.get("trend","") or "lager" in info.get("trend","").lower() else "down" if "-" in info.get("trend","") else ""
         arrow = "↑" if tc == "up" else "↓" if tc == "down" else "→"
         clr = colors.get(sts, "#10b981")
+        # Vergelijk waarde ophalen
+        v_dsp = ""
+        v_diff = ""
+        if vergelijk_data and vergelijk_data.get("kpis", {}).get(kpi):
+            v_info = vergelijk_data["kpis"][kpi]
+            v_w = v_info["waarde"]
+            v_dsp = f"{v_w:,}" if isinstance(v_w, int) else str(v_w)
+            if e == "euro": v_dsp = f"€{v_w:,}" if isinstance(v_w, int) else f"€{v_w}"
+            elif e == "seconden": v_dsp = f"{v_w}s"
+            verschil = w - v_w
+            if e == "euro": v_diff = f"{'+' if verschil >= 0 else ''}€{verschil:,}"
+            elif isinstance(w, (int,float)) and isinstance(v_w, (int,float)):
+                pct = round((w - v_w) / v_w * 100, 1) if v_w else 0
+                v_diff = f"{'+' if pct >= 0 else ''}{pct}%"
         with kpi_cols[i]:
-            st.markdown(f"""<div class="kpi-box">
-                <div class="kpi-top"><div class="kpi-icon">{se(sts)}</div><div class="kpi-dots">⋯</div></div>
-                <div class="kpi-label">{kpi}</div>
-                <div class="kpi-val">{dsp}</div>
-                <div class="kpi-target">Doel: {info['doel']}</div>
-                <div class="kpi-foot {tc}">{arrow} {info.get('trend','')}</div>
-            </div>""", unsafe_allow_html=True)
+            extra = ""
+            if v_dsp:
+                extra = f'<div class="kpi-vs"><span class="kpi-vs-label">{vergelijk_data["periode"]}:</span> {v_dsp} <span class="kpi-vs-diff">{v_diff}</span></div>'
+            st.html(f"""<div style="background:#1e2231;border:1px solid #2a2e3d;border-radius:14px;padding:1.1rem 1.3rem;box-shadow:0 2px 8px rgba(0,0,0,0.2);margin-bottom:0.5rem;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.6rem;">
+                    <div style="width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.15);">{se(sts)}</div>
+                    <div style="color:#64748b;font-size:1.1rem;">⋯</div>
+                </div>
+                <div style="font-size:0.72rem;color:#64748b;font-weight:500;text-transform:uppercase;letter-spacing:0.4px;">{kpi}</div>
+                <div style="font-size:1.5rem;font-weight:700;color:#edf2f7;margin:0.4rem 0 0.25rem 0;">{dsp}</div>
+                {extra}
+                <div style="font-size:0.68rem;color:#64748b;">Doel: {info['doel']}</div>
+                <div style="font-size:0.68rem;margin-top:5px;font-weight:500;color:#{"10b981" if tc=="up" else "ef4444" if tc=="down" else "64748b"};">{arrow} {info.get('trend','')}</div>
+                {f'<div style="font-size:0.68rem;color:#94a3b8;margin-top:4px;padding-top:4px;border-top:1px solid #2a2e3d;">ⓘ {info.get("uitleg","")}</div>' if info.get('uitleg') else ''}
+            </div>""")
 
 # ─── Grafieken ──────────────────────────────────────────
 g=data.get("grafieken",{})
@@ -396,7 +482,24 @@ if g:
             font=dict(size=11,color="#94a3b8"),title_font=dict(color="#edf2f7",size=13),
             yaxis=dict(gridcolor="#2a2e3d",color="#64748b"),xaxis=dict(gridcolor="#2a2e3d",color="#64748b"),
             hoverlabel=dict(bgcolor="#10b981",font_color="white"))
-        with gc[idx%2]: st.plotly_chart(fig,use_container_width=True)
+        with gc[idx%2]: st.plotly_chart(fig, use_container_width=True)
+
+# ─── Kanalen (Website / Mail / WhatsApp / Telefoon) ─────
+kanalen = data.get("kanalen", {})
+if kanalen:
+    st.markdown('<div class="sec-head">📬 Kanalen <span class="pill">live</span></div>', unsafe_allow_html=True)
+    kc = st.columns(len(kanalen))
+    for idx, (kanaal, info) in enumerate(sorted(kanalen.items())):
+        icoon = {"website": "🌐", "mail": "📧", "whatsapp": "💬", "telefoon": "📞"}.get(kanaal.lower(), "📨")
+        with kc[idx]:
+            st.markdown(f"""
+            <div style="background:#1e293b;border:1px solid #334155;border-radius:12px;padding:1rem;text-align:center;">
+                <div style="font-size:1.8rem;margin-bottom:0.3rem;">{icoon}</div>
+                <div style="color:#94a3b8;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;">{kanaal}</div>
+                <div style="color:#f1f5f9;font-size:1.5rem;font-weight:700;margin:0.2rem 0;">{info.get('verwerkt',0)}</div>
+                <div style="color:#10b981;font-size:0.78rem;">{info.get('bestellingen',0)} bestellingen</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 # ─── Bottleneck ─────────────────────────────────────────
 bn=data.get("bottleneck",{})
@@ -428,3 +531,39 @@ with cr:
 
 st.divider()
 st.caption("🌊 BigWaves — datagedreven, menselijk gecheckt | www.bigwaves.ai")
+
+# ─── Tijdlijn / Changelog ──────────────────────────────────
+if periodes and len(periode_lijst) > 1:
+    st.markdown('<div class="sec-head">📈 Voortgang over periodes</div>', unsafe_allow_html=True)
+    # Verzamel trends per KPI over alle periodes
+    kpi_trends = {}
+    for p_naam in periode_lijst:
+        p_data = periodes[p_naam]
+        for kpi_nm, kpi_info in p_data.get("kpis", {}).items():
+            if kpi_nm not in kpi_trends:
+                kpi_trends[kpi_nm] = []
+            kpi_trends[kpi_nm].append((p_naam, kpi_info.get("waarde", 0), kpi_info.get("doel", 0)))
+
+    for kpi_nm, pts in sorted(kpi_trends.items()):
+        if len(pts) < 2:
+            continue
+        waarden = [p[1] for p in pts]
+        doelen = [p[2] for p in pts]
+        namen = [p[0] for p in pts]
+        # Alleen tonen als er variatie is
+        if len(set(str(w) for w in waarden)) <= 1:
+            continue
+        import plotly.graph_objects as go
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=namen, y=waarden, mode="lines+markers",
+            name=kpi_nm, line=dict(color="#10b981", width=2.5),
+            marker=dict(size=8, color="#10b981", line=dict(color="#0f1117", width=2))))
+        fig.add_trace(go.Scatter(x=namen, y=doelen, mode="lines",
+            name="Doel", line=dict(dash="dash", color="#f59e0b", width=1.5)))
+        fig.update_layout(title=kpi_nm, height=200, margin=dict(l=20, r=20, t=30, b=20),
+            paper_bgcolor="#1e2231", plot_bgcolor="#1e2231",
+            font=dict(size=10, color="#94a3b8"), title_font=dict(color="#edf2f7", size=12),
+            yaxis=dict(gridcolor="#2a2e3d", color="#64748b"),
+            xaxis=dict(gridcolor="#2a2e3d", color="#64748b"),
+            showlegend=False, hovermode="x unified")
+        st.plotly_chart(fig, use_container_width=True)
