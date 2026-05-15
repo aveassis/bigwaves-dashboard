@@ -1,2 +1,41 @@
-*.pyc
+# Python
 __pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+linkedin-outreach/venv/
+
+# Database
+*.db
+*.sqlite
+data/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+*.env.local
+
+# Backup files
+*.bak
+*.oud
+*.old
+
+# Streamlit
+.streamlit/
