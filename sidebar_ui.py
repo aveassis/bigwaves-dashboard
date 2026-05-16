@@ -17,7 +17,6 @@ footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
-section[data-testid="stSidebar"] { display: block !important; }
 /* Sidebar toggle knop — vast pijltje rechtsboven in de sidebar */
 .sidebar-toggle-collapse {
     position: absolute !important;

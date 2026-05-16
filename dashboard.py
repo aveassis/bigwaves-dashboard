@@ -477,6 +477,11 @@ def login_screen():
     st.stop()
 
 if "ingelogd" not in st.session_state or not st.session_state.ingelogd: login_screen()
+# Zorg dat sidebar zichtbaar is na login (override login CSS)
+st.markdown("""<style>
+section[data-testid="stSidebar"] { display: block !important; }
+section[data-testid="stSidebar"][aria-expanded] { display: block !important; }
+</style>""", unsafe_allow_html=True)
 data=st.session_state.data; kn=st.session_state.klant_naam
 
 # ─── GroeiTeam sidebar badge ─────────────────────────────
