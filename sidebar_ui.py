@@ -71,8 +71,7 @@ header[data-testid="stHeader"] { display: none !important; }
 </style>""", unsafe_allow_html=True)
     
     with st.sidebar:
-        st.markdown('<div class="sidebar-logo" style="position:relative;">🌊 <span>BigWaves</span> <span class="sidebar-toggle-collapse" id="bw-collapse-btn">◀</span></div>', unsafe_allow_html=True)
-        st.markdown('<div class="sidebar-toggle-open" id="bw-open-btn">☰</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-logo" style="position:relative;">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
 
         # Pakket badge
         if gt:
@@ -138,22 +137,44 @@ header[data-testid="stHeader"] { display: none !important; }
         st.caption("🌊 BigWaves AI-bureau")
         st.caption("datagedreven · menselijk gecheckt")
 
-    # Toggle JS — collapse en open knoppen
+    # Toggle JS — maakt collapse/open knoppen aan in de DOM en koppelt click handlers
     st.markdown("""<script>
-var bwCollapse = document.getElementById('bw-collapse-btn');
-var bwOpen = document.getElementById('bw-open-btn');
-if (bwCollapse) {
-    bwCollapse.onclick = function() {
+(function() {
+    if (document.getElementById('bw-sidebar-toggle')) return;
+    // Collapse knop (◀) — in de sidebar header
+    var sbHeader = parent.document.querySelector('[data-testid="stSidebar"] .sidebar-logo');
+    if (sbHeader) {
+        sbHeader.style.position = 'relative';
+        var collBtn = document.createElement('span');
+        collBtn.id = 'bw-collapse-btn';
+        collBtn.className = 'sidebar-toggle-collapse';
+        collBtn.textContent = '◀';
+        sbHeader.appendChild(collBtn);
+        collBtn.onclick = function() {
+            var sb = parent.document.querySelector('[data-testid="stSidebar"]');
+            if (sb) { sb.style.width='0'; sb.style.minWidth='0'; sb.style.overflow='hidden'; sb.style.padding='0'; sb.style.border='none'; sb.setAttribute('aria-expanded','false'); }
+            if (openBtn) openBtn.style.display='flex';
+        };
+    }
+    // Open knop (☰) — floating linksboven
+    var openBtn = document.createElement('div');
+    openBtn.id = 'bw-open-btn';
+    openBtn.className = 'sidebar-toggle-open';
+    openBtn.textContent = '☰';
+    document.body.appendChild(openBtn);
+    openBtn.onclick = function() {
         var sb = parent.document.querySelector('[data-testid="stSidebar"]');
-        if (sb) { sb.style.width='0'; sb.style.minWidth='0'; sb.style.overflow='hidden'; sb.setAttribute('aria-expanded','false'); }
-        if (bwOpen) bwOpen.style.display='flex';
+        if (sb) { sb.style.width=''; sb.style.minWidth=''; sb.style.overflow=''; sb.style.padding=''; sb.style.border=''; sb.setAttribute('aria-expanded','true'); }
+        openBtn.style.display='none';
     };
-}
-if (bwOpen) {
-    bwOpen.onclick = function() {
+    // Monitor sidebar breedte voor open knop
+    function check() {
         var sb = parent.document.querySelector('[data-testid="stSidebar"]');
-        if (sb) { sb.style.width=''; sb.style.minWidth=''; sb.style.overflow=''; sb.setAttribute('aria-expanded','true'); }
-        bwOpen.style.display='none';
-    };
-}
+        if (!sb) return;
+        var hidden = sb.getBoundingClientRect().width < 10;
+        openBtn.style.display = hidden ? 'flex' : 'none';
+    }
+    check();
+    setInterval(check, 500);
+})();
 </script>""", unsafe_allow_html=True)
