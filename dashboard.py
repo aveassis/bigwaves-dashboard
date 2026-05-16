@@ -38,7 +38,7 @@ if (window.innerWidth < 768) {
     if (document.getElementById('bw-collapse-btn')) return;
     // Wacht tot sidebar geladen is
     function init() {
-        var sbHeader = parent.document.querySelector('[data-testid="stSidebar"] .sidebar-logo');
+        var sbHeader = document.querySelector('.sidebar-logo');
         if (!sbHeader) return;
         sbHeader.style.position = 'relative';
         var collBtn = document.createElement('span');
@@ -52,17 +52,17 @@ if (window.innerWidth < 768) {
         openBtn.textContent = '☰';
         document.body.appendChild(openBtn);
         collBtn.onclick = function() {
-            var sb = parent.document.querySelector('[data-testid="stSidebar"]');
+            var sb = document.querySelector('[data-testid="stSidebar"]');
             if (sb) { sb.style.width='0'; sb.style.minWidth='0'; sb.style.overflow='hidden'; sb.style.padding='0'; sb.style.border='none'; }
             openBtn.style.display='flex';
         };
         openBtn.onclick = function() {
-            var sb = parent.document.querySelector('[data-testid="stSidebar"]');
+            var sb = document.querySelector('[data-testid="stSidebar"]');
             if (sb) { sb.style.width=''; sb.style.minWidth=''; sb.style.overflow=''; sb.style.padding=''; sb.style.border=''; }
             openBtn.style.display='none';
         };
         function check() {
-            var sb = parent.document.querySelector('[data-testid="stSidebar"]');
+            var sb = document.querySelector('[data-testid="stSidebar"]');
             if (!sb) return;
             openBtn.style.display = sb.getBoundingClientRect().width < 10 ? 'flex' : 'none';
         }
@@ -72,7 +72,7 @@ if (window.innerWidth < 768) {
     // Retry tot sidebar header beschikbaar is
     var retries = 0;
     var timer = setInterval(function() {
-        if (parent.document.querySelector('[data-testid="stSidebar"] .sidebar-logo')) {
+        if (document.querySelector('.sidebar-logo')) {
             init(); clearInterval(timer);
         }
         if (++retries > 20) clearInterval(timer);
