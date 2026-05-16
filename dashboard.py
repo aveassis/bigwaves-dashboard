@@ -369,18 +369,14 @@ if st.session_state.get("show_mail_input", False):
                     part = MIMEBase("application", "octet-stream")
                     part.set_payload(pb.getvalue())
                     encoders.encode_base64(part)
-# ─── Knoppen over volle breedte ──────────────────────────
-bcols = st.columns([1, 1, 1])
-with bcols[0]:
-    if st.button("📄 PDF", type="secondary", use_container_width=True):
-        try:
-            st.session_state["pdf_data"] = genereer_pdf(data)
-        except Exception as e:
-            st.error(f"Fout: {e}")
-    if st.session_state.get("pdf_data"):
-        st.download_button(
-            "📥 Download PDF",
-            st.session_state["pdf_data"],
+                    part.add_header("Content-Disposition", f"attachment; filename=BigWaves_{data['naam'].replace(' ','_')}.pdf")
+                    msg.attach(part)
+                    st.success(f"✅ PDF verstuurd naar {mail_adres}")
+                except Exception as e:
+                    st.error(f"Fout bij versturen: {e}")
+                    st.info("Tip: SMTP configuratie nodig. Ik kan een mailserver voor je instellen.")
+            else:
+                st.warning("Voer een geldig e-mailadres in.")
 # ─── Knoppen over volle breedte ──────────────────────────
 bcols = st.columns([1, 1, 1])
 with bcols[0]:
