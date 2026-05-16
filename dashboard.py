@@ -442,7 +442,8 @@ def login_screen():
     # Hide sidebar on login maar laat collapse knop zichtbaar
     st.markdown("""
     <style>
-    section[data-testid="stSidebar"] { display: none !important; }
+    section[data-testid="stSidebar"] > div > div:nth-child(2) { display: none !important; }
+    section[data-testid="stSidebar"] .stAppHeader { display: none !important; }
     .main > div { padding: 1.2rem 1.8rem !important; max-width: 1440px; margin: 0 auto; }
     button[kind="header"] { display: none !important; }
     header[data-testid="stHeader"] { display: none !important; }
@@ -477,11 +478,6 @@ def login_screen():
     st.stop()
 
 if "ingelogd" not in st.session_state or not st.session_state.ingelogd: login_screen()
-# Zorg dat sidebar zichtbaar is na login (override login CSS)
-st.markdown("""<style>
-section[data-testid="stSidebar"] { display: block !important; }
-section[data-testid="stSidebar"][aria-expanded] { display: block !important; }
-</style>""", unsafe_allow_html=True)
 data=st.session_state.data; kn=st.session_state.klant_naam
 
 # ─── GroeiTeam sidebar badge ─────────────────────────────
