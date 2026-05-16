@@ -18,10 +18,62 @@ footer { visibility: hidden !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
 section[data-testid="stSidebar"] { display: block !important; }
+/* Sidebar toggle knop — vast pijltje rechtsboven in de sidebar */
+.sidebar-toggle-collapse {
+    position: absolute !important;
+    top: 0.5rem !important;
+    right: 0.5rem !important;
+    z-index: 999 !important;
+    width: 28px !important;
+    height: 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    border-radius: 6px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+.sidebar-toggle-collapse:hover {
+    background: rgba(255,255,255,0.2) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+}
+/* Floating open-knop als sidebar collapsed is */
+.sidebar-toggle-open {
+    position: fixed !important;
+    top: 0.5rem !important;
+    left: 0.5rem !important;
+    z-index: 9999 !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(45, 27, 105, 0.9) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    font-size: 1.1rem !important;
+    cursor: pointer !important;
+    backdrop-filter: blur(8px) !important;
+    transition: all 0.2s ease !important;
+}
+.sidebar-toggle-open:hover {
+    background: rgba(45, 27, 105, 1) !important;
+    border-color: rgba(255,255,255,0.4) !important;
+}
+/* Toon open-knop altijd — JS verstopt hem als sidebar open is */
+.sidebar-toggle-open {
+    display: flex !important;
+}
 </style>""", unsafe_allow_html=True)
     
     with st.sidebar:
-        st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-logo" style="position:relative;">🌊 <span>BigWaves</span> <span class="sidebar-toggle-collapse" id="bw-collapse-btn">◀</span></div>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-toggle-open" id="bw-open-btn">☰</div>', unsafe_allow_html=True)
 
         # Pakket badge
         if gt:
@@ -86,3 +138,23 @@ section[data-testid="stSidebar"] { display: block !important; }
         st.divider()
         st.caption("🌊 BigWaves AI-bureau")
         st.caption("datagedreven · menselijk gecheckt")
+
+    # Toggle JS — collapse en open knoppen
+    st.markdown("""<script>
+var bwCollapse = document.getElementById('bw-collapse-btn');
+var bwOpen = document.getElementById('bw-open-btn');
+if (bwCollapse) {
+    bwCollapse.onclick = function() {
+        var sb = parent.document.querySelector('[data-testid="stSidebar"]');
+        if (sb) { sb.style.width='0'; sb.style.minWidth='0'; sb.style.overflow='hidden'; sb.setAttribute('aria-expanded','false'); }
+        if (bwOpen) bwOpen.style.display='flex';
+    };
+}
+if (bwOpen) {
+    bwOpen.onclick = function() {
+        var sb = parent.document.querySelector('[data-testid="stSidebar"]');
+        if (sb) { sb.style.width=''; sb.style.minWidth=''; sb.style.overflow=''; sb.setAttribute('aria-expanded','true'); }
+        bwOpen.style.display='none';
+    };
+}
+</script>""", unsafe_allow_html=True)

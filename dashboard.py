@@ -37,49 +37,6 @@ if (window.innerWidth < 768) {
 
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
 
-st.markdown("""<script>
-(function() {
-    let existing = document.getElementById('bw-sidebar-toggle');
-    if (existing) return;
-    let toggle = document.createElement('div');
-    toggle.id = 'bw-sidebar-toggle';
-    toggle.innerHTML = '☰';
-    Object.assign(toggle.style, {
-        position: 'fixed', top: '0.5rem', left: '0.5rem', zIndex: '9999',
-        width: '32px', height: '32px', display: 'none',
-        alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(45, 27, 105, 0.9)',
-        border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px',
-        color: '#ffffff', fontSize: '1.1rem', cursor: 'pointer',
-        backdropFilter: 'blur(8px)', transition: 'all 0.2s ease',
-        fontFamily: 'sans-serif', lineHeight: '1'
-    });
-    toggle.onmouseenter = () => { toggle.style.background = 'rgba(45, 27, 105, 1)'; toggle.style.borderColor = 'rgba(255,255,255,0.4)'; };
-    toggle.onmouseleave = () => { toggle.style.background = 'rgba(45, 27, 105, 0.9)'; toggle.style.borderColor = 'rgba(255,255,255,0.2)'; };
-    toggle.onclick = () => {
-        let sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
-        if (sidebar) {
-            sidebar.style.width = ''; sidebar.style.minWidth = ''; sidebar.style.display = '';
-            sidebar.setAttribute('aria-expanded', 'true');
-            let expandBtn = parent.document.querySelector('[data-testid="stSidebarCollapsedControl"], button[title*="sidebar"], button[aria-label*="sidebar"]');
-            if (expandBtn) expandBtn.click();
-        }
-        toggle.style.display = 'none';
-    };
-    document.body.appendChild(toggle);
-    function checkSidebar() {
-        let sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
-        if (!sidebar) { toggle.style.display = 'none'; return; }
-        let hidden = sidebar.getBoundingClientRect().width < 10;
-        toggle.style.display = hidden ? 'flex' : 'none';
-    }
-    checkSidebar();
-    setInterval(checkSidebar, 500);
-})();
-</script>""", unsafe_allow_html=True)
-
-st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
-
 st.markdown("""<style>
 :root {
 --bg: #f1efed;
