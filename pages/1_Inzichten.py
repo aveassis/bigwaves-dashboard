@@ -3,22 +3,18 @@ import streamlit as st
 
 st.set_page_config(page_title="Inzichten — BigWaves", page_icon="📈", layout="wide")
 
-from shared_css import setup_subpage
-setup_subpage()
+from sidebar_ui import render_sidebar
+
+if "data" not in st.session_state:
+    st.switch_page("dashboard.py")
 
 data = st.session_state.data
 klant_naam = st.session_state.klant_naam
 
-# ─── Header (zelfde stijl als home) ─────────────────────────
-logo = data.get("logo", "🌊")
-st.markdown(
-    f"<div style='display:flex;align-items:center;gap:0.8rem;'>"
-    f"<span style='font-size:2.5rem;'>{logo}</span>"
-    f"<div><h1 style='margin:0;'>Inzichten</h1>"
-    f"<p style='margin:0;color:var(--text-muted);font-size:0.82rem;'>"
-    f"Voortgang • Resultaten • Status — {klant_naam}</p></div></div>",
-    unsafe_allow_html=True,
-)
+# Render sidebar
+gt = data.get("groei_team", {}) if data else {}
+periodes = data.get("periodes", None)
+render_sidebar(data, klant_naam, gt, periodes, list(periodes.keys()) if periodes else None)
 
 # ─── Helper functies ───────────────────────────────────────
 def status_icon(s):

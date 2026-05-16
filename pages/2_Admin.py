@@ -50,8 +50,6 @@ def admin_styling():
 .admin-label { color: var(--text-muted); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:0.2rem; }
 .sidebar-btn-active button { background: rgba(82,115,255,0.2) !important; border-color: rgba(82,115,255,0.4) !important; }
 </style>""", unsafe_allow_html=True)
-.sidebar-btn-active button { background: rgba(82,115,255,0.2) !important; border-color: rgba(82,115,255,0.4) !important; }
-</style>\"\"\", unsafe_allow_html=True)
 
 # ─── Login ─────────────────────────────────────────────────
 if "admin_logged_in" not in st.session_state:
@@ -82,7 +80,6 @@ if "admin_tab" not in st.session_state:
 # ─── Sidebar (gedeelde look, zelfde als home) ───────────
 with st.sidebar:
     st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
-
     st.markdown('<div class="sidebar-sec">Navigatie</div>', unsafe_allow_html=True)
     st.page_link("dashboard.py", label="📊 Dashboard", use_container_width=True)
     st.page_link("pages/1_Conversie.py", label="📈 Conversie", use_container_width=True)

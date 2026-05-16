@@ -9,6 +9,7 @@ from groei_team_ui import (
     render_health_ring, render_pakket_badge, render_workflow_health_item,
     render_roi_card, render_hitl_samenvatting, bereken_health_score, GROEI_TEAM_CSS
 )
+from sidebar_ui import render_sidebar
 
 # set_page_config must be first Streamlit command
 st.set_page_config(page_title="Mijn GroeiTeam — BigWaves", page_icon="🌊", layout="wide")
@@ -20,6 +21,13 @@ setup_subpage()
 if "ingelogd" not in st.session_state or not st.session_state.ingelogd:
     st.warning("Log eerst in via het dashboard.")
     st.stop()
+
+# Laad data voor sidebar
+kn = st.session_state.get("klant_naam", "")
+data = st.session_state.get("data", {})
+gt = data.get("groei_team", {}) if data else {}
+periodes = data.get("periodes", None)
+render_sidebar(data, kn, gt, periodes, list(periodes.keys()) if periodes else None)
 
 # Laad klant data
 klant_naam = st.session_state.get("klant_naam", None)

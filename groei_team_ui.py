@@ -20,8 +20,7 @@ def render_health_ring(score: int) -> str:
     straal = 36
     omtrek = 2 * 3.14159 * straal
     offset = omtrek - (pct / 100) * omtrek
-    return f"""
-    return f"""<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">"""
+    return f"""<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
         <svg width="90" height="90" viewBox="0 0 90 90">
             <circle cx="45" cy="45" r="{straal}" fill="none" stroke="#2a2e3d" stroke-width="6"/>
             <circle cx="45" cy="45" r="{straal}" fill="none" stroke="{kleur}" stroke-width="6"
@@ -134,7 +133,7 @@ def bereken_health_score(data: dict) -> int:
             pass
 
     # Check KPI statussen
-if periodes:
+    if periodes:
         huidige = list(periodes.keys())[-1] if periodes else None
         if huidige:
             for kpi, info in periodes[huidige].get("kpis", {}).items():
@@ -189,10 +188,6 @@ def render_roi_card(data: dict) -> str:
 
 # CSS voor GroeiTeam componenten
 GROEI_TEAM_CSS = """
-    s = wf.get("status", "onbekend")
-    kleur = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}.get(s, "#64748b")
-    icoon = {"groen": "🟢", "oranje": "🟠", "rood": "🔴"}.get(s, "⚪")
-    return f"""<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
         <span>{icoon}</span>
         <span style="color:var(--text);flex:1;">{wf.get('naam','Workflow')}</span>
         <span style="color:{kleur};font-weight:600;">{wf.get('volume',0)}</span>
