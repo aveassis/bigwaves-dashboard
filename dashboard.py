@@ -243,16 +243,17 @@ button[data-testid="stBaseButton-headerNoPadding"] {
     visibility: visible !important;
     position: fixed !important;
     top: 0.3rem !important;
-    right: 0.5rem !important;
+    right: 14rem !important;
     left: auto !important;
     width: 28px !important;
     height: 28px !important;
-    background: rgba(255,255,255,0.1) !important;
-    border: 1px solid rgba(255,255,255,0.15) !important;
+    background: #ff0000 !important;
+    border: 2px solid #ffffff !important;
     border-radius: 6px !important;
     color: #ffffff !important;
     cursor: pointer !important;
-    z-index: 999 !important;
+    z-index: 99999 !important;
+    font-size: 16px !important;
 }
 button[data-testid="stBaseButton-headerNoPadding"]:hover {
     background: rgba(255,255,255,0.2) !important;
