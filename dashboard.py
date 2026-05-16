@@ -17,6 +17,14 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# Forceer verse sessie bij nieuwe deploy — leeg oude session state keys
+if st.session_state.get("ingelogd") and "sidebar_v2" not in st.session_state:
+    for k in ["ingelogd", "klant_naam", "data", "admin_logged_in"]:
+        if k in st.session_state:
+            del st.session_state[k]
+    st.session_state.sidebar_v2 = True
+    st.rerun()
+
 # Detect mobiel via JavaScript — sluit sidebar in als small screen
 st.markdown("""<script>
 if (window.innerWidth < 768) {
