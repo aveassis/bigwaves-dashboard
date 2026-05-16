@@ -16,76 +16,14 @@ footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
-/* Collapse knop styling */
-.stButton[data-testid="sidebar_collapse_btn"] button {
-    position: absolute !important;
-    top: 0.3rem !important;
-    right: 0.3rem !important;
-    width: 28px !important;
-    height: 28px !important;
-    padding: 0 !important;
-    background: rgba(255,255,255,0.1) !important;
-    border: 1px solid rgba(255,255,255,0.15) !important;
-    border-radius: 6px !important;
-    color: #ffffff !important;
-    font-size: 0.85rem !important;
-    min-width: unset !important;
-}
-.stButton[data-testid="sidebar_collapse_btn"] button:hover {
-    background: rgba(255,255,255,0.2) !important;
-}
-/* Open knop styling — floating linksboven */
-.stButton[data-testid="sidebar_open_btn"] button {
-    position: fixed !important;
-    top: 0.5rem !important;
-    left: 0.5rem !important;
-    z-index: 9999 !important;
-    width: 32px !important;
-    height: 32px !important;
-    padding: 0 !important;
-    background: rgba(45, 27, 105, 0.9) !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
-    border-radius: 8px !important;
-    color: #ffffff !important;
-    font-size: 1rem !important;
-    min-width: unset !important;
-    backdrop-filter: blur(8px) !important;
-}
-.stButton[data-testid="sidebar_open_btn"] button:hover {
-    background: rgba(45, 27, 105, 1) !important;
-    border-color: rgba(255,255,255,0.4) !important;
-}
 </style>""", unsafe_allow_html=True)
 
-    # Collapse/open state in session_state
-    if "sidebar_collapsed" not in st.session_state:
-        st.session_state.sidebar_collapsed = False
-
-    # CSS body class voor sidebar collapsed
-    if st.session_state.sidebar_collapsed:
-        st.markdown("""<style>
-html, body { overflow-x: hidden; }
-section[data-testid="stSidebar"] { width: 0 !important; min-width: 0 !important; overflow: hidden !important; padding: 0 !important; border: none !important; }
-section[data-testid="stSidebar"] > * { display: none !important; }
-</style>""", unsafe_allow_html=True)
-
-    # Open knop (☰) — alleen tonen als sidebar collapsed is
-    if st.session_state.sidebar_collapsed:
-        col1, col2, col3 = st.columns([0, 0, 1])
-        with col1:
-            if st.button("☰", key="sidebar_open_btn"):
-                st.session_state.sidebar_collapsed = False
-                st.rerun()
+    # Pure Streamlit sidebar — native collapse via stBaseButton-headerNoPadding
+    # Die knop zit onderin de sidebar; we maken hem zichtbaar met CSS
 
     with st.sidebar:
-        # Logo + collapse knop
-        lc1, lc2 = st.columns([6, 1])
-        with lc1:
-            st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
-        with lc2:
-            if st.button("◀", key="sidebar_collapse_btn"):
-                st.session_state.sidebar_collapsed = True
-                st.rerun()
+        # Logo
+        st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
 
         # Pakket badge
         if gt:

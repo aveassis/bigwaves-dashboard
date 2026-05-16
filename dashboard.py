@@ -238,6 +238,25 @@ footer { visibility: hidden !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
 /* ─── Sidebar collapse ──────────────────── */
+/* Streamlit native collapse knop (◀) zichtbaar maken */
+button[data-testid="stBaseButton-headerNoPadding"] {
+    visibility: visible !important;
+    position: absolute !important;
+    top: 0.3rem !important;
+    right: 0.3rem !important;
+    width: 28px !important;
+    height: 28px !important;
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    border-radius: 6px !important;
+    color: #ffffff !important;
+    cursor: pointer !important;
+    z-index: 999 !important;
+}
+button[data-testid="stBaseButton-headerNoPadding"]:hover {
+    background: rgba(255,255,255,0.2) !important;
+}
+/* Floating open-knop (☰) als sidebar collapsed is — Streamlit native */
 @media screen and (min-width: 769px) {
     div[data-testid="stSidebarCollapsedControl"] {
         display: flex !important;
