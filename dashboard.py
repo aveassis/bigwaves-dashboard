@@ -241,9 +241,10 @@ header[data-testid="stHeader"] { display: none !important; }
 /* Streamlit native collapse knop (◀) zichtbaar maken */
 button[data-testid="stBaseButton-headerNoPadding"] {
     visibility: visible !important;
-    position: absolute !important;
+    position: fixed !important;
     top: 0.3rem !important;
-    right: 0.3rem !important;
+    right: 0.5rem !important;
+    left: auto !important;
     width: 28px !important;
     height: 28px !important;
     background: rgba(255,255,255,0.1) !important;
