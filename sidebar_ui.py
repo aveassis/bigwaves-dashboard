@@ -7,7 +7,7 @@ def render_sidebar(data: dict, kn: str, gt: dict = None, periodes: dict = None, 
         return
     with st.sidebar:
         st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
-        st.markdown('<p style="font-size:0.7rem;color:#64748b;margin:-8px 0 12px 0;letter-spacing:0.3px;">Conversiebureau</p>', unsafe_allow_html=True)
+        st.markdown('<div class="sidebar-tagline">datagedreven · menselijk gecheckt</div>', unsafe_allow_html=True)
 
         st.markdown('<div class="sidebar-sect">NAVIGATIE</div>', unsafe_allow_html=True)
         st.page_link("dashboard.py", label="📊  Dashboard", width="stretch")
@@ -32,12 +32,27 @@ def render_sidebar(data: dict, kn: str, gt: dict = None, periodes: dict = None, 
             )
 
         st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+
+        # Health badge
+        gt_data = gt or {}
+        health = gt_data.get("health_score") or data.get("health_score")
+        if health is not None:
+            c = "#10b981" if health >= 80 else "#f59e0b" if health >= 60 else "#ef4444"
+            st.markdown(
+                f'<div class="health-badge">'
+                f'<span class="health-dot" style="background:{c};"></span>'
+                f'Groei Health: <strong style="color:{c};">{health}%</strong>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
         st.markdown('<div class="sidebar-sect">KLANT</div>', unsafe_allow_html=True)
         logo = data.get('logo','🌊')
-        st.markdown(f"<div style='padding:0.3rem 0;font-size:0.85rem;color:var(--text);font-weight:500;'>{logo} {kn}</div>", unsafe_allow_html=True)
+        st.markdown(f'<div class="client-name">{logo} {kn}</div>', unsafe_allow_html=True)
         periode = data.get('periode','—')
         update = data.get('laatste_update','—')
-        st.caption(f"Periode: {periode} · Update: {update}")
+        st.markdown(f'<div class="client-meta">Periode: {periode}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="client-meta">Update: {update}</div>', unsafe_allow_html=True)
 
         st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
         if st.button("🚪 Uitloggen", width="stretch"):
@@ -47,4 +62,4 @@ def render_sidebar(data: dict, kn: str, gt: dict = None, periodes: dict = None, 
             st.rerun()
 
         st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
-        st.markdown('<p style="font-size:0.65rem;color:#475569;text-align:center;margin-top:8px;">🌊 BigWaves — datagedreven · menselijk gecheckt</p>', unsafe_allow_html=True)
+        st.markdown('<p style="font-size:0.65rem;color:#475569;text-align:center;margin-top:8px;">🌊 BigWaves AI-bureau — datagedreven · menselijk gecheckt</p>', unsafe_allow_html=True)

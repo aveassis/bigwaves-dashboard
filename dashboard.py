@@ -79,10 +79,18 @@ footer { visibility: hidden !important; }
 }
 
 /* Sidebar styling */
-.sidebar-logo { font-size: 1.15rem; font-weight: 700; padding: 0.2rem 0; display: flex; align-items: center; gap: 6px; }
+.sidebar-logo { font-size:1.1rem; font-weight:700; color:var(--text); display:flex; align-items:center; gap:0.45rem; margin-bottom:0.1rem; }
 .sidebar-logo span { color: var(--text); }
-.sidebar-sect { font-size: 0.68rem; color: #475569; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; margin: 0.8rem 0 0.3rem 0; }
-.sidebar-divider { height: 1px; background: var(--border); margin: 0.6rem 0; }
+.sidebar-tagline { font-size:0.62rem; color:var(--text-muted); margin-bottom:0.2rem; }
+.sidebar-divider { height:1px; background:linear-gradient(to right,var(--border),transparent); margin:0.55rem 0; }
+.sidebar-sect { font-size:0.58rem; font-weight:600; color:#4a5568; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:0.35rem; padding-left:0.1rem; }
+.health-badge { display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--text-sec); padding:0.25rem 0; }
+.health-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+.client-name { font-size:0.85rem; color:var(--text); font-weight:500; padding:0.2rem 0; }
+.client-meta { font-size:0.68rem; color:var(--text-muted); padding:0.05rem 0; }
+/* Hide Streamlit's auto-generated page nav in sidebar */
+div[data-testid="stSidebar"] nav { display:none; }
+div[data-testid="stSidebar"] ul[role="list"] { display:none; }
 section[data-testid="stSidebar"] .stPageLink { padding: 0.15rem 0 !important; }
 section[data-testid="stSidebar"] .stPageLink p { font-size: 0.82rem !important; }
 section[data-testid="stSidebar"] button[data-testid="baseButton-secondary"] { font-size: 0.82rem !important; padding: 0.3rem 0.6rem !important; }
