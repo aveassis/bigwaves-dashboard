@@ -65,6 +65,14 @@ footer { visibility: hidden !important; }
 .admin-card strong { color: var(--text) !important; }
 .admin-sectie { font-size:0.9rem; font-weight:600; color:var(--text); margin:1rem 0 0.5rem 0; }
 .admin-label { color: var(--text-muted); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:0.2rem; }
+.sidebar-logo { font-size: 1.15rem; font-weight: 700; padding: 0.2rem 0; display: flex; align-items: center; gap: 6px; }
+.sidebar-logo span { color: var(--text); }
+.sidebar-sect { font-size: 0.68rem; color: #475569; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; margin: 0.8rem 0 0.3rem 0; }
+.sidebar-divider { height: 1px; background: var(--border); margin: 0.6rem 0; }
+.sidebar-btn-active button { background: rgba(16,185,129,0.15) !important; border-color: rgba(16,185,129,0.3) !important; }
+section[data-testid="stSidebar"] .stPageLink { padding: 0.15rem 0 !important; }
+section[data-testid="stSidebar"] .stPageLink p { font-size: 0.82rem !important; }
+section[data-testid="stSidebar"] button[data-testid="baseButton-secondary"] { font-size: 0.82rem !important; padding: 0.3rem 0.6rem !important; }
 </style>""", unsafe_allow_html=True)
 
 # ─── Login ─────────────────────────────────────────────────
@@ -95,21 +103,30 @@ if "admin_tab" not in st.session_state:
 
 # ─── Sidebar ───────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### 🔐 Admin Paneel")
-    st.caption("BigWaves beheeromgeving")
-    st.divider()
+    st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:0.7rem;color:#64748b;margin:-8px 0 12px 0;letter-spacing:0.3px;">Conversiebureau</p>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-sect">NAVIGATIE</div>', unsafe_allow_html=True)
+    st.page_link("dashboard.py", label="📊  Dashboard", width="stretch")
+    st.page_link("pages/1_GroeiTeam.py", label="🌱  GroeiTeam", width="stretch")
+    st.page_link("pages/1_Inzichten.py", label="📈  Inzichten", width="stretch")
+    st.page_link("pages/2_Admin.py", label="🔐  Admin", width="stretch")
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-sect">BEHEER</div>', unsafe_allow_html=True)
     tabs = ["📋 Overzicht", "✏️ Bewerken", "🌊 GroeiTeam", "➕ Nieuwe klant", "📦 JSON Editor"]
     for t in tabs:
+        active = "sidebar-btn-active" if t == st.session_state.admin_tab else ""
+        st.markdown(f'<div class="{active}">', unsafe_allow_html=True)
         if st.button(t, width="stretch", key=f"tab_{t}"):
             st.session_state.admin_tab = t
             st.rerun()
-    st.divider()
-    if st.button("← Dashboard", width="stretch"):
-        st.switch_page("dashboard.py")
+        st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
     if st.button("🚪 Uitloggen", width="stretch"):
         for k in ["admin_logged_in", "edit_klant", "admin_tab"]:
             st.session_state.pop(k, None)
         st.rerun()
+    st.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size:0.65rem;color:#475569;text-align:center;margin-top:8px;">🌊 BigWaves — datagedreven · menselijk gecheckt</p>', unsafe_allow_html=True)
 
 # ─── Tab routing ───────────────────────────────────────────
 tab = st.session_state.admin_tab

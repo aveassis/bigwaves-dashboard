@@ -1,8 +1,18 @@
 # pages/3_LinkedIn.py — LinkedIn Outreach overzicht (schone versie)
 import streamlit as st
+st.set_page_config(page_title="LinkedIn — BigWaves", page_icon="🔗", layout="wide")
+from sidebar_ui import render_sidebar
 from pathlib import Path
 import sqlite3
 from datetime import date
+
+# Laad data voor sidebar
+kn = st.session_state.get("klant_naam", "")
+data = st.session_state.get("data", {})
+if kn and data:
+    gt = data.get("groei_team", {}) if data else {}
+    periodes = data.get("periodes", None)
+    render_sidebar(data, kn, gt, periodes, list(periodes.keys()) if periodes else None)
 
 # LinkedIn DB pad
 linkedin_db = Path(__file__).parent.parent / "linkedin-outreach" / "data" / "linkedin.db"

@@ -1,13 +1,20 @@
 # BigWaves Inzichten Pagina — Voortgang · Resultaten · Status
 import streamlit as st
 
+st.set_page_config(page_title="Inzichten — BigWaves", page_icon="📈", layout="wide")
+
+from sidebar_ui import render_sidebar
+
 if "data" not in st.session_state:
     st.switch_page("dashboard.py")
 
 data = st.session_state.data
 klant_naam = st.session_state.klant_naam
 
-st.set_page_config(page_title="Inzichten — BigWaves", page_icon="📈", layout="wide")
+# Render sidebar
+gt = data.get("groei_team", {}) if data else {}
+periodes = data.get("periodes", None)
+render_sidebar(data, klant_naam, gt, periodes, list(periodes.keys()) if periodes else None)
 
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>

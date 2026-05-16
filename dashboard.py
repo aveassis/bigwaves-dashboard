@@ -7,6 +7,7 @@ from pathlib import Path
 from io import BytesIO
 from pdf_export import genereer_pdf
 from groei_team_ui import render_pakket_badge, GROEI_TEAM_CSS
+from sidebar_ui import render_sidebar
 
 DATA_DIR = Path(__file__).parent / "data"
 st.set_page_config(
@@ -76,6 +77,15 @@ footer { visibility: hidden !important; }
     button[aria-label*="sidebar"] { display: none !important; }
     [data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
 }
+
+/* Sidebar styling */
+.sidebar-logo { font-size: 1.15rem; font-weight: 700; padding: 0.2rem 0; display: flex; align-items: center; gap: 6px; }
+.sidebar-logo span { color: var(--text); }
+.sidebar-sect { font-size: 0.68rem; color: #475569; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; margin: 0.8rem 0 0.3rem 0; }
+.sidebar-divider { height: 1px; background: var(--border); margin: 0.6rem 0; }
+section[data-testid="stSidebar"] .stPageLink { padding: 0.15rem 0 !important; }
+section[data-testid="stSidebar"] .stPageLink p { font-size: 0.82rem !important; }
+section[data-testid="stSidebar"] button[data-testid="baseButton-secondary"] { font-size: 0.82rem !important; padding: 0.3rem 0.6rem !important; }
 
 /* KPI card styling */
 .kpi-box {
@@ -265,67 +275,31 @@ else:
     pass
 
 # ─── Sidebar ─────────────────────────────────────────────
-with st.sidebar:
-    st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
-    st.markdown('<div class="sidebar-sec">Main</div>', unsafe_allow_html=True)
-    st.page_link("dashboard.py", label="📊  Dashboard", width="stretch")
-    st.page_link("pages/1_Inzichten.py", label="📈  Inzichten", width="stretch")
-    # LinkedIn Outreach alleen voor Pro pakket
-    pakket_naam = gt.get("pakket", "") if gt else ""
-    if pakket_naam == "Pro":
-        st.page_link("pages/3_LinkedIn.py", label="🔗  LinkedIn Outreach", use_container_width=True)
-    else:
-        st.markdown(
-            f'<div style="padding:0.3rem 0.8rem;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(16,185,129,0.02));'
-            f'border:1px solid rgba(16,185,129,0.2);border-radius:10px;margin:0.2rem 0;font-size:0.78rem;">'
-            f'<div style="color:#64748b;font-size:0.72rem;">🔗 LinkedIn Outreach</div>'
-            f'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">'
-            f'<span style="color:#94a3b8;">Alleen in Pro</span>'
-            f'<span style="color:#10b981;font-weight:600;font-size:0.7rem;">⬆ Upgrade</span>'
-            f'</div></div>',
-            unsafe_allow_html=True,
-        )
-    st.markdown('<div class="sidebar-sec">Klant</div>', unsafe_allow_html=True)
-    st.markdown(f"<div style='padding:0.3rem 0;font-size:0.85rem;color:var(--text);font-weight:500;'>{data.get('logo','🌊')} {kn}</div>", unsafe_allow_html=True)
-    st.caption(f"Periode: {data.get('periode','—')}")
-    st.caption(f"Update: {data.get('laatste_update','—')}")
-    st.divider()
-    if st.button("🚪 Uitloggen", width="stretch"):
-        for k in["ingelogd","klant_naam","data"]:
-            if k in st.session_state: del st.session_state[k]
-        st.rerun()
-    st.divider()
-    # Dark/light toggle
-    if "dark_mode" not in st.session_state:
-        st.session_state.dark_mode = True
-    dark = st.toggle("🌙 Donker", value=st.session_state.dark_mode, key="dark_toggle")
-    if dark != st.session_state.dark_mode:
-        st.session_state.dark_mode = dark
-        st.rerun()
+render_sidebar(data, kn, gt, periodes, periode_lijst if periodes else None)
 
-    # Light mode CSS override
-    if not st.session_state.dark_mode:
-        st.markdown("""<style>
-        :root {
-        --bg: #f5f7fa !important;
-        --surface: #ffffff !important;
-        --card: #ffffff !important;
-        --border: #e8ecf1 !important;
-        --border-light: #d1d5db !important;
-        --text: #1a1d23 !important;
-        --text-sec: #6b7280 !important;
-        --text-muted: #9ca3af !important;
-        }
-        section[data-testid="stSidebar"] { background: var(--surface) !important; }
-        .kpi-box { background: var(--card) !important; }
-        .kpi-val { color: var(--text) !important; }
-        .kpi-label { color: var(--text-muted) !important; }
-        .kpi-target { color: var(--text-muted) !important; }
-        div[data-testid="column"]:nth-child(2) button { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
-        </style>""", unsafe_allow_html=True)
-    st.divider()
-    st.caption("🌊 BigWaves AI-bureau")
-    st.caption("datagedreven · menselijk gecheckt")
+# Light mode CSS override
+if not st.session_state.dark_mode:
+    st.markdown("""<style>
+    :root {
+    --bg: #f5f7fa !important;
+    --surface: #ffffff !important;
+    --card: #ffffff !important;
+    --border: #e8ecf1 !important;
+    --border-light: #d1d5db !important;
+    --text: #1a1d23 !important;
+    --text-sec: #6b7280 !important;
+    --text-muted: #9ca3af !important;
+    }
+    section[data-testid="stSidebar"] { background: var(--surface) !important; }
+    .kpi-box { background: var(--card) !important; }
+    .kpi-val { color: var(--text) !important; }
+    .kpi-label { color: var(--text-muted) !important; }
+    .kpi-target { color: var(--text-muted) !important; }
+    div[data-testid="column"]:nth-child(2) button { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
+    </style>""", unsafe_allow_html=True)
+st.divider()
+st.caption("🌊 BigWaves AI-bureau")
+st.caption("datagedreven · menselijk gecheckt")
 
 # ─── Header ──────────────────────────────────────────────
 logo = data.get("logo", "🌊")
