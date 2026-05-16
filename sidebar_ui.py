@@ -7,6 +7,7 @@ def render_sidebar(data, kn, gt, periodes=None, periode_lijst=None):
     Aanroepen vanuit elke pagina: render_sidebar(data, kn, gt, periodes, periode_lijst)
     """
     # CSS om Streamlit's auto-navigatie te verbergen op alle pagina's
+    # Ook: ongedaan maken van login pagina's sidebar hide
     st.markdown("""<style>
 section[data-testid="stSidebar"] ul.st-emotion-cache-1gczx66 {
     display: none !important;
@@ -16,6 +17,7 @@ footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
+section[data-testid="stSidebar"] { display: block !important; }
 </style>""", unsafe_allow_html=True)
     
     with st.sidebar:
@@ -139,9 +141,8 @@ header[data-testid="stHeader"] { display: none !important; }
         let sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
         if (!sidebar) { toggle.style.display = 'none'; return; }
         let rect = sidebar.getBoundingClientRect();
-        let hidden = rect.width < 10 || sidebar.style.display === 'none' || 
-                     getComputedStyle(sidebar).display === 'none' ||
-                     sidebar.getAttribute('aria-expanded') === 'false';
+        // Verborgen als sidebar echt 0 breedte heeft (gecollapsed)
+        let hidden = rect.width < 10;
         toggle.style.display = hidden ? 'flex' : 'none';
     }
     checkSidebar();
