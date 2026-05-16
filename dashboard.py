@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from io import BytesIO
 from pdf_export import genereer_pdf
+from groei_team_ui import render_pakket_badge, GROEI_TEAM_CSS
 
 DATA_DIR = Path(__file__).parent / "data"
 st.set_page_config(
@@ -25,8 +26,6 @@ if (window.innerWidth < 768) {
     }
 }
 </script>""", unsafe_allow_html=True)
-
-from groei_team_ui import render_pakket_badge, GROEI_TEAM_CSS
 
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
 # Accentkleur via aparte mini-style
