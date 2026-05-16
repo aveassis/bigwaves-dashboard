@@ -4,6 +4,11 @@ from pathlib import Path
 import sqlite3
 from datetime import date
 
+st.set_page_config(page_title="LinkedIn Outreach — BigWaves", page_icon="🔗", layout="wide")
+
+from shared_css import setup_subpage
+setup_subpage()
+
 # LinkedIn DB pad
 linkedin_db = Path(__file__).parent.parent / "linkedin-outreach" / "data" / "linkedin.db"
 if not linkedin_db.exists():
@@ -60,37 +65,34 @@ def get_stats(db_path):
     return stats
 
 # === UI ===
-st.set_page_config(page_title="LinkedIn Outreach", page_icon="🔗", layout="wide")
-
 st.markdown("""
 <style>
     .block-container { padding-top: 1.5rem; }
-    h1, h2, h3 { color: #f1f5f9 !important; }
     .metric-card {
-        background: #1e293b; border: 1px solid #334155;
+        background: #ffffff; border: 1px solid var(--border);
         border-radius: 12px; padding: 1rem 1.2rem; text-align: center;
     }
-    .metric-val { font-size: 2rem; font-weight: 700; color: #10b981; line-height: 1.2; }
-    .metric-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric-val { font-size: 2rem; font-weight: 700; color: var(--primary); line-height: 1.2; }
+    .metric-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .prospect-row {
-        background: #1e293b; border: 1px solid #334155;
+        background: #ffffff; border: 1px solid var(--border);
         border-radius: 8px; padding: 0.6rem 1rem; margin-bottom: 4px; font-size: 0.85rem;
     }
     .status-badge {
         display: inline-block; padding: 2px 8px; border-radius: 20px;
         font-size: 0.7rem; font-weight: 600;
     }
-    .status-new { background: #1e3a5f; color: #60a5fa; }
-    .status-warming { background: #5b3a1a; color: #fbbf24; }
-    .status-warmed { background: #1a3d1a; color: #34d399; }
-    .status-connecting { background: #3b1a5e; color: #c084fc; }
-    .status-connected { background: #1a3d3d; color: #2dd4bf; }
-    .status-replied { background: #1a3d1a; color: #10b981; }
-    .status-meeting { background: #1a5e1a; color: #4ade80; }
-    .status-rejected { background: #3d1a1a; color: #f87171; }
+    .status-new { background: #dbeafe; color: #2563eb; }
+    .status-warming { background: #fef3c7; color: #d97706; }
+    .status-warmed { background: #d1fae5; color: #059669; }
+    .status-connecting { background: #e9d5ff; color: #7c3aed; }
+    .status-connected { background: #ccfbf1; color: #0d9488; }
+    .status-replied { background: #d1fae5; color: #10b981; }
+    .status-meeting { background: #bbf7d0; color: #16a34a; }
+    .status-rejected { background: #fee2e2; color: #ef4444; }
     .activity-item {
         display: flex; gap: 8px; align-items: center;
-        border-bottom: 1px solid #1e293b; padding: 6px 0; font-size: 0.82rem;
+        border-bottom: 1px solid var(--border); padding: 6px 0; font-size: 0.82rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -119,7 +121,7 @@ with c5:
     vandaag = sum(stats["acties_vandaag"].values())
     st.markdown(f"<div class='metric-card'><div class='metric-val'>{vandaag}</div><div class='metric-label'>Acties Vandaag</div></div>", unsafe_allow_html=True)
 
-st.markdown("<hr style='border-color:#334155; margin: 1.5rem 0;'>", unsafe_allow_html=True)
+st.markdown("<hr style='border-color:var(--border); margin: 1.5rem 0;'>", unsafe_allow_html=True)
 
 # Recente activiteit + status
 col_left, col_right = st.columns([2, 1])
@@ -130,22 +132,22 @@ with col_left:
         icon_map = {"visit": "👁️", "like": "👍", "comment": "💬", "connect_request": "🔗", "message": "✉️", "followup": "🔄"}
         for a in stats["recente_acties"][:15]:
             icon = icon_map.get(a["action_type"], "•")
-            st.markdown(f"<div class='activity-item'><span>{icon}</span><span><strong>{a.get('naam','?')}</strong> ({a.get('bedrijf','')})</span><span style='color:#64748b;font-size:0.75rem;'>{a.get('actie_datum','')[:16]}</span></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='activity-item'><span>{icon}</span><span><strong>{a.get('naam','?')}</strong> ({a.get('bedrijf','')})</span><span style='color:var(--text-muted);font-size:0.75rem;'>{a.get('actie_datum','')[:16]}</span></div>", unsafe_allow_html=True)
     else:
         st.info("Nog geen activiteit.")
 
 with col_right:
     st.markdown("#### 📊 Status Verdeling")
     status_kleuren = {
-        "new": "#60a5fa", "warming": "#fbbf24", "warmed": "#34d399",
-        "connecting": "#c084fc", "connected": "#2dd4bf",
-        "replied": "#10b981", "meeting": "#4ade80", "rejected": "#f87171",
+        "new": "#2563eb", "warming": "#d97706", "warmed": "#059669",
+        "connecting": "#7c3aed", "connected": "#0d9488",
+        "replied": "#10b981", "meeting": "#16a34a", "rejected": "#ef4444",
     }
     for status in ["new", "warming", "warmed", "connecting", "connected", "replied", "meeting", "rejected"]:
         count = stats["per_status"].get(status, 0)
         if count > 0:
             kleur = status_kleuren.get(status, "#64748b")
-            st.markdown(f"<div style='display:flex;justify-content:space-between;margin-bottom:4px;'><span style='color:#94a3b8;font-size:0.82rem;'><span style='color:{kleur};'>●</span> {status.capitalize()}</span><span style='color:#f1f5f9;font-weight:600;'>{count}</span></div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='display:flex;justify-content:space-between;margin-bottom:4px;'><span style='color:var(--text-sec);font-size:0.82rem;'><span style='color:{kleur};'>●</span> {status.capitalize()}</span><span style='color:var(--text);font-weight:600;'>{count}</span></div>", unsafe_allow_html=True)
 
     st.markdown("#### 🔧 Limieten Vandaag")
     limieten = [
@@ -156,9 +158,9 @@ with col_right:
     for label, used, max_l in limieten:
         pct = min(used / max_l, 1.0)
         bar_kleur = "#10b981" if pct < 0.8 else ("#fbbf24" if pct < 1.0 else "#ef4444")
-        st.markdown(f"<div style='margin-bottom:6px;'><div style='display:flex;justify-content:space-between;font-size:0.78rem;'><span style='color:#94a3b8;'>{label}</span><span style='color:#f1f5f9;'>{used}/{max_l}</span></div><div style='background:#1e293b;border-radius:10px;height:6px;'><div style='background:{bar_kleur};width:{pct*100:.0f}%;height:6px;border-radius:10px;'></div></div></div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='margin-bottom:6px;'><div style='display:flex;justify-content:space-between;font-size:0.78rem;'><span style='color:var(--text-muted);'>{label}</span><span style='color:var(--text);'>{used}/{max_l}</span></div><div style='background:var(--primary-light);border-radius:10px;height:6px;'><div style='background:{bar_kleur};width:{pct*100:.0f}%;height:6px;border-radius:10px;'></div></div></div>", unsafe_allow_html=True)
 
-st.markdown("<hr style='border-color:#334155; margin: 1.5rem 0;'>", unsafe_allow_html=True)
+st.markdown("<hr style='border-color:var(--border); margin: 1.5rem 0;'>", unsafe_allow_html=True)
 
 # Prospect lijst
 st.markdown("#### 🎯 Prospects Overzicht")
@@ -170,11 +172,11 @@ for p in stats["prospects"]:
     s_class = f"status-{p['status']}" if p["status"] in status_kleuren else "status-new"
     st.markdown(
         f"<div class='prospect-row'><div style='display:flex;justify-content:space-between;align-items:center;'>"
-        f"<div><strong style='color:#f1f5f9;'>{p.get('naam','?')}</strong>"
-        f"<span style='color:#94a3b8;font-size:0.78rem;'> — {p.get('functie','')} bij {p.get('bedrijf','')}</span></div>"
+        f"<div><strong style='color:var(--text);'>{p.get('naam','?')}</strong>"
+        f"<span style='color:var(--text-muted);font-size:0.78rem;'> — {p.get('functie','')} bij {p.get('bedrijf','')}</span></div>"
         f"<div style='display:flex;gap:6px;align-items:center;'>"
         f"<span class='status-badge {s_class}'>{p['status']}</span>"
-        f"<span style='color:#64748b;font-size:0.7rem;'>{p.get('laatste_actie','')[:10] if p.get('laatste_actie') else ''}</span>"
+        f"<span style='color:var(--text-muted);font-size:0.7rem;'>{p.get('laatste_actie','')[:10] if p.get('laatste_actie') else ''}</span>"
         f"</div></div></div>",
         unsafe_allow_html=True,
     )

@@ -10,7 +10,11 @@ from groei_team_ui import (
     render_roi_card, render_hitl_samenvatting, bereken_health_score, GROEI_TEAM_CSS
 )
 
-# Geen set_page_config hier — overgenomen van dashboard.py
+# set_page_config must be first Streamlit command
+st.set_page_config(page_title="Mijn GroeiTeam — BigWaves", page_icon="🌊", layout="wide")
+
+from shared_css import setup_subpage
+setup_subpage()
 
 # Check login
 if "ingelogd" not in st.session_state or not st.session_state.ingelogd:
@@ -121,7 +125,7 @@ with cols2[1]:
         {"datum": "2026-04-14", "type": "wekelijkse check-in",
          "notities": "Kostenbesparing zichtbaar. Doel &euro;3.000 gehaald.", "status": "groen"},
     ])
-    checkin_html = '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.8rem 1rem;">'
+    checkin_html = '<div style=\"background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.8rem 1rem;\">'
     kleur_map = {"groen": "#10b981", "oranje": "#f59e0b", "rood": "#ef4444"}
     for ci in checkins:
         c = kleur_map.get(ci.get("status", "groen"), "#10b981")
@@ -201,7 +205,6 @@ if pakket == "Pro":
     st.markdown("<hr class='gt-divider'>", unsafe_allow_html=True)
     st.markdown("<div class='gt-section-title'>&#128279; LinkedIn Outreach</div>", unsafe_allow_html=True)
 
-    # Probeer data uit linkedin db
     linkedin_db = Path(__file__).parent.parent / "linkedin-outreach" / "data" / "linkedin.db"
     li_stats = {}
     if linkedin_db.exists():

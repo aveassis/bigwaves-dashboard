@@ -3,6 +3,7 @@ import streamlit as st
 import json
 from pathlib import Path
 from datetime import datetime
+from shared_css import DASHBOARD_CSS as ADMIN_BASE_CSS
 
 ADMIN_PASS = "bigwaves2026"
 DATA_DIR = Path(__file__).parent.parent / "data"
@@ -35,37 +36,22 @@ def lege_periode():
 
 def lege_klant(naam, ww):
     return {
-        "naam": naam, "wachtwoord": ww, "logo": "🌊", "accent_kleur": "#10b981",
+        "naam": naam, "wachtwoord": ww, "logo": "🌊", "accent_kleur": "#5273ff",
         "periodes": {"Huidige maand": lege_periode()}
     }
 
 # ─── Admin CSS ─────────────────────────────────────────────
 def admin_styling():
-    st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-* { font-family: 'Inter', system-ui, -apple-system, sans-serif !important; }
-:root { --bg:#0f1117; --surface:#1a1d27; --card:#1e2231; --border:#2a2e3d; --border-light:#363b4d; --text:#edf2f7; --text-sec:#94a3b8; --text-muted:#64748b; --primary:#10b981; --primary-light:rgba(16,185,129,0.1); --shadow:0 2px 8px rgba(0,0,0,0.2); --radius:14px; --radius-sm:10px; }
-.stApp { background: var(--bg) !important; }
-.stApp h1 { font-size: 1.4rem !important; font-weight: 700 !important; color: var(--text) !important; }
-.stApp h2 { font-size: 1.1rem !important; font-weight: 600 !important; color: var(--text) !important; }
-.stApp h3 { font-size: 0.95rem !important; font-weight: 600 !important; color: var(--text) !important; }
-.stApp p, .stApp li, .stApp span, .stApp label { color: var(--text-sec) !important; font-size: 0.82rem !important; }
-.stApp .st-caption { color: var(--text-muted) !important; font-size: 0.72rem !important; }
-.stTextInput input, .stTextArea textarea, .stSelectbox div[data-baseweb="select"] { background: var(--surface) !important; color: var(--text) !important; border: 1px solid var(--border) !important; border-radius: var(--radius-sm) !important; }
-.stTextInput input:focus, .stTextArea textarea:focus { border-color: var(--primary) !important; box-shadow: 0 0 0 3px var(--primary-light) !important; }
-.stButton button { border-radius: var(--radius-sm) !important; font-weight: 500 !important; }
-.stButton button[kind="primary"] { background: var(--primary) !important; border: 1px solid var(--primary) !important; color: #fff !important; }
-.stButton button[kind="primary"]:hover { background: #059669 !important; }
-.stApp hr { border-color: var(--border) !important; }
-.stApp .stAlert { background: var(--card) !important; border: 1px solid var(--border) !important; color: var(--text) !important; }
-#MainMenu { visibility: hidden !important; }
-footer { visibility: hidden !important; }
-.stDeployButton { display: none !important; }
+    st.markdown(ADMIN_BASE_CSS, unsafe_allow_html=True)
+    st.markdown("""<style>
 .admin-card { background: var(--card) !important; border: 1px solid var(--border) !important; border-radius: var(--radius) !important; padding: 1.2rem !important; box-shadow: var(--shadow) !important; margin-bottom: 0.8rem !important; }
 .admin-card strong { color: var(--text) !important; }
 .admin-sectie { font-size:0.9rem; font-weight:600; color:var(--text); margin:1rem 0 0.5rem 0; }
 .admin-label { color: var(--text-muted); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.3px; margin-bottom:0.2rem; }
+.sidebar-btn-active button { background: rgba(82,115,255,0.2) !important; border-color: rgba(82,115,255,0.4) !important; }
 </style>""", unsafe_allow_html=True)
+.sidebar-btn-active button { background: rgba(82,115,255,0.2) !important; border-color: rgba(82,115,255,0.4) !important; }
+</style>\"\"\", unsafe_allow_html=True)
 
 # ─── Login ─────────────────────────────────────────────────
 if "admin_logged_in" not in st.session_state:
@@ -93,23 +79,34 @@ admin_styling()
 if "admin_tab" not in st.session_state:
     st.session_state.admin_tab = "overzicht"
 
-# ─── Sidebar ───────────────────────────────────────────────
+# ─── Sidebar (gedeelde look, zelfde als home) ───────────
 with st.sidebar:
-    st.markdown("### 🔐 Admin Paneel")
-    st.caption("BigWaves beheeromgeving")
-    st.divider()
+    st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="sidebar-sec">Navigatie</div>', unsafe_allow_html=True)
+    st.page_link("dashboard.py", label="📊 Dashboard", use_container_width=True)
+    st.page_link("pages/1_Conversie.py", label="📈 Conversie", use_container_width=True)
+    st.page_link("pages/1_Inzichten.py", label="📊 Inzichten", use_container_width=True)
+    st.page_link("pages/2_Admin.py", label="🔧 Admin", use_container_width=True)
+    st.page_link("pages/3_LinkedIn.py", label="🔗 LinkedIn Outreach", use_container_width=True)
+
+    st.markdown('<div class="sidebar-sec">Admin</div>', unsafe_allow_html=True)
     tabs = ["📋 Overzicht", "✏️ Bewerken", "🌊 GroeiTeam", "➕ Nieuwe klant", "📦 JSON Editor"]
     for t in tabs:
-        if st.button(t, width="stretch", key=f"tab_{t}"):
+        selected = t == st.session_state.get("admin_tab", "📋 Overzicht")
+        btn_class = "sidebar-btn-active" if selected else ""
+        if st.button(t, width="stretch", key=f"tab_{t}", use_container_width=True):
             st.session_state.admin_tab = t
             st.rerun()
+
     st.divider()
-    if st.button("← Dashboard", width="stretch"):
-        st.switch_page("dashboard.py")
-    if st.button("🚪 Uitloggen", width="stretch"):
+    if st.button("🚪 Uitloggen", width="stretch", use_container_width=True):
         for k in ["admin_logged_in", "edit_klant", "admin_tab"]:
             st.session_state.pop(k, None)
         st.rerun()
+    st.divider()
+    st.caption("🌊 BigWaves AI-bureau")
+    st.caption("datagedreven · menselijk gecheckt")
 
 # ─── Tab routing ───────────────────────────────────────────
 tab = st.session_state.admin_tab
@@ -162,7 +159,7 @@ elif tab == "➕ Nieuwe klant":
         ww = st.text_input("Wachtwoord", type="password", placeholder="Kies wachtwoord")
     with c2:
         logo = st.text_input("Logo (emoji)", value="🌊")
-        accent = st.color_picker("Accentkleur", value="#10b981")
+        accent = st.color_picker("Accentkleur", value="#5273ff")
     if st.button("✅ Aanmaken", type="primary", width="stretch"):
         if nm and ww:
             if nm in klanten:
