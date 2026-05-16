@@ -237,28 +237,42 @@ footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
-/* ─── Sidebar collapse ──────────────────── */
-/* Streamlit native collapse knop (◀) zichtbaar maken */
-button[data-testid="stBaseButton-headerNoPadding"] {
-    visibility: visible !important;
+/* ─── Sidebar toggle ─────────────────────── */
+/* Floating toggle knop — linksboven, altijd zichtbaar na login */
+.bw-toggle-btn {
     position: fixed !important;
-    top: 0.3rem !important;
-    right: 14rem !important;
-    left: auto !important;
-    width: 28px !important;
-    height: 28px !important;
-    background: #ff0000 !important;
-    border: 2px solid #ffffff !important;
-    border-radius: 6px !important;
-    color: #ffffff !important;
-    cursor: pointer !important;
+    top: 0.5rem !important;
+    left: 0.5rem !important;
     z-index: 99999 !important;
-    font-size: 16px !important;
+    width: 30px !important;
+    height: 30px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(45, 27, 105, 0.85) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    cursor: pointer !important;
+    backdrop-filter: blur(6px) !important;
+    transition: all 0.2s ease !important;
+    user-select: none !important;
 }
-button[data-testid="stBaseButton-headerNoPadding"]:hover {
-    background: rgba(255,255,255,0.2) !important;
+.bw-toggle-btn:hover {
+    background: rgba(45, 27, 105, 1) !important;
+    border-color: rgba(255,255,255,0.4) !important;
 }
-/* Floating open-knop (☰) als sidebar collapsed is — Streamlit native */
+/* Sidebar collapsed */
+.bw-sidebar-closed section[data-testid="stSidebar"] {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+}
+/* Floating open-knop (►) als sidebar collapsed */
 @media screen and (min-width: 769px) {
     div[data-testid="stSidebarCollapsedControl"] {
         display: flex !important;
@@ -469,7 +483,7 @@ def login_screen():
     button[kind="header"] { display: none !important; }
     header[data-testid="stHeader"] { display: none !important; }
     div[data-testid="stToolbar"] { display: none !important; }
-    section.main { margin-left: 0 !important; }
+    section.main { margin-left: 0; }
     @media screen and (max-width: 768px) {
         .main > div { padding: 0.6rem 0.8rem !important; }
     }
@@ -533,6 +547,40 @@ else:
 
 # ─── Sidebar ─────────────────────────────────────────────
 render_sidebar(data, kn, gt, periodes, periode_lijst if periodes else None)
+
+# ─── Sidebar toggle knop + JS ──────────────────────────
+st.markdown("""<div class="bw-toggle-btn" id="bwToggleBtn">◀</div>
+<script>
+(function() {
+    var btn = document.getElementById('bwToggleBtn');
+    if (!btn || btn.dataset.initialized) return;
+    btn.dataset.initialized = '1';
+    var closed = false;
+    btn.onclick = function() {
+        var sb = document.querySelector('[data-testid="stSidebar"]');
+        if (!sb) return;
+        if (!closed) {
+            sb.style.width = '0';
+            sb.style.minWidth = '0';
+            sb.style.overflow = 'hidden';
+            sb.style.padding = '0';
+            sb.style.margin = '0';
+            sb.style.border = 'none';
+            btn.textContent = '☰';
+            closed = true;
+        } else {
+            sb.style.width = '';
+            sb.style.minWidth = '';
+            sb.style.overflow = '';
+            sb.style.padding = '';
+            sb.style.margin = '';
+            sb.style.border = '';
+            btn.textContent = '◀';
+            closed = false;
+        }
+    };
+})();
+</script>""", unsafe_allow_html=True)
 
 # ─── Header ──────────────────────────────────────────────
 logo = data.get("logo", "🌊")
