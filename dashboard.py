@@ -268,11 +268,10 @@ header[data-testid="stHeader"] { display: none !important; }
     }
     button[title*="sidebar"] { display: none !important; }
     button[aria-label*="sidebar"] { display: none !important; }
-    /* Als sidebar collapsed is, toon de collapse knop rechtsboven */
+    /* Als sidebar collapsed is, toon de collapse knop linksboven */
     section[data-testid="stSidebar"][aria-expanded="false"] ~ div[data-testid="stSidebarCollapsedControl"] {
         left: 0.5rem !important;
     }
-    [data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
 }
 
 /* ─── KPI card styling ──────────────────── */
