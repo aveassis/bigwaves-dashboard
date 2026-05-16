@@ -33,6 +33,51 @@ if (window.innerWidth < 768) {
         if (btn) btn.click();
     }
 }
+// ─── Sidebar toggle knoppen ──────────────────────────────
+(function() {
+    if (document.getElementById('bw-collapse-btn')) return;
+    // Wacht tot sidebar geladen is
+    function init() {
+        var sbHeader = parent.document.querySelector('[data-testid="stSidebar"] .sidebar-logo');
+        if (!sbHeader) return;
+        sbHeader.style.position = 'relative';
+        var collBtn = document.createElement('span');
+        collBtn.id = 'bw-collapse-btn';
+        collBtn.style.cssText = 'position:absolute;top:0.3rem;right:0.3rem;z-index:999;width:26px;height:26px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#fff;font-size:0.9rem;cursor:pointer;transition:all 0.2s ease;';
+        collBtn.textContent = '◀';
+        sbHeader.appendChild(collBtn);
+        var openBtn = document.createElement('div');
+        openBtn.id = 'bw-open-btn';
+        openBtn.style.cssText = 'position:fixed;top:0.5rem;left:0.5rem;z-index:9999;width:32px;height:32px;display:none;align-items:center;justify-content:center;background:rgba(45,27,105,0.9);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;font-size:1.1rem;cursor:pointer;backdrop-filter:blur(8px);transition:all 0.2s ease;font-family:sans-serif;line-height:1;';
+        openBtn.textContent = '☰';
+        document.body.appendChild(openBtn);
+        collBtn.onclick = function() {
+            var sb = parent.document.querySelector('[data-testid="stSidebar"]');
+            if (sb) { sb.style.width='0'; sb.style.minWidth='0'; sb.style.overflow='hidden'; sb.style.padding='0'; sb.style.border='none'; }
+            openBtn.style.display='flex';
+        };
+        openBtn.onclick = function() {
+            var sb = parent.document.querySelector('[data-testid="stSidebar"]');
+            if (sb) { sb.style.width=''; sb.style.minWidth=''; sb.style.overflow=''; sb.style.padding=''; sb.style.border=''; }
+            openBtn.style.display='none';
+        };
+        function check() {
+            var sb = parent.document.querySelector('[data-testid="stSidebar"]');
+            if (!sb) return;
+            openBtn.style.display = sb.getBoundingClientRect().width < 10 ? 'flex' : 'none';
+        }
+        check();
+        setInterval(check, 500);
+    }
+    // Retry tot sidebar header beschikbaar is
+    var retries = 0;
+    var timer = setInterval(function() {
+        if (parent.document.querySelector('[data-testid="stSidebar"] .sidebar-logo')) {
+            init(); clearInterval(timer);
+        }
+        if (++retries > 20) clearInterval(timer);
+    }, 300);
+})();
 </script>""", unsafe_allow_html=True)
 
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
