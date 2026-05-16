@@ -237,6 +237,7 @@ footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
+#MainMenu { visibility: visible !important; }
 /* ─── Sidebar toggle ─────────────────────── */
 .bw-sidebar-closed section[data-testid="stSidebar"] {
     width: 0 !important;

@@ -13,33 +13,13 @@ section[data-testid="stSidebar"] ul.st-emotion-cache-1gczx66 {
 }
 #MainMenu { visibility: hidden !important; }
 footer { visibility: hidden !important; }
-.stDeployButton { display: none !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
-</style>""", unsafe_allow_html=True)
-
-    # Pure Streamlit toggle — sidebar collapse via CSS class + session_state
-    if "sb_open" not in st.session_state:
-        st.session_state.sb_open = True
-
-    # Open knop in main body — alleen als sidebar dicht is
-    if not st.session_state.sb_open:
-        st.markdown("""<div style="position:fixed;top:0.5rem;left:0.5rem;z-index:99999;">""", unsafe_allow_html=True)
-        if st.button("☰", key="bw_open_btn"):
-            st.session_state.sb_open = True
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown("""<style>section[data-testid="stSidebar"] { width: 0 !important; min-width: 0 !important; overflow: hidden !important; padding: 0 !important; margin: 0 !important; border: none !important; }</style>""", unsafe_allow_html=True)
+    </style>""", unsafe_allow_html=True)
 
     with st.sidebar:
-        # Logo + collapse knop
-        lc1, lc2, lc3 = st.columns([4, 1, 1])
-        with lc1:
-            st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
-        with lc3:
-            if st.button("◀", key="bw_collapse_btn"):
-                st.session_state.sb_open = False
-                st.rerun()
+        # Logo
+        st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
 
         # Pakket badge
         if gt:
