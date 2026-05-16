@@ -6,8 +6,7 @@ def render_sidebar(data, kn, gt, periodes=None, periode_lijst=None):
     """Render de sidebar met logo, navigatie, periode selector, klant info en uitloggen.
     Aanroepen vanuit elke pagina: render_sidebar(data, kn, gt, periodes, periode_lijst)
     """
-    # CSS om Streamlit's auto-navigatie te verbergen op alle pagina's
-    # Ook: ongedaan maken van login pagina's sidebar hide
+    # CSS voor Streamlit chrome + sidebar toggle styling
     st.markdown("""<style>
 section[data-testid="stSidebar"] ul.st-emotion-cache-1gczx66 {
     display: none !important;
@@ -17,61 +16,76 @@ footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
-/* Sidebar toggle knop — vast pijltje rechtsboven in de sidebar */
-.sidebar-toggle-collapse {
+/* Collapse knop styling */
+.stButton[data-testid="sidebar_collapse_btn"] button {
     position: absolute !important;
-    top: 0.5rem !important;
-    right: 0.5rem !important;
-    z-index: 999 !important;
+    top: 0.3rem !important;
+    right: 0.3rem !important;
     width: 28px !important;
     height: 28px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    padding: 0 !important;
     background: rgba(255,255,255,0.1) !important;
     border: 1px solid rgba(255,255,255,0.15) !important;
     border-radius: 6px !important;
     color: #ffffff !important;
-    font-size: 1rem !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
+    font-size: 0.85rem !important;
+    min-width: unset !important;
 }
-.sidebar-toggle-collapse:hover {
+.stButton[data-testid="sidebar_collapse_btn"] button:hover {
     background: rgba(255,255,255,0.2) !important;
-    border-color: rgba(255,255,255,0.3) !important;
 }
-/* Floating open-knop als sidebar collapsed is */
-.sidebar-toggle-open {
+/* Open knop styling — floating linksboven */
+.stButton[data-testid="sidebar_open_btn"] button {
     position: fixed !important;
     top: 0.5rem !important;
     left: 0.5rem !important;
     z-index: 9999 !important;
     width: 32px !important;
     height: 32px !important;
-    display: none !important;
-    align-items: center !important;
-    justify-content: center !important;
+    padding: 0 !important;
     background: rgba(45, 27, 105, 0.9) !important;
     border: 1px solid rgba(255,255,255,0.2) !important;
     border-radius: 8px !important;
     color: #ffffff !important;
-    font-size: 1.1rem !important;
-    cursor: pointer !important;
+    font-size: 1rem !important;
+    min-width: unset !important;
     backdrop-filter: blur(8px) !important;
-    transition: all 0.2s ease !important;
 }
-.sidebar-toggle-open:hover {
+.stButton[data-testid="sidebar_open_btn"] button:hover {
     background: rgba(45, 27, 105, 1) !important;
     border-color: rgba(255,255,255,0.4) !important;
 }
-/* Toon open-knop altijd — JS verstopt hem als sidebar open is */
-.sidebar-toggle-open {
-    display: flex !important;
-}
 </style>""", unsafe_allow_html=True)
-    
+
+    # Collapse/open state in session_state
+    if "sidebar_collapsed" not in st.session_state:
+        st.session_state.sidebar_collapsed = False
+
+    # CSS body class voor sidebar collapsed
+    if st.session_state.sidebar_collapsed:
+        st.markdown("""<style>
+html, body { overflow-x: hidden; }
+section[data-testid="stSidebar"] { width: 0 !important; min-width: 0 !important; overflow: hidden !important; padding: 0 !important; border: none !important; }
+section[data-testid="stSidebar"] > * { display: none !important; }
+</style>""", unsafe_allow_html=True)
+
+    # Open knop (☰) — alleen tonen als sidebar collapsed is
+    if st.session_state.sidebar_collapsed:
+        col1, col2, col3 = st.columns([0, 0, 1])
+        with col1:
+            if st.button("☰", key="sidebar_open_btn"):
+                st.session_state.sidebar_collapsed = False
+                st.rerun()
+
     with st.sidebar:
-        st.markdown('<div class="sidebar-logo" style="position:relative;">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
+        # Logo + collapse knop
+        lc1, lc2 = st.columns([6, 1])
+        with lc1:
+            st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
+        with lc2:
+            if st.button("◀", key="sidebar_collapse_btn"):
+                st.session_state.sidebar_collapsed = True
+                st.rerun()
 
         # Pakket badge
         if gt:
@@ -94,9 +108,9 @@ header[data-testid="stHeader"] { display: none !important; }
             st.markdown(
                 f'<div style="padding:0.3rem 0.8rem;background:linear-gradient(135deg,rgba(82,115,255,0.08),rgba(82,115,255,0.02));'
                 f'border:1px solid rgba(82,115,255,0.2);border-radius:10px;margin:0.2rem 0;font-size:0.78rem;">'
-                f'<div style="color:var(--sidebar-text-muted);font-size:0.72rem;">🔗 LinkedIn Outreach</div>'
+                f'<div style="color:#ffffff;font-size:0.72rem;">🔗 LinkedIn Outreach</div>'
                 f'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;">'
-                f'<span style="color:var(--sidebar-text-muted);">Alleen in Pro</span>'
+                f'<span style="color:#ffffff;">Alleen in Pro</span>'
                 f'<span style="color:#5273ff;font-weight:600;font-size:0.7rem;">⬆ Upgrade</span>'
                 f'</div></div>',
                 unsafe_allow_html=True,
