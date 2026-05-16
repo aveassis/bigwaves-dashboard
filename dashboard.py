@@ -70,12 +70,42 @@ section[data-testid="stSidebar"] { background: var(--surface) !important; border
 #MainMenu { visibility: hidden !important; }
 footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
-/* Sidebar collapse — verborgen op desktop, zichtbaar op mobiel */
+/* Sidebar collapse — subtiele knop rechtsboven */
 @media screen and (min-width: 769px) {
-    div[data-testid="stSidebarCollapsedControl"] { display: none !important; }
+    div[data-testid="stSidebarCollapsedControl"] {
+        display: flex !important;
+        position: fixed !important;
+        top: 0.5rem !important;
+        left: 0.5rem !important;
+        z-index: 999 !important;
+        background: rgba(30, 33, 49, 0.9) !important;
+        border: 1px solid rgba(139, 92, 246, 0.3) !important;
+        border-radius: 8px !important;
+        width: 32px !important;
+        height: 32px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        backdrop-filter: blur(8px) !important;
+        transition: all 0.2s ease !important;
+    }
+    div[data-testid="stSidebarCollapsedControl"]:hover {
+        background: rgba(139, 92, 246, 0.2) !important;
+        border-color: rgba(139, 92, 246, 0.6) !important;
+    }
+    div[data-testid="stSidebarCollapsedControl"] svg {
+        color: #8b5cf6 !important;
+        fill: #8b5cf6 !important;
+        width: 18px !important;
+        height: 18px !important;
+        display: block !important;
+    }
     button[title*="sidebar"] { display: none !important; }
     button[aria-label*="sidebar"] { display: none !important; }
-    [data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
+    /* Als sidebar collapsed is, toon de collapse knop rechtsboven */
+    section[data-testid="stSidebar"][aria-expanded="false"] ~ div[data-testid="stSidebarCollapsedControl"] {
+        left: 0.5rem !important;
+    }
 }
 
 /* Sidebar styling */
@@ -178,13 +208,12 @@ def laad_klanten():
 
 # ─── Login ───────────────────────────────────────────────
 def login_screen():
-    # Hide sidebar on login
+    # Hide sidebar on login maar laat collapse knop zichtbaar
     st.markdown("""
     <style>
     section[data-testid="stSidebar"] { display: none !important; }
     .main > div { padding: 1.2rem 1.8rem !important; max-width: 1440px; margin: 0 auto; }
     button[kind="header"] { display: none !important; }
-    [data-testid="collapsedControl"] { display: none !important; }
     header[data-testid="stHeader"] { display: none !important; }
     div[data-testid="stToolbar"] { display: none !important; }
     section.main { margin-left: 0 !important; }

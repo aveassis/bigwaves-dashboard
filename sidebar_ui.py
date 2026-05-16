@@ -5,6 +5,16 @@ def render_sidebar(data: dict, kn: str, gt: dict = None, periodes: dict = None, 
     """Render de consistente sidebar voor alle dashboard pagina's."""
     if not data:
         return
+    # Forceer sidebar expanded bij elke pagina
+    st.markdown("""
+    <script>
+    const sb = parent.document.querySelector('[data-testid="stSidebar"]');
+    if (sb && sb.getAttribute('aria-expanded') === 'false') {
+        const btn = parent.document.querySelector('[data-testid="stSidebarCollapsedControl"]');
+        if (btn) btn.click();
+    }
+    </script>
+    """, unsafe_allow_html=True)
     with st.sidebar:
         st.markdown('<div class="sidebar-logo">🌊 <span>BigWaves</span></div>', unsafe_allow_html=True)
         st.markdown('<div class="sidebar-tagline">datagedreven · menselijk gecheckt</div>', unsafe_allow_html=True)
