@@ -275,31 +275,6 @@ header[data-testid="stHeader"] { display: none !important; }
 }
 
 /* Als sidebar gecollapsed is, toon een eigen herstel knopje linksboven */
-section[data-testid="stSidebar"][aria-expanded="false"] + div::before {
-    content: "☰";
-    position: fixed;
-    top: 0.5rem;
-    left: 0.5rem;
-    z-index: 999;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(45, 27, 105, 0.9);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 8px;
-    color: #ffffff;
-    font-size: 1.1rem;
-    cursor: pointer;
-    backdrop-filter: blur(8px);
-    transition: all 0.2s ease;
-}
-section[data-testid="stSidebar"][aria-expanded="false"] + div::before:hover {
-    background: rgba(45, 27, 105, 1);
-    border-color: rgba(255,255,255,0.4);
-}
-
 /* ─── KPI card styling ──────────────────── */
 .kpi-box {
     background: #ffffff;
