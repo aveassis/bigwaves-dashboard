@@ -6,13 +6,17 @@ from pathlib import Path
 import sqlite3
 from datetime import date
 
+# Check login
+if "ingelogd" not in st.session_state or not st.session_state.ingelogd:
+    st.warning("Log eerst in via het dashboard.")
+    st.stop()
+
 # Laad data voor sidebar
 kn = st.session_state.get("klant_naam", "")
 data = st.session_state.get("data", {})
-if kn and data:
-    gt = data.get("groei_team", {}) if data else {}
-    periodes = data.get("periodes", None)
-    render_sidebar(data, kn, gt, periodes, list(periodes.keys()) if periodes else None)
+gt = data.get("groei_team", {}) if data else {}
+periodes = data.get("periodes", None)
+render_sidebar(data, kn, gt, periodes, list(periodes.keys()) if periodes else None)
 
 # LinkedIn DB pad
 linkedin_db = Path(__file__).parent.parent / "linkedin-outreach" / "data" / "linkedin.db"

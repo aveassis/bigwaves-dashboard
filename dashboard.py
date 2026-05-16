@@ -277,30 +277,6 @@ else:
 # ─── Sidebar ─────────────────────────────────────────────
 render_sidebar(data, kn, gt, periodes, periode_lijst if periodes else None)
 
-# Light mode CSS override
-if not st.session_state.dark_mode:
-    st.markdown("""<style>
-    :root {
-    --bg: #f5f7fa !important;
-    --surface: #ffffff !important;
-    --card: #ffffff !important;
-    --border: #e8ecf1 !important;
-    --border-light: #d1d5db !important;
-    --text: #1a1d23 !important;
-    --text-sec: #6b7280 !important;
-    --text-muted: #9ca3af !important;
-    }
-    section[data-testid="stSidebar"] { background: var(--surface) !important; }
-    .kpi-box { background: var(--card) !important; }
-    .kpi-val { color: var(--text) !important; }
-    .kpi-label { color: var(--text-muted) !important; }
-    .kpi-target { color: var(--text-muted) !important; }
-    div[data-testid="column"]:nth-child(2) button { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text) !important; }
-    </style>""", unsafe_allow_html=True)
-st.divider()
-st.caption("🌊 BigWaves AI-bureau")
-st.caption("datagedreven · menselijk gecheckt")
-
 # ─── Header ──────────────────────────────────────────────
 logo = data.get("logo", "🌊")
 accent = data.get("accent_kleur", "#10b981")
