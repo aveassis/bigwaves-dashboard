@@ -6,7 +6,7 @@ def render_sidebar(data, kn, gt, periodes=None, periode_lijst=None):
     """Render de sidebar met logo, navigatie, periode selector, klant info en uitloggen.
     Aanroepen vanuit elke pagina: render_sidebar(data, kn, gt, periodes, periode_lijst)
     """
-    # CSS voor Streamlit chrome + sidebar toggle styling
+    # CSS voor Streamlit chrome cleanup
     st.markdown("""<style>
 section[data-testid="stSidebar"] ul.st-emotion-cache-1gczx66 {
     display: none !important;

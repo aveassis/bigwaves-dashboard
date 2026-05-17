@@ -17,24 +17,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Forceer verse sessie: als gebruiker ingelogd is maar sidebar_v2 ontbreekt, log uit
-if st.session_state.get("ingelogd") and "sidebar_v2" not in st.session_state:
-    for k in ["ingelogd", "klant_naam", "data", "admin_logged_in"]:
-        st.session_state.pop(k, None)
-    st.session_state.sidebar_v2 = True
-    st.rerun()
-
-# Detect mobiel via JavaScript — sluit sidebar in als small screen
-st.markdown("""<script>
-if (window.innerWidth < 768) {
-    const sidebar = parent.document.querySelector('[data-testid="stSidebar"]');
-    if (sidebar) {
-        const btn = parent.document.querySelector('[data-testid="stSidebarCollapsedControl"]');
-        if (btn) btn.click();
-    }
-}
-</script>""", unsafe_allow_html=True)
-
 st.markdown("""<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">""", unsafe_allow_html=True)
 
 st.markdown("""<style>
@@ -247,44 +229,7 @@ header[data-testid="stHeader"] { display: none !important; }
     margin: 0 !important;
     border: none !important;
 }
-@media screen and (min-width: 769px) {
-    div[data-testid="stSidebarCollapsedControl"] {
-        display: flex !important;
-        position: fixed !important;
-        top: 0.5rem !important;
-        left: 0.5rem !important;
-        z-index: 999 !important;
-        background: rgba(30, 33, 49, 0.9) !important;
-        border: 1px solid rgba(139, 92, 246, 0.3) !important;
-        border-radius: 8px !important;
-        width: 32px !important;
-        height: 32px !important;
-        align-items: center !important;
-        justify-content: center !important;
-        cursor: pointer !important;
-        backdrop-filter: blur(8px) !important;
-        transition: all 0.2s ease !important;
-    }
-    div[data-testid="stSidebarCollapsedControl"]:hover {
-        background: rgba(139, 92, 246, 0.2) !important;
-        border-color: rgba(139, 92, 246, 0.6) !important;
-    }
-    div[data-testid="stSidebarCollapsedControl"] svg {
-        color: #8b5cf6 !important;
-        fill: #8b5cf6 !important;
-        width: 18px !important;
-        height: 18px !important;
-        display: block !important;
-    }
-    button[title*=\"sidebar\"] { display: none !important; }
-    button[aria-label*=\"sidebar\"] { display: none !important; }
-    /* Als sidebar collapsed is, toon de collapse knop linksboven */
-    section[data-testid="stSidebar"][aria-expanded="false"] + div button[data-testid="stBaseButton-headerNoPadding"] {
-        display: none !important;
-    }
-}
 
-/* Als sidebar gecollapsed is, toon een eigen herstel knopje linksboven */
 /* ─── KPI card styling ──────────────────── */
 .kpi-box {
     background: #ffffff;
@@ -448,7 +393,7 @@ def laad_klanten():
 
 # ─── Login ───────────────────────────────────────────────
 def login_screen():
-    # Hide sidebar on login maar laat collapse knop zichtbaar
+    # Hide sidebar on login
     st.markdown("""
     <style>
     section[data-testid="stSidebar"] > div > div:nth-child(2) { display: none !important; }

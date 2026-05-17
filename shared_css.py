@@ -169,12 +169,6 @@ footer { visibility: hidden !important; }
 .stDeployButton { display: none !important; }
 div[data-testid="stToolbar"] { display: none !important; }
 header[data-testid="stHeader"] { display: none !important; }
-/* ─── Sidebar collapse ──────────────────── */
-@media screen and (min-width: 769px) {
-    div[data-testid="stSidebarCollapsedControl"] { display: none !important; }
-    button[title*="sidebar"] { display: none !important; }
-    [data-testid="stSidebarCollapsedControl"] svg { display: none !important; }
-}
 /* ─── KPI card styling ──────────────────── */
 .kpi-box {
     background: #ffffff;
