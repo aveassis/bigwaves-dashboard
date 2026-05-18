@@ -255,12 +255,14 @@ def build_sidebar(cn, pe, active_page):
         html.Div([html.Div("Menu", className="nav-label"), *nav_items,
             html.A([html.I(className="fas fa-moon"), html.Span("Donker thema")], href="#", className="theme-toggle", id="theme-btn"),
             html.Div("Periode", className="nav-label"),
-            html.Div(dcc.Dropdown(id="period-select", options=[{"label": p, "value": p} for p in list(d.get("periodes", {}).keys())], value=pe, clearable=False, className="period-dropdown"), style={"padding": "0 0.8rem 0.6rem"})], className="sidebar-nav"),
+            html.Div(dcc.Dropdown(id="period-select", options=[{"label": p, "value": p} for p in list(d.get("periodes", {}).keys())], value=pe, clearable=False, className="period-dropdown"), style={"padding": "0 0.8rem 0.6rem"}),
+            html.A([html.I(className="fas fa-chart-simple"), html.Span("Vergelijk met vorige")], href="/dashboard/vergelijk", className="theme-toggle", id="compare-btn"),
+        ], className="sidebar-nav"),
         html.Div([html.Div([html.Div(d.get("logo", "🌊"), className="client-avatar"),
             html.Div([html.Div(cn, className="client-name"), html.Div(f"Periode: {pe}", className="client-meta")])], className="client-row"),
             html.A("Uitloggen", href="/uitloggen", className="logout-btn")], className="sidebar-footer")], className="sidebar")
 
-def build_page(cn, pe, active_page="dashboard"):
+def build_page(cn, pe, active_page="dashboard", vergelijk=False):
     d = clients[cn]; ps = d.get("periodes",{})
     if not pe or pe not in ps: pe = list(ps.keys())[0] if ps else None
     if not pe: return "Geen data"
@@ -270,15 +272,42 @@ def build_page(cn, pe, active_page="dashboard"):
     bn = full.get("bottleneck",{}); gt = d.get("groei_team",{}); chk = gt.get("checkin_historie",[]) if gt else []
     logo = d.get("logo","🌊")
 
+    # Laad vorige periode voor vergelijking
+    vorige_data = None
+    vorige_pe = None
+    if vergelijk:
+        period_keys = list(ps.keys())
+        cur_idx = period_keys.index(pe) if pe in period_keys else -1
+        if cur_idx > 0:
+            vorige_pe = period_keys[cur_idx - 1]
+            vorige_data = ps[vorige_pe]
+
     kpi_cards = []
     for i,(nm,inf) in enumerate(list(kpis.items())[:4]):
         w,e = inf["waarde"],inf.get("eenheid",""); t = inf.get("trend",""); do = inf.get("doel",0)
         ic = KPI_ICONS.get(nm,("fa-chart-bar","rgba(82,115,255,0.08)","#5273ff"))
+        
+        # Vergelijkingskolom
+        vergelijk_html = []
+        if vergelijk and vorige_data:
+            v_kpis = vorige_data.get("kpis", {})
+            if nm in v_kpis:
+                vw = v_kpis[nm]["waarde"]
+                delta = w - vw
+                delta_pct = round((delta / vw) * 100, 1) if vw else 0
+                delta_str = f"+{delta_pct}%" if delta >= 0 else f"{delta_pct}%"
+                delta_color = "#22c55e" if delta >= 0 else "#ef4444"
+                vergelijk_html = [html.Div([
+                    html.Span(f"Vorige: {fv(vw,e)}", style={"fontSize":"0.6rem","color":"var(--text-muted)","marginRight":"0.3rem"}),
+                    html.Span(delta_str, style={"fontSize":"0.6rem","fontWeight":"600","color":delta_color}),
+                ], style={"marginTop":"0.15rem"})]
+        
         kpi_cards.append(dbc.Col(html.Div([
             html.Div(html.I(className=f"fas {ic[0]}",style={"color":ic[2]}),className="kpi-icon",style={"background":ic[1]}),
             html.Div(nm,className="kpi-label"),html.Div(fv(w,e),className="kpi-value"),
             html.Div(f"Doel: {do}",className="kpi-target"),
             html.Div(f"{ta(t)} {t}",className=f"kpi-trend {tc(t)}",style={"color":tcol(t)}),
+            *vergelijk_html,
             kpi_progress(w, do)],className="kpi-card"),
             width=3,style={"padding":"0 0.4rem","marginBottom":"0.5rem"}))
 
@@ -312,7 +341,13 @@ def build_page(cn, pe, active_page="dashboard"):
             dbc.Row([dbc.Col(html.Div([html.Div("Laatste check-in",className="ci-label"),html.Div(laatste.get("datum",""),className="ci-date"),html.Div(laatste.get("notities",""),className="ci-note")],className="checkin-card",style={"borderLeftColor":c}),width=6,style={"padding":"0 0.4rem"}),
                 dbc.Col(html.Div([html.Div("Check-ins totaal",className="ci-label"),html.Div(str(len(chk)),className="ci-date"),html.Div("allemaal op groen" if all(ch.get("status")=="groen" for ch in chk) else f"{sum(1 for ch in chk if ch.get('status')=='groen')} groen",className="ci-note")],className="checkin-card",style={"borderLeftColor":"#5273ff"}),width=6,style={"padding":"0 0.4rem"})],style={"margin":"0 -0.4rem"})]
 
-    main = html.Div([html.Div([html.Div([html.H1("Dashboard"),html.Div(f"Performance overzicht • {pe}",className="subtitle")]),html.Div([html.A("📄 PDF", href="/export/pdf", className="btn-pill", style={"marginRight":"0.3rem","textDecoration":"none"}),html.A("📊 CSV", href="/export/csv", className="btn-pill", style={"textDecoration":"none"})])],className="page-header"),
+    # Vergelijk badge in header
+    vergelijk_badge = []
+    if vergelijk and vorige_data:
+        vergelijk_badge = [html.Span(" vs " + vorige_pe, style={"fontSize":"0.7rem","fontWeight":"500","color":"var(--primary)","marginLeft":"0.3rem"})]
+
+    main = html.Div([html.Div([html.Div([html.H1("Dashboard"),html.Div(f"Performance overzicht . {pe}",className="subtitle"),*vergelijk_badge]),
+        html.Div([html.A("PDF", href="/export/pdf", className="btn-pill", style={"marginRight":"0.3rem","textDecoration":"none"}),html.A("CSV", href="/export/csv", className="btn-pill", style={"textDecoration":"none"})])],className="page-header"),
         dbc.Row(kpi_cards,style={"margin":"0 -0.4rem"}),*charts,*kan_section,*bn_section,*inz_section],className="main-content")
     return main
 
@@ -449,6 +484,8 @@ h2{{font-size:0.9rem;margin:1rem 0 0.3rem;color:#1a1a2e}}
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
     html.Div(id="dash-content"),
+    dcc.Store(id="period-store", storage_type="session"),
+    dcc.Store(id="compare-store", storage_type="memory", data=False),
 ])
 
 @app.callback(Output("dash-content", "children"), Input("url", "pathname"))
@@ -460,6 +497,15 @@ def router(pathname):
                         style={"textAlign": "center", "marginTop": "4rem"})
 
     path = pathname or "/dashboard/"
+    
+    # Vergelijk toggle
+    if "/vergelijk" in path:
+        cur = session.get("vergelijk", False)
+        session["vergelijk"] = not cur
+        # Redirect back to dashboard
+        from flask import redirect as rd
+        return rd("/dashboard/")
+
     if path in ("/dashboard/", "/dashboard", "/dashboard/dashboard"):
         active = "dashboard"
     else:
@@ -468,8 +514,10 @@ def router(pathname):
         if active not in PAGE_ORDERS:
             active = "dashboard"
 
+    vergelijk = session.get("vergelijk", False)
+
     if active == "dashboard":
-        main = build_page(c, pe, active)
+        main = build_page(c, pe, active, vergelijk)
     elif active == "conversie":
         main = build_conversie_page(c, pe)
     elif active == "inzichten":
