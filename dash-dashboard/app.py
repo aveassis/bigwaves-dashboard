@@ -481,6 +481,15 @@ h2{{font-size:0.9rem;margin:1rem 0 0.3rem;color:#1a1a2e}}
     resp.headers["Content-Disposition"] = f'inline; filename="bigwaves-{c}-{pe}.html"'
     return resp
 
+@server.route("/dashboard/vergelijk")
+def toggle_vergelijk():
+    c = session.get("client")
+    if not c or c not in clients:
+        return redirect("/")
+    cur = session.get("vergelijk", False)
+    session["vergelijk"] = not cur
+    return redirect("/dashboard/")
+
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
     html.Div(id="dash-content"),
@@ -497,15 +506,6 @@ def router(pathname):
                         style={"textAlign": "center", "marginTop": "4rem"})
 
     path = pathname or "/dashboard/"
-    
-    # Vergelijk toggle
-    if "/vergelijk" in path:
-        cur = session.get("vergelijk", False)
-        session["vergelijk"] = not cur
-        # Redirect back to dashboard
-        from flask import redirect as rd
-        return rd("/dashboard/")
-
     if path in ("/dashboard/", "/dashboard", "/dashboard/dashboard"):
         active = "dashboard"
     else:
