@@ -107,6 +107,24 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .theme-toggle:hover{color:#fff;background:var(--sidebar-hover)}
 .theme-toggle i{width:16px;text-align:center;font-size:0.85rem}
 
+/* Onboarding overlay */
+.bw-onboard-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.bw-onboard-overlay.show{opacity:1;pointer-events:all}
+.bw-onboard-box{background:#fff;border-radius:16px;padding:2.5rem 2.2rem;max-width:440px;text-align:center;box-shadow:0 16px 60px rgba(0,0,0,0.2)}
+.bw-onboard-box .logo{font-size:2.5rem;margin-bottom:0.5rem}
+.bw-onboard-box h2{font-size:1.2rem;font-weight:700;color:#1a1a2e;margin-bottom:0.3rem}
+.bw-onboard-box .tag{color:#7e8299;font-size:0.78rem;margin-bottom:1.2rem;line-height:1.5}
+.bw-onboard-box ul{text-align:left;list-style:none;padding:0;margin:0 0 1.2rem}
+.bw-onboard-box ul li{padding:0.35rem 0;font-size:0.8rem;color:#1a1a2e;display:flex;align-items:center;gap:0.5rem}
+.bw-onboard-box ul li i{width:18px;color:#5273ff;font-size:0.9rem}
+.bw-onboard-box .btn{background:#5273ff;color:#fff;border:none;border-radius:200px;padding:0.5rem 2rem;font-size:0.82rem;font-weight:600;cursor:pointer}
+.bw-onboard-box .btn:hover{background:#3f5ee6}
+
+body.dark .bw-onboard-box{background:#1e2231}
+body.dark .bw-onboard-box h2{color:#e8e8ed}
+body.dark .bw-onboard-box .tag{color:#8a8ba7}
+body.dark .bw-onboard-box ul li{color:#e8e8ed}
+
 /* Period dropdown in sidebar */
 .period-dropdown .Select-control{background:rgba(255,255,255,0.06)!important;border:1px solid rgba(255,255,255,0.08)!important;border-radius:6px!important;min-height:28px!important;height:28px!important}
 .period-dropdown .Select-control .Select-value{line-height:26px!important;color:rgba(255,255,255,0.7)!important;font-size:0.68rem!important;padding-left:6px!important}
@@ -128,12 +146,31 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
     .main-content{margin-left:60px;padding:1rem}
 }
 </style>
+{%css%}
+</head>
+<body>{%app_entry%}<footer>{%config%}{%scripts%}{%renderer%}</footer>
+<div class="bw-onboard-overlay" id="bw-onboard">
+<div class="bw-onboard-box">
+<div class="logo">🌊</div>
+<h2>Welkom bij BigWaves</h2>
+<p class="tag">Jij 1 call per week, wij regelen de rest.</p>
+<ul>
+<li><i class="fas fa-check-circle"></i> Jij hebt wekelijks 1 check-in call</li>
+<li><i class="fas fa-robot"></i> Wij verwerken al het binnenkomende verkeer</li>
+<li><i class="fas fa-chart-line"></i> Dit dashboard toont je resultaten</li>
+<li><i class="fas fa-headset"></i> Bij vragen staan we voor je klaar</li>
+</ul>
+<button class="btn" onclick="document.getElementById('bw-onboard').classList.remove('show');try{localStorage.setItem('bw-onboarded','1')}catch(e){}">Aan de slag</button>
+</div>
+</div>
 <script>
 (function(){
-  try{
-    var t=localStorage.getItem('bw-theme')||'light';
-    if(t==='dark')document.body.classList.add('dark');
-  }catch(e){}
+  var o=document.getElementById('bw-onboard');
+  if(o){
+    try{
+      if(!localStorage.getItem('bw-onboarded'))o.classList.add('show');
+    }catch(e){o.classList.add('show')}
+  }
 })();
 function toggleTheme(){
   var b=document.body;
@@ -145,10 +182,7 @@ document.addEventListener('click',function(e){
   if(t){e.preventDefault();toggleTheme()}
 });
 </script>
-{%css%}
-</head>
-<body>{%app_entry%}<footer>{%config%}{%scripts%}{%renderer%}</footer></body>
-</html>"""
+</body></html>"""
 
 LOGIN_PAGE = """<!DOCTYPE html>
 <html lang="nl">
