@@ -490,6 +490,66 @@ def toggle_vergelijk():
     session["vergelijk"] = not cur
     return redirect("/dashboard/?v=1")
 
+@server.route("/admin/nieuw", methods=["GET", "POST"])
+def admin_nieuwe_klant():
+    c = session.get("client")
+    if not c or c not in clients:
+        return redirect("/")
+    if request.method == "GET":
+        admin_form = """<h1>Nieuwe klant aanmaken</h1>
+<div class="sub">Er wordt een JSON template gegenereerd in de data directory</div>
+<form method="POST">
+<label>Klantnaam</label><input name="naam" required>
+<label>Wachtwoord</label><input name="wachtwoord" value="demo">
+<label>Pakket</label><select name="pakket"><option>Start</option><option selected>Groei</option><option>Pro</option></select>
+<label>Maandprijs (EUR)</label><input name="prijs" type="number" value="1497">
+<label>Setup (EUR)</label><input name="setup" type="number" value="2500">
+<label>Aantal workflows</label><input name="workflows" type="number" value="2">
+<button class="btn" type="submit">Genereer template</button>
+</form></body></html>"""
+        msg = request.args.get("msg", "")
+        success = '<div class="success">' + msg + "</div>" if msg else ""
+        return admin_form.replace("<form", success + "<form")
+    
+    # POST: genereer template
+    import json, os
+    from datetime import datetime
+    n = request.form.get("naam", "Nieuwe Klant").strip()
+    pw = request.form.get("wachtwoord", "demo")
+    pakket = request.form.get("pakket", "Groei")
+    prijs = int(request.form.get("prijs", 1497))
+    setup = int(request.form.get("setup", 2500))
+    wf_count = int(request.form.get("workflows", 2))
+    
+    jaarprijs = prijs * 12 - (prijs * 12 // 10)  # 10% korting
+    jaarprijs = round(jaarprijs, -2)  # afronden op 100
+    
+    template = {
+        "naam": n,
+        "logo": "🌊",
+        "accent_kleur": "#5273ff",
+        "wachtwoord": pw,
+        "groei_team": {
+            "pakket": pakket,
+            "sinds": datetime.now().strftime("%Y-%m-%d"),
+            "prijs": {"huidig": prijs, "eenheid": "maand", "setup": setup, "jaar": jaarprijs, "workflows": wf_count},
+            "status": "actief",
+            "contact_frequentie": "wekelijks",
+            "health_score": 85,
+            "workflows": [{"naam": f"Workflow {i+1}", "type": "lead", "actief": True, "items_verwerkt": 0, "opvolgmomenten": 0, "status": "groen"} for i in range(wf_count)],
+            "hitl_samenvatting": {"deze_maand_goedgekeurd": 0, "deze_maand_geweigerd": 0, "wachttijd_gemiddeld": "0 uur"},
+            "checkin_historie": []
+        },
+        "kanalen": {"website": {"verwerkt": 0, "bestellingen": 0}, "mail": {"verwerkt": 0, "bestellingen": 0}, "whatsapp": {"verwerkt": 0, "bestellingen": 0}, "telefoon": {"verwerkt": 0, "bestellingen": 0}},
+        "periodes": {}
+    }
+    
+    filepath = DATA_DIR / f"{n.lower().replace(' ', '-')}.json"
+    with open(filepath, "w") as f:
+        json.dump(template, f, indent=2, ensure_ascii=False)
+    
+    return redirect("/admin/nieuw?msg=Template+opgeslagen:+{}.json".format(filepath.name))
+
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
     html.Div(id="dash-content"),
@@ -689,7 +749,16 @@ def build_admin_page(cn, pe):
             ], style={"marginBottom": "0.8rem"}))
 
     return html.Div([html.Div([html.H1("Admin"), html.Div(f"Accountbeheer . {cn}", className="subtitle")], className="page-header"),
-        *gt_info], className="main-content")
+        *gt_info,
+        html.Div([html.I(className="fas fa-database", style={"color": "#5273ff"}), " Alle klanten"], className="section-title"),
+        html.Div(html.Table([
+            html.Thead(html.Tr([html.Th("Klant"), html.Th("Pakket"), html.Th("Status"), html.Th("Sinds")])),
+            html.Tbody([
+                html.Tr([html.Td(nm), html.Td(c.get("groei_team",{}).get("pakket","-") if "groei_team" in c else "-"), html.Td(c.get("groei_team",{}).get("status","-") if "groei_team" in c else "-"), html.Td(c.get("groei_team",{}).get("sinds","-") if "groei_team" in c else "-")])
+                for nm, c in sorted(clients.items())
+            ]),
+        ], className="detail-table"), className="admin-card"),
+        html.Div([html.A("+ Nieuwe klant", href="/admin/nieuw", className="btn-pill", style={"textDecoration":"none","display":"inline-block"})], style={"marginTop":"0.5rem"})], className="main-content")
 
 def build_linkedin_page(cn, pe):
     d = linkedin_data
