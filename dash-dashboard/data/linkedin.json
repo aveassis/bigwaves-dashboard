@@ -1,0 +1,46 @@
+{
+  "naam": "LinkedIn Outreach",
+  "metrics": {
+    "totaal_prospects": 47,
+    "connecties_verzonden": 38,
+    "connecties_geaccepteerd": 29,
+    "acceptatiegraad": 76,
+    "berichten_verzonden": 82,
+    "responsen_ontvangen": 31,
+    "responsgraad": 38,
+    "gesprekken_gaande": 12,
+    "afspraken_ingeboekt": 5
+  },
+  "prospects": [
+    {"naam": "Mark van der Berg", "titel": "Head of Marketing", "bedrijf": "TechSolutions NL", "status": "connected", "datum": "2026-05-15", "berichten": 3},
+    {"naam": "Sandra de Vries", "titel": "CEO", "bedrijf": "DigitalBoost", "status": "connected", "datum": "2026-05-14", "berichten": 2},
+    {"naam": "Jeroen Bakker", "titel": "Sales Director", "bedrijf": "LeadForce", "status": "meeting", "datum": "2026-05-12", "berichten": 5},
+    {"naam": "Linda Visser", "titel": "Founder", "bedrijf": "GroeiGroep", "status": "message", "datum": "2026-05-11", "berichten": 1},
+    {"naam": "Robert Jansen", "titel": "Marketing Manager", "bedrijf": "ConversionLab", "status": "pending", "datum": "2026-05-10", "berichten": 1},
+    {"naam": "Annemiek Kok", "titel": "Head of Growth", "bedrijf": "ScaleUp Inc", "status": "connected", "datum": "2026-05-09", "berichten": 4},
+    {"naam": "Tom Willems", "titel": "CRO", "bedrijf": "Optimaliseer BV", "status": "meeting", "datum": "2026-05-08", "berichten": 6},
+    {"naam": "Floor van Dijk", "titel": "Digital Strategist", "bedrijf": "NextLevel", "status": "pending", "datum": "2026-05-07", "berichten": 1},
+    {"naam": "Bart Hendriks", "titel": "Eigenaar", "bedrijf": "ResultaatGroep", "status": "message", "datum": "2026-05-06", "berichten": 2},
+    {"naam": "Carla van der Veen", "titel": "Business Developer", "bedrijf": "NewWave", "status": "connected", "datum": "2026-05-05", "berichten": 3}
+  ],
+  "recente_acties": [
+    {"type": "connectie", "prospect": "Mark van der Berg", "datum": "2026-05-15", "notitie": "Connectieverzoek geaccepteerd"},
+    {"type": "bericht", "prospect": "Tom Willems", "datum": "2026-05-15", "notitie": "Vervolgbericht gestuurd — belt volgende week"},
+    {"type": "connectie", "prospect": "Sandra de Vries", "datum": "2026-05-14", "notitie": "Connectie gelegd, intro gestuurd"},
+    {"type": "bericht", "prospect": "Jeroen Bakker", "datum": "2026-05-14", "notitie": "Afspraak bevestigd voor 21 mei"},
+    {"type": "connectie", "prospect": "Annemiek Kok", "datum": "2026-05-13", "notitie": "Connectie + DM gestuurd"},
+    {"type": "bericht", "prospect": "Linda Visser", "datum": "2026-05-12", "notitie": "Eerste bericht verstuurd"},
+    {"type": "connectie", "prospect": "Robert Jansen", "datum": "2026-05-11", "notitie": "Connectieverzoek verstuurd"},
+    {"type": "bericht", "prospect": "Bart Hendriks", "datum": "2026-05-10", "notitie": "LinkedIn DM gestuurd na connectie"},
+    {"type": "bericht", "prospect": "Floor van Dijk", "datum": "2026-05-09", "notitie": "Eerste contact gelegd"},
+    {"type": "connectie", "prospect": "Carla van der Veen", "datum": "2026-05-09", "notitie": "Connectie + bericht gestuurd"}
+  ],
+  "accounts": {"demo": {"naam": "Demo Klant B.V.", "actief": true}},
+  "instellingen": {
+    "dagelijkse_limiet": 15,
+    "berichten_per_dag": 10,
+    "connecties_per_dag": 8,
+    "actief": true,
+    "laatste_run": "2026-05-15 08:30"
+  }
+}

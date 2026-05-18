@@ -8,9 +8,14 @@ from flask import Flask, session, request, redirect
 
 DATA_DIR = Path(__file__).parent / "data"
 clients = {}
+linkedin_data = {}
 if DATA_DIR.exists():
     for f in sorted(DATA_DIR.glob("*.json")):
-        with open(f) as fh: d = json.load(fh); clients[d["naam"]] = d
+        with open(f) as fh: d = json.load(fh)
+        if "prospects" in d:
+            linkedin_data = d
+        else:
+            clients[d["naam"]] = d
 
 server = Flask(__name__)
 server.secret_key = "bw-final-v2"
@@ -629,11 +634,115 @@ def build_admin_page(cn, pe):
         *gt_info], className="main-content")
 
 def build_linkedin_page(cn, pe):
-    return html.Div([html.Div([html.H1("LinkedIn Outreach"), html.Div("Volgt binnenkort", className="subtitle")], className="page-header"),
-        html.Div([html.I(className="fas fa-tools", style={"color": "#f59e0b", "fontSize": "1.5rem"}),
-                  html.H3("Nog in ontwikkeling", style={"margin": "0.5rem 0", "color": "#1a1a2e"}),
-                  html.P("De LinkedIn Outreach module wordt binnenkort toegevoegd.", style={"color": "#7e8299", "fontSize": "0.82rem"})],
-                 style={"textAlign": "center", "padding": "3rem 1rem"})], className="main-content")
+    d = linkedin_data
+    if not d or "metrics" not in d:
+        return html.Div([html.Div([html.H1("LinkedIn Outreach"), html.Div("Geen data — start de outreach tool", className="subtitle")], className="page-header"),
+            html.Div([html.I(className="fas fa-tools", style={"color": "#f59e0b", "fontSize": "1.5rem"}),
+                      html.P("Configureer de LinkedIn Outreach module in de admin console.", style={"color": "#7e8299", "fontSize": "0.82rem"})],
+                     style={"textAlign": "center", "padding": "3rem 1rem"})], className="main-content")
+
+    m = d.get("metrics", {})
+    prospects = d.get("prospects", [])[:8]
+    acties = d.get("recente_acties", [])[:6]
+    inst = d.get("instellingen", {})
+
+    metric_icons = {
+        "totaal_prospects": ("fa-users", "#5273ff"),
+        "connecties_verzonden": ("fa-paper-plane", "#f59e0b"),
+        "connecties_geaccepteerd": ("fa-handshake", "#22c55e"),
+        "acceptatiegraad": ("fa-percent", "#22c55e"),
+        "berichten_verzonden": ("fa-comment-dots", "#8b5cf6"),
+        "responsen_ontvangen": ("fa-reply", "#5273ff"),
+        "responsgraad": ("fa-chart-line", "#22c55e"),
+        "gesprekken_gaande": ("fa-comments", "#f59e0b"),
+        "afspraken_ingeboekt": ("fa-calendar-check", "#22c55e"),
+    }
+
+    metric_cards = []
+    for key, (icon, color) in metric_icons.items():
+        val = m.get(key, 0)
+        label = key.replace("_", " ").title()
+        metric_cards.append(dbc.Col(html.Div([
+            html.Div(html.I(className=f"fas {icon}", style={"color": color}), className="lc-icon", style={"background": f"{color}15"}),
+            html.Div(label, className="lc-label"),
+            html.Div(str(val), className="lc-value"),
+        ], className="linkedin-card"), width=3, style={"padding": "0 0.4rem", "marginBottom": "0.5rem"}))
+
+    acc = m.get("acceptatiegraad", 0)
+    resp_gr = m.get("responsgraad", 0)
+    insight_cards = dbc.Row([
+        dbc.Col(html.Div([
+            html.Div("Connecties", className="ci-label"),
+            html.Div(f"{m.get('connecties_geaccepteerd', 0)}/{m.get('connecties_verzonden', 0)} geaccepteerd", className="ci-date"),
+            html.Div(f"{acc}% acceptatiegraad", style={"fontSize": "0.68rem", "color": "#22c55e" if acc >= 70 else "#f59e0b"}),
+        ], className="checkin-card", style={"borderLeftColor": "#22c55e"}), width=6, style={"padding": "0 0.4rem"}),
+        dbc.Col(html.Div([
+            html.Div("Berichten", className="ci-label"),
+            html.Div(f"{m.get('responsen_ontvangen', 0)}/{m.get('berichten_verzonden', 0)} respons", className="ci-date"),
+            html.Div(f"{resp_gr}% responsgraad", style={"fontSize": "0.68rem", "color": "#22c55e" if resp_gr >= 30 else "#f59e0b"}),
+        ], className="checkin-card", style={"borderLeftColor": "#8b5cf6"}), width=6, style={"padding": "0 0.4rem"}),
+    ], style={"margin": "0 -0.4rem", "marginBottom": "0.8rem"})
+
+    inst_cards = dbc.Row([
+        dbc.Col(html.Div([
+            html.Div("Dagelijkse limiet", className="ci-label"), html.Div(str(inst.get("dagelijkse_limiet", 0)), className="ci-date"),
+            html.Div(f"{inst.get('connecties_per_dag', 0)} connecties, {inst.get('berichten_per_dag', 0)} berichten", className="ci-note"),
+        ], className="checkin-card", style={"borderLeftColor": "#5273ff"}), width=4, style={"padding": "0 0.4rem"}),
+        dbc.Col(html.Div([
+            html.Div("Status", className="ci-label"), html.Div("Actief" if inst.get("actief") else "Gepauzeerd", className="ci-date"),
+            html.Div(f"Laatste run: {inst.get('laatste_run', '-')}", className="ci-note"),
+        ], className="checkin-card", style={"borderLeftColor": "#22c55e" if inst.get("actief") else "#f59e0b"}), width=4, style={"padding": "0 0.4rem"}),
+        dbc.Col(html.Div([
+            html.Div("Gesprekken", className="ci-label"), html.Div(str(m.get("gesprekken_gaande", 0)), className="ci-date"),
+            html.Div(f"{m.get('afspraken_ingeboekt', 0)} afspraken ingeboekt", className="ci-note"),
+        ], className="checkin-card", style={"borderLeftColor": "#8b5cf6"}), width=4, style={"padding": "0 0.4rem"}),
+    ], style={"margin": "0 -0.4rem", "marginBottom": "0.8rem"})
+
+    status_labels = {"connected": "Verbonden", "pending": "In afwachting", "message": "Bericht gestuurd", "meeting": "Afspraak" }
+    status_colors = {"connected": "#22c55e", "pending": "#f59e0b", "message": "#5273ff", "meeting": "#8b5cf6"}
+
+    prospect_items = []
+    for p in prospects:
+        s = p.get("status", "pending")
+        c = status_colors.get(s, "#7e8299")
+        lbl = status_labels.get(s, s)
+        prospect_items.append(html.Div([
+            html.Div([
+                html.Div(p.get("naam", "")[:2].upper(), className="profile-avatar"),
+                html.Div([
+                    html.Div(p.get("naam", ""), className="profile-name"),
+                    html.Div(f"{p.get('titel', '')} • {p.get('bedrijf', '')}", className="profile-title"),
+                ]),
+            ], style={"display": "flex", "alignItems": "center", "gap": "0.6rem", "flex": "1"}),
+            html.Div([
+                html.Div(f"{p.get('berichten', 0)} berichten", style={"fontSize": "0.62rem", "color": "#7e8299"}),
+                html.Div(lbl, className="profile-status", style={"color": c}),
+            ], style={"textAlign": "right"}),
+        ], className="profile-card"))
+
+    actie_items = []
+    for a in acties:
+        icon_type = "fa-user-plus" if a.get("type") == "connectie" else "fa-comment"
+        actie_items.append(html.Tr([
+            html.Td(html.I(className=f"fas {icon_type}", style={"color": "#5273ff", "marginRight": "0.3rem"})),
+            html.Td(a.get("prospect", "")),
+            html.Td(a.get("notitie", "")),
+            html.Td(a.get("datum", "")),
+        ]))
+
+    return html.Div([html.Div([html.H1("LinkedIn Outreach"), html.Div("Prospect management", className="subtitle")], className="page-header"),
+        html.Div([html.I(className="fas fa-chart-bar", style={"color": "#5273ff"}), " Overzicht"], className="section-title"),
+        dbc.Row(metric_cards, style={"margin": "0 -0.4rem"}),
+        insight_cards,
+        inst_cards,
+        html.Div([html.I(className="fas fa-address-card", style={"color": "#5273ff"}), " Recente prospects"], className="section-title"),
+        html.Div(prospect_items),
+        html.Div([html.I(className="fas fa-history", style={"color": "#f59e0b"}), " Recente acties"], className="section-title"),
+        html.Div(html.Table([
+            html.Thead(html.Tr([html.Th(""), html.Th("Prospect"), html.Th("Actie"), html.Th("Datum")])),
+            html.Tbody(actie_items),
+        ], className="detail-table"), className="admin-card")], className="main-content")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8501, debug=False, dev_tools_ui=False, dev_tools_props_check=False)
