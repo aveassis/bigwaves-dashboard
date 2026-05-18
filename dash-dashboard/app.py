@@ -488,7 +488,7 @@ def toggle_vergelijk():
         return redirect("/")
     cur = session.get("vergelijk", False)
     session["vergelijk"] = not cur
-    return redirect("/dashboard/")
+    return redirect("/dashboard/?v=1")
 
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
