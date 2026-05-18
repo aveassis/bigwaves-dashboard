@@ -237,7 +237,7 @@ def kpi_progress(waarde, doel):
         return ""
     pct = min(round(waarde / doel * 100), 100)
     color = "#22c55e" if pct >= 100 else "#f59e0b" if pct >= 80 else "#ef4444"
-    return html.Div(html.Div(style={"width": f"{pct}%", "background": color}), className="kpi-bar")
+    return html.Div(html.Div(style={"width": f"{pct}%", "background": color}, className="kpi-bar-fill"), className="kpi-bar")
 
 def build_sidebar(cn, pe, active_page):
     d = clients[cn]
