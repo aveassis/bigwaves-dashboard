@@ -255,9 +255,139 @@ def build_page(cn, pe, active_page="dashboard"):
             dbc.Row([dbc.Col(html.Div([html.Div("Laatste check-in",className="ci-label"),html.Div(laatste.get("datum",""),className="ci-date"),html.Div(laatste.get("notities",""),className="ci-note")],className="checkin-card",style={"borderLeftColor":c}),width=6,style={"padding":"0 0.4rem"}),
                 dbc.Col(html.Div([html.Div("Check-ins totaal",className="ci-label"),html.Div(str(len(chk)),className="ci-date"),html.Div("allemaal op groen" if all(ch.get("status")=="groen" for ch in chk) else f"{sum(1 for ch in chk if ch.get('status')=='groen')} groen",className="ci-note")],className="checkin-card",style={"borderLeftColor":"#5273ff"}),width=6,style={"padding":"0 0.4rem"})],style={"margin":"0 -0.4rem"})]
 
-    main = html.Div([html.Div([html.Div([html.H1("Dashboard"),html.Div(f"Performance overzicht • {pe}",className="subtitle")]),html.Div([html.Button("📄 PDF",className="btn-pill",style={"marginRight":"0.3rem"}),html.Button("📊 CSV",className="btn-pill")])],className="page-header"),
+    main = html.Div([html.Div([html.Div([html.H1("Dashboard"),html.Div(f"Performance overzicht • {pe}",className="subtitle")]),html.Div([html.A("📄 PDF", href="/export/pdf", className="btn-pill", style={"marginRight":"0.3rem","textDecoration":"none"}),html.A("📊 CSV", href="/export/csv", className="btn-pill", style={"textDecoration":"none"})])],className="page-header"),
         dbc.Row(kpi_cards,style={"margin":"0 -0.4rem"}),*charts,*kan_section,*bn_section,*inz_section],className="main-content")
     return main
+
+# ── Export routes ────────────────────────────────────────────────────────────
+
+@server.route("/export/csv")
+def export_csv():
+    c = session.get("client")
+    pe = session.get("periode")
+    if not c or c not in clients:
+        return redirect("/")
+    d = clients[c]
+    ps = d.get("periodes", {})
+    if not pe or pe not in ps:
+        pe = list(ps.keys())[0] if ps else None
+    if not pe:
+        return "Geen data", 404
+    pd = ps[pe]
+    kpis = pd.get("kpis", {})
+    kan = d.get("kanalen", {})
+    hitl = pd.get("hitl_detail", {})
+    gt = d.get("groei_team", {})
+
+    import csv, io
+    output = io.StringIO()
+    w = csv.writer(output)
+    w.writerow(["BigWaves Conversiebureau - Export", c, pe])
+    w.writerow([])
+    w.writerow(["KPI", "Waarde", "Doel", "Eenheid", "Trend"])
+    for nm, inf in kpis.items():
+        w.writerow([nm, inf["waarde"], inf.get("doel",""), inf.get("eenheid",""), inf.get("trend","")])
+    w.writerow([])
+    w.writerow(["Kanaal", "Verwerkt", "Bestellingen"])
+    for nm, inf in sorted(kan.items()):
+        w.writerow([nm, inf.get("verwerkt",0), inf.get("bestellingen",0)])
+    if hitl:
+        w.writerow([])
+        w.writerow(["HITL Categorie", "Totaal", "HITL", "%"])
+        for cn_, cd in hitl.get("categorieen",{}).items():
+            w.writerow([cn_, cd.get("totaal",0), cd.get("hitl",0), f"{cd.get('percentage',0)}%"])
+    if gt:
+        w.writerow([])
+        w.writerow(["Workflow", "Type", "Items", "Status"])
+        for wf in gt.get("workflows",[]):
+            w.writerow([wf.get("naam",""), wf.get("type",""), wf.get("items_verwerkt",0), wf.get("status","")])
+
+    resp = app.server.response_class(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="bigwaves-{c}-{pe}.csv"'},
+    )
+    return resp
+
+@server.route("/export/pdf")
+def export_pdf():
+    c = session.get("client")
+    pe = session.get("periode")
+    if not c or c not in clients:
+        return redirect("/")
+    d = clients[c]
+    ps = d.get("periodes", {})
+    if not pe or pe not in ps:
+        pe = list(ps.keys())[0] if ps else None
+    if not pe:
+        return "Geen data", 404
+    pd = ps[pe]
+    kpis = pd.get("kpis", {})
+    kan = d.get("kanalen", {})
+    gt = d.get("groei_team", {})
+    chk = gt.get("checkin_historie", []) if gt else []
+    hitl = pd.get("hitl_detail", {})
+
+    def s(v):
+        return fmt_val(v.get("waarde"), v.get("eenheid","")) if isinstance(v,dict) else str(v)
+    def e(v):
+        return v.get("eenheid","") if isinstance(v,dict) else ""
+
+    kpi_rows = ""
+    for nm, inf in kpis.items():
+        kpi_rows += f"<tr><td>{nm}</td><td>{inf['waarde']}{' '+inf.get('eenheid','') if inf.get('eenheid','') else ''}</td><td>{inf.get('doel','')}</td><td>{inf.get('trend','')}</td></tr>"
+
+    kan_rows = ""
+    for nm, inf in sorted(kan.items()):
+        kan_rows += f"<tr><td>{nm}</td><td>{inf.get('verwerkt',0)}</td><td>{inf.get('bestellingen',0)}</td></tr>"
+
+    wf_rows = ""
+    for wf in gt.get("workflows",[]):
+        wf_rows += f"<tr><td>{wf.get('naam','')}</td><td>{wf.get('type','')}</td><td>{wf.get('items_verwerkt',0)}</td><td>{wf.get('status','')}</td></tr>"
+
+    chk_rows = ""
+    for ch in chk:
+        chk_rows += f"<tr><td>{ch.get('datum','')}</td><td>{ch.get('type','')}</td><td>{ch.get('notities','')}</td><td>{ch.get('status','')}</td></tr>"
+
+    hitl_rows = ""
+    if hitl:
+        for cn_, cd in hitl.get("categorieen",{}).items():
+            hitl_rows += f"<tr><td>{cn_}</td><td>{cd.get('totaal',0)}</td><td>{cd.get('hitl',0)}</td><td>{cd.get('percentage',0)}%</td></tr>"
+
+    html_content = f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+body{{font-family:'Inter',sans-serif;padding:2rem;color:#1a1a2e;font-size:12px}}
+h1{{font-size:1.3rem;margin-bottom:0.2rem}}
+.sub{{color:#7e8299;font-size:0.75rem;margin-bottom:1rem}}
+table{{width:100%;border-collapse:collapse;margin-bottom:1.5rem}}
+th{{text-align:left;padding:6px 8px;background:#f5f6fa;color:#7e8299;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #edf0f5}}
+td{{padding:6px 8px;border-bottom:1px solid #f5f6fa;font-size:0.75rem}}
+h2{{font-size:0.9rem;margin:1rem 0 0.3rem;color:#1a1a2e}}
+@media print{{body{{padding:0}}}}
+</style></head><body>
+<h1>🌊 BigWaves Conversiebureau</h1>
+<div class="sub">{c} • {pe} • Gegenereerd op ___DATE___</div>
+<h2>📊 KPI's</h2>
+<table><thead><tr><th>KPI</th><th>Waarde</th><th>Doel</th><th>Trend</th></tr></thead><tbody>{kpi_rows}</tbody></table>
+<h2>📬 Kanalen</h2>
+<table><thead><tr><th>Kanaal</th><th>Verwerkt</th><th>Bestellingen</th></tr></thead><tbody>{kan_rows}</tbody></table>"""
+
+    if wf_rows:
+        html_content += f"""<h2>⚙️ Workflows</h2><table><thead><tr><th>Workflow</th><th>Type</th><th>Items</th><th>Status</th></tr></thead><tbody>{wf_rows}</tbody></table>"""
+
+    if hitl_rows:
+        html_content += f"""<h2>🤖 HITL Categorieën</h2><table><thead><tr><th>Categorie</th><th>Totaal</th><th>HITL</th><th>%</th></tr></thead><tbody>{hitl_rows}</tbody></table>"""
+
+    if chk_rows:
+        html_content += f"""<h2>📋 Check-ins</h2><table><thead><tr><th>Datum</th><th>Type</th><th>Notities</th><th>Status</th></tr></thead><tbody>{chk_rows}</tbody></table>"""
+
+    html_content += "</body></html>"
+    html_content = html_content.replace("___DATE___", __import__("datetime").datetime.now().strftime("%d-%m-%Y %H:%M"))
+
+    resp = app.server.response_class(html_content, mimetype="text/html")
+    resp.headers["Content-Disposition"] = f'inline; filename="bigwaves-{c}-{pe}.html"'
+    return resp
 
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
