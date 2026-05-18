@@ -22,7 +22,9 @@ server.config["SESSION_PERMANENT"] = True
 app = dash.Dash(__name__, server=server, url_base_pathname="/dashboard/",
     external_stylesheets=[dbc.themes.BOOTSTRAP,
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"],
-    suppress_callback_exceptions=True, title="BigWaves Conversiebureau")
+    suppress_callback_exceptions=True, title="BigWaves Conversiebureau",
+    show_undo_redo=False, assets_folder=None,
+    compress=False, update_title=None)
 
 app.index_string = """<!DOCTYPE html>
 <html>
@@ -83,6 +85,20 @@ body{font-family:'Inter',sans-serif;background:#f5f6fa;color:#1a1a2e}
 .login-err{color:#ef4444;font-size:0.75rem;margin-top:0.5rem;min-height:1.2rem}
 .btn-pill{border-radius:200px;padding:0.35rem 1rem;font-size:0.75rem;font-weight:500;border:1px solid #e4e6ef;background:#fff;cursor:pointer;transition:all 0.15s;color:#1a1a2e}
 .btn-pill:hover{border-color:#5273ff;color:#5273ff}
+
+/* Period dropdown in sidebar */
+.period-dropdown .Select-control{background:rgba(255,255,255,0.06)!important;border:1px solid rgba(255,255,255,0.08)!important;border-radius:6px!important;min-height:28px!important;height:28px!important}
+.period-dropdown .Select-control .Select-value{line-height:26px!important;color:rgba(255,255,255,0.7)!important;font-size:0.68rem!important;padding-left:6px!important}
+.period-dropdown .Select-control .Select-arrow{border-color:rgba(255,255,255,0.3) transparent transparent!important}
+.period-dropdown .Select-menu-outer{background:#2a2a3d!important;border:1px solid rgba(255,255,255,0.08)!important;border-radius:6px!important;z-index:9999!important}
+.period-dropdown .Select-option{color:rgba(255,255,255,0.7)!important;font-size:0.68rem!important;padding:4px 8px!important}
+.period-dropdown .Select-option:hover{background:rgba(82,115,255,0.2)!important;color:#fff!important}
+.period-dropdown .Select-option.is-focused{background:rgba(82,115,255,0.15)!important;color:#fff!important}
+.period-dropdown .Select-option.is-selected{background:rgba(82,115,255,0.25)!important;color:#fff!important}
+.period-dropdown .Select-placeholder{color:rgba(255,255,255,0.4)!important;font-size:0.68rem!important;line-height:26px!important;padding-left:6px!important}
+.period-dropdown .Select-input{height:26px!important}
+.period-dropdown .Select-clear{color:rgba(255,255,255,0.3)!important}
+.period-dropdown.is-open .Select-control .Select-arrow{border-color:transparent transparent rgba(255,255,255,0.3)!important}
 </style>
 {%css%}
 </head>
@@ -449,4 +465,4 @@ def build_linkedin_page(cn, pe):
                  style={"textAlign": "center", "padding": "3rem 1rem"})], className="main-content")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8501, debug=False)
+    app.run(host="0.0.0.0", port=8501, debug=False, dev_tools_ui=False, dev_tools_props_check=False)
