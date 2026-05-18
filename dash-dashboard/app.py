@@ -235,7 +235,7 @@ def build_sidebar(cn, pe, active_page):
         )
     return html.Div([html.Div([html.H2("🌊 BigWaves"), html.Small("Conversiebureau")], className="sidebar-brand"),
         html.Div([html.Div("Menu", className="nav-label"), *nav_items,
-            html.Button([html.I(className="fas fa-moon"), html.Span("Donker thema")], id="theme-btn", className="theme-toggle", n_clicks=0, onClick="toggleTheme()"),
+            html.A([html.I(className="fas fa-moon"), html.Span("Donker thema")], href="#", className="theme-toggle", id="theme-btn", onClick="toggleTheme();return false"),
             html.Div("Periode", className="nav-label"),
             html.Div(dcc.Dropdown(id="period-select", options=[{"label": p, "value": p} for p in list(d.get("periodes", {}).keys())], value=pe, clearable=False, className="period-dropdown"), style={"padding": "0 0.8rem 0.6rem"})], className="sidebar-nav"),
         html.Div([html.Div([html.Div(d.get("logo", "🌊"), className="client-avatar"),
