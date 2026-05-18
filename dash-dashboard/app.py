@@ -269,7 +269,9 @@ for k in clients: LOGIN_PAGE += f'<option value="{k}">{k}</option>'
 LOGIN_PAGE += """</select>
 <input type="password" name="password" placeholder="Voer wachtwoord in">
 <button type="submit">Inloggen</button>
-<div class="login-err">ERROR_PLACEHOLDER</div></form></div></body></html>"""
+<div class="login-err">ERROR_PLACEHOLDER</div></form>
+<div style="text-align:center;margin-top:1rem;font-size:0.7rem"><a href="/dashboard/admin" style="color:#7e8299;text-decoration:none">BigWaves beheer →</a></div>
+</div></body></html>"""
 
 @server.route("/")
 def index():
