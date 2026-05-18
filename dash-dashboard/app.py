@@ -281,6 +281,9 @@ def build_page(cn, pe, active_page="dashboard", vergelijk=False):
         if cur_idx > 0:
             vorige_pe = period_keys[cur_idx - 1]
             vorige_data = ps[vorige_pe]
+            print(f"DEBUG build_page: pe={pe}, vorige={vorige_pe}, vorige_data keys={list(vorige_data.get('kpis',{}).keys())}", flush=True)
+        else:
+            print(f"DEBUG build_page: geen vorige periode voor {pe} (idx={cur_idx})", flush=True)
 
     kpi_cards = []
     for i,(nm,inf) in enumerate(list(kpis.items())[:4]):
