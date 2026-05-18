@@ -216,8 +216,6 @@ def build_page(cn, pe, active_page="dashboard"):
     bn = full.get("bottleneck",{}); gt = d.get("groei_team",{}); chk = gt.get("checkin_historie",[]) if gt else []
     logo = d.get("logo","🌊")
 
-    sidebar = build_sidebar(cn, pe, active_page)
-
     kpi_cards = []
     for i,(nm,inf) in enumerate(list(kpis.items())[:4]):
         w,e = inf["waarde"],inf.get("eenheid",""); t = inf.get("trend","")
@@ -259,7 +257,7 @@ def build_page(cn, pe, active_page="dashboard"):
 
     main = html.Div([html.Div([html.Div([html.H1("Dashboard"),html.Div(f"Performance overzicht • {pe}",className="subtitle")]),html.Div([html.Button("📄 PDF",className="btn-pill",style={"marginRight":"0.3rem"}),html.Button("📊 CSV",className="btn-pill")])],className="page-header"),
         dbc.Row(kpi_cards,style={"margin":"0 -0.4rem"}),*charts,*kan_section,*bn_section,*inz_section],className="main-content")
-    return html.Div([sidebar, main])
+    return main
 
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
@@ -283,8 +281,6 @@ def router(pathname):
         if active not in PAGE_ORDERS:
             active = "dashboard"
 
-    sidebar = build_sidebar(c, pe, active)
-
     if active == "dashboard":
         main = build_page(c, pe, active)
     elif active == "conversie":
@@ -297,8 +293,8 @@ def router(pathname):
         main = build_linkedin_page(c, pe)
     else:
         main = build_page(c, pe, "dashboard")
+    sidebar = build_sidebar(c, pe, active)
     return html.Div([sidebar, main])
-
 @app.callback(Output("period-store", "data"),
               Input("period-select", "value"),
               prevent_initial_call=True)
