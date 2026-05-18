@@ -191,6 +191,14 @@ body.dark .bw-onboard-box ul li{color:#e8e8ed}
 <button class="btn" onclick="document.getElementById('bw-onboard').classList.remove('show');try{localStorage.setItem('bw-onboarded','1')}catch(e){}">Aan de slag</button>
 </div>
 </div>
+<div class="bw-notif-overlay" id="bw-notif">
+<div class="bw-notif-panel">
+<span class="close" onclick="document.getElementById('bw-notif').classList.remove('show')">&times;</span>
+<h3>🔔 Notificaties</h3>
+<div style="font-size:0.7rem;color:var(--text-sec);margin-bottom:1rem">Meldingen en herinneringen</div>
+<div id="bw-notif-list"></div>
+</div>
+</div>
 <script>
 (function(){
   var o=document.getElementById('bw-onboard');
@@ -198,6 +206,15 @@ body.dark .bw-onboard-box ul li{color:#e8e8ed}
     try{
       if(!localStorage.getItem('bw-onboarded'))o.classList.add('show');
     }catch(e){o.classList.add('show')}
+  }
+  var nl=document.getElementById('bw-notif-list');
+  if(nl){
+    var n=[
+      {l:'Check-in verlopen',t:'Gepland op 5 mei 2026.',d:'2 weken geleden',c:'#ef4444'},
+      {l:'KPI data bijgewerkt',t:'Mei 2026 is geladen.',d:'2 dagen geleden',c:'#5273ff'},
+      {l:'Doel behaald',t:'847 items verwerkt (doel: 800).',d:'Vandaag',c:'#22c55e'},
+    ];
+    nl.innerHTML=n.map(function(x){return '<div class=\"bw-notif-item\"><div class=\"ni-label\" style=\"color:'+x.c+'\">'+x.l+'</div><div>'+x.t+'</div><div class=\"ni-date\">'+x.d+'</div></div>';}).join('');
   }
 })();
 function toggleTheme(){
@@ -208,6 +225,8 @@ function toggleTheme(){
 document.addEventListener('click',function(e){
   var t=e.target.closest('#theme-btn');
   if(t){e.preventDefault();toggleTheme()}
+  var n=e.target.closest('#notif-btn');
+  if(n){e.preventDefault();document.getElementById('bw-notif').classList.toggle('show')}
 });
 </script>
 </body></html>"""
@@ -436,7 +455,12 @@ def build_page(cn, pe, active_page="dashboard", vergelijk=False):
         vergelijk_badge = [html.Span(" vs " + vorige_pe, style={"fontSize":"0.7rem","fontWeight":"500","color":"var(--primary)","marginLeft":"0.3rem"})]
 
     main = html.Div([html.Div([html.Div([html.H1("Dashboard"),html.Div(f"Performance overzicht . {pe}",className="subtitle"),*vergelijk_badge]),
-        html.Div([html.A("PDF", href="/export/pdf", className="btn-pill", style={"marginRight":"0.3rem","textDecoration":"none"}),html.A("CSV", href="/export/csv", className="btn-pill", style={"textDecoration":"none"})])],className="page-header"),
+        html.Div([
+            html.A("📄 PDF", href="/export/pdf", className="btn-pill", style={"marginRight":"0.3rem","textDecoration":"none"}),
+            html.A("📧 Mail PDF", href="/export/mail-pdf", className="btn-pill", style={"marginRight":"0.3rem","textDecoration":"none"}),
+            html.A("📊 CSV", href="/export/csv", className="btn-pill", style={"marginRight":"0.3rem","textDecoration":"none"}),
+            html.A("🔔 Notificaties", href="#", className="btn-pill", style={"textDecoration":"none"}, id="notif-btn"),
+        ])],className="page-header"),
         dbc.Row(kpi_cards,style={"margin":"0 -0.4rem"}),*charts,*kan_section,*bn_section,*inz_section],className="main-content")
     return main
 
@@ -569,6 +593,18 @@ h2{{font-size:0.9rem;margin:1rem 0 0.3rem;color:#1a1a2e}}
     resp = app.server.response_class(html_content, mimetype="text/html")
     resp.headers["Content-Disposition"] = f'inline; filename="bigwaves-{c}-{pe}.html"'
     return resp
+
+@server.route("/export/mail-pdf")
+def export_mail_pdf():
+    c = session.get("client")
+    pe = session.get("periode")
+    if not c or c not in clients:
+        return redirect("/")
+    import urllib.parse
+    subject = f"BigWaves rapport - {c} - {pe}"
+    body = f"Beste,\n\nHierbij het BigWaves rapport voor {c} - {pe}.\n\nBekijk het dashboard voor de volledige rapportage:\nhttps://dashboard.bigwaves.nl/\n\n--\nBigWaves Conversiebureau"
+    mailto = f"mailto:?subject={urllib.parse.quote(subject)}&body={urllib.parse.quote(body)}"
+    return redirect(mailto)
 
 @server.route("/dashboard/vergelijk")
 def toggle_vergelijk():
