@@ -239,6 +239,30 @@ def kpi_progress(waarde, doel):
     color = "#22c55e" if pct >= 100 else "#f59e0b" if pct >= 80 else "#ef4444"
     return html.Div(html.Div(style={"width": f"{pct}%", "background": color}, className="kpi-bar-fill"), className="kpi-bar")
 
+def build_checkin_badge(d):
+    gt = d.get("groei_team", {})
+    if not gt:
+        return ""
+    volgende = gt.get("volgende_checkin", "")
+    if not volgende:
+        return ""
+    from datetime import datetime, date
+    try:
+        v_datum = datetime.strptime(volgende, "%Y-%m-%d").date()
+        vandaag = date.today()
+        delta = (v_datum - vandaag).days
+        if delta < 0:
+            icon, label, color = "🔴", "Check-in verlopen", "#ef4444"
+        elif delta <= 2:
+            icon, label, color = "🟡", f"Check-in over {delta} dag", "#f59e0b"
+        elif delta <= 7:
+            icon, label, color = "🟢", f"Check-in over {delta} dagen", "#22c55e"
+        else:
+            icon, label, color = "⚪", f"Check-in over {delta} dagen", "rgba(255,255,255,0.35)"
+        return html.Div([html.Span(icon, style={"marginRight":"0.3rem"}), html.Span(label)], style={"fontSize":"0.62rem","color":color,"margin":"0.2rem 0 0.4rem 0","padding":"0 0.2rem"})
+    except (ValueError, TypeError):
+        return ""
+
 def build_sidebar(cn, pe, active_page):
     d = clients[cn]
     nav_items = []
@@ -260,6 +284,8 @@ def build_sidebar(cn, pe, active_page):
         ], className="sidebar-nav"),
         html.Div([html.Div([html.Div(d.get("logo", "🌊"), className="client-avatar"),
             html.Div([html.Div(cn, className="client-name"), html.Div(f"Periode: {pe}", className="client-meta")])], className="client-row"),
+            # Check-in notificatie badge
+            build_checkin_badge(d),
             html.A("Uitloggen", href="/uitloggen", className="logout-btn")], className="sidebar-footer")], className="sidebar")
 
 def build_page(cn, pe, active_page="dashboard", vergelijk=False):
