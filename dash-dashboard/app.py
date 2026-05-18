@@ -493,12 +493,10 @@ def toggle_vergelijk():
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
     html.Div(id="dash-content"),
-    dcc.Store(id="period-store", storage_type="session"),
-    dcc.Store(id="compare-store", storage_type="memory", data=False),
 ])
 
-@app.callback(Output("dash-content", "children"), Input("url", "pathname"))
-def router(pathname):
+@app.callback(Output("dash-content", "children"), Input("url", "pathname"), Input("url", "search"))
+def router(pathname, search):
     c = session.get("client")
     pe = session.get("periode")
     if not c or c not in clients:
@@ -514,7 +512,7 @@ def router(pathname):
         if active not in PAGE_ORDERS:
             active = "dashboard"
 
-    vergelijk = session.get("vergelijk", False)
+    vergelijk = session.get("vergelijk", False) or (search and "v=1" in search)
 
     if active == "dashboard":
         main = build_page(c, pe, active, vergelijk)
