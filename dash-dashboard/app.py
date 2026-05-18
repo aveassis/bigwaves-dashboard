@@ -276,14 +276,11 @@ def build_page(cn, pe, active_page="dashboard", vergelijk=False):
     vorige_data = None
     vorige_pe = None
     if vergelijk:
-        period_keys = list(ps.keys())
+        period_keys = sorted(ps.keys())
         cur_idx = period_keys.index(pe) if pe in period_keys else -1
         if cur_idx > 0:
             vorige_pe = period_keys[cur_idx - 1]
             vorige_data = ps[vorige_pe]
-            print(f"DEBUG build_page: pe={pe}, vorige={vorige_pe}, vorige_data keys={list(vorige_data.get('kpis',{}).keys())}", flush=True)
-        else:
-            print(f"DEBUG build_page: geen vorige periode voor {pe} (idx={cur_idx})", flush=True)
 
     kpi_cards = []
     for i,(nm,inf) in enumerate(list(kpis.items())[:4]):
@@ -516,7 +513,6 @@ def router(pathname, search):
             active = "dashboard"
 
     vergelijk = session.get("vergelijk", False) or (search and "v=1" in search)
-    import sys; print(f"DEBUG router: vergelijk={vergelijk}, search={search}", flush=True)
 
     if active == "dashboard":
         main = build_page(c, pe, active, vergelijk)
