@@ -23,8 +23,7 @@ app = dash.Dash(__name__, server=server, url_base_pathname="/dashboard/",
     external_stylesheets=[dbc.themes.BOOTSTRAP,
         "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"],
     suppress_callback_exceptions=True, title="BigWaves Conversiebureau",
-    show_undo_redo=False, assets_folder=None,
-    compress=False, update_title=None)
+    show_undo_redo=False)
 
 app.index_string = """<!DOCTYPE html>
 <html>
