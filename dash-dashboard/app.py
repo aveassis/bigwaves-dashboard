@@ -125,6 +125,18 @@ body.dark .bw-onboard-box h2{color:#e8e8ed}
 body.dark .bw-onboard-box .tag{color:#8a8ba7}
 body.dark .bw-onboard-box ul li{color:#e8e8ed}
 
+/* Notificatie paneel */
+.bw-notif-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);z-index:10001;display:flex;align-items:flex-start;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.bw-notif-overlay.show{opacity:1;pointer-events:all}
+.bw-notif-panel{background:var(--card);width:380px;height:100vh;padding:1.5rem;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,0.1);margin-right:-380px;transition:margin 0.25s}
+.bw-notif-overlay.show .bw-notif-panel{margin-right:0}
+.bw-notif-panel h3{font-size:0.95rem;font-weight:700;color:var(--text);margin-bottom:0.2rem}
+.bw-notif-panel .close{float:right;font-size:1.2rem;cursor:pointer;color:var(--text-muted)}
+.bw-notif-panel .close:hover{color:var(--text)}
+.bw-notif-item{padding:0.7rem 0;border-bottom:1px solid var(--border);font-size:0.78rem;color:var(--text)}
+.bw-notif-item .ni-label{font-size:0.6rem;color:var(--text-sec);text-transform:uppercase;letter-spacing:0.5px}
+.bw-notif-item .ni-date{font-size:0.65rem;color:var(--text-muted);margin-top:0.15rem}
+
 /* Period dropdown in sidebar */
 .period-dropdown .Select-control{background:rgba(255,255,255,0.06)!important;border:1px solid rgba(255,255,255,0.08)!important;border-radius:6px!important;min-height:28px!important;height:28px!important}
 .period-dropdown .Select-control .Select-value{line-height:26px!important;color:rgba(255,255,255,0.7)!important;font-size:0.68rem!important;padding-left:6px!important}
