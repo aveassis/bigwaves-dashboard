@@ -513,6 +513,7 @@ def router(pathname, search):
             active = "dashboard"
 
     vergelijk = session.get("vergelijk", False) or (search and "v=1" in search)
+    import sys; print(f"DEBUG router: vergelijk={vergelijk}, search={search}", flush=True)
 
     if active == "dashboard":
         main = build_page(c, pe, active, vergelijk)
