@@ -197,7 +197,7 @@ KPI_ICONS = {
     "Gem. responstijd": ("fa-clock", "rgba(34,197,94,0.08)", "#22c55e"),
     "Nauwkeurigheid": ("fa-bullseye", "rgba(245,158,11,0.08)", "#f59e0b"),
     "Uptime": ("fa-shield-alt", "rgba(82,115,255,0.08)", "#5273ff"),
-    "HITL-ratio": ("fa-robot", "rgba(139,92,246,0.08)", "#8b5cf6"),
+    "Kwaliteitsborging": ("fa-shield-alt", "rgba(34,197,94,0.08)", "#22c55e"),
     "Kostenbesparing": ("fa-euro-sign", "rgba(34,197,94,0.08)", "#22c55e"),
 }
 KAN_ICON = {"website":"fa-globe","mail":"fa-envelope","whatsapp":"fa-whatsapp","telefoon":"fa-phone"}
@@ -271,6 +271,8 @@ def build_page(cn, pe, active_page="dashboard"):
     if graf:
         row = []
         for k,gr in graf.items():
+            if k == "hitl_trend":
+                continue  # skip HITL grafiek, niet klantgericht
             fig = go.Figure(); fig.add_trace(go.Bar(x=gr["labels"],y=gr["waarden"],marker_color="#5273ff",opacity=0.85))
             if "doel" in gr: fig.add_hline(y=gr["doel"],line_dash="dash",line_color="#f59e0b",annotation_text=f"Doel: {gr['doel']}",annotation_position="top left")
             fig.update_layout(title=dict(text=gr["titel"],font=dict(size=12,color="#1a1a2e"),x=0.02),height=240,margin=dict(l=16,r=16,t=32,b=16),paper_bgcolor="#fff",plot_bgcolor="#fff",font=dict(size=10,color="#7e8299"),yaxis=dict(gridcolor="#f1efed"),xaxis=dict(gridcolor="#f1efed"),hoverlabel=dict(bgcolor="#5273ff",font_color="white"),showlegend=False)
@@ -485,20 +487,23 @@ def build_conversie_page(cn, pe):
     kpis = pd.get("kpis", {})
     hitl = pd.get("hitl_detail", {})
 
+    # Hernoem de HITL-ratio KPI naar "Kwaliteitsborging" in de conversie pagina
     kpi_cards = []
     for nm, inf in list(kpis.items())[:6]:
         w, e = inf["waarde"], inf.get("eenheid", "")
         t = inf.get("trend", "")
+        # Hernoem HITL-ratio naar klantvriendelijke term
+        label = "Kwaliteitsborging" if nm == "HITL-ratio" else nm
         ic = KPI_ICONS.get(nm, ("fa-chart-bar", "rgba(82,115,255,0.08)", "#5273ff"))
         kpi_cards.append(dbc.Col(html.Div([
             html.Div(html.I(className=f"fas {ic[0]}", style={"color": ic[2]}), className="kpi-icon", style={"background": ic[1]}),
-            html.Div(nm, className="kpi-label"),
+            html.Div(label, className="kpi-label"),
             html.Div(fmt_val(w, e), className="kpi-value"),
             html.Div(f"Doel: {inf['doel']}", className="kpi-target"),
             html.Div(f"{trend_arrow(t)} {t}", className=f"kpi-trend {trend_class(t)}", style={"color": trend_col(t)}),
         ], className="kpi-card"), width=4, style={"padding": "0 0.4rem", "marginBottom": "0.5rem"}))
 
-    hitl_section = []
+    kwaliteit_section = []
     if hitl:
         totaal = hitl.get("totaal_acties", 0)
         mens = hitl.get("menselijke_check", 0)
@@ -506,11 +511,12 @@ def build_conversie_page(cn, pe):
         saved = hitl.get("bespaarde_uren", 0)
         cat = hitl.get("categorieen", {})
 
-        hitl_cards = dbc.Row([
-            dbc.Col(html.Div([html.Div("Totaal acties", className="ci-label"), html.Div(str(totaal), className="ci-date")], className="checkin-card", style={"borderLeftColor": "#5273ff"}), width=3, style={"padding": "0 0.3rem"}),
-            dbc.Col(html.Div([html.Div("Menselijke check", className="ci-label"), html.Div(str(mens), className="ci-date"), html.Div(f"{round(mens/totaal*100) if totaal else 0}%", className="ci-note")], className="checkin-card", style={"borderLeftColor": "#f59e0b"}), width=3, style={"padding": "0 0.3rem"}),
-            dbc.Col(html.Div([html.Div("Geautomatiseerd", className="ci-label"), html.Div(str(auto), className="ci-date"), html.Div(f"{round(auto/totaal*100) if totaal else 0}%", className="ci-note")], className="checkin-card", style={"borderLeftColor": "#22c55e"}), width=3, style={"padding": "0 0.3rem"}),
-            dbc.Col(html.Div([html.Div("Bespaarde uren", className="ci-label"), html.Div(f"{saved}h", className="ci-date"), html.Div("deze periode", className="ci-note")], className="checkin-card", style={"borderLeftColor": "#8b5cf6"}), width=3, style={"padding": "0 0.3rem"}),
+        # Klantvriendelijke kwaliteitscontrole kaarten
+        kwaliteit_cards = dbc.Row([
+            dbc.Col(html.Div([html.Div("Totaal verwerkt", className="ci-label"), html.Div(str(totaal), className="ci-date")], className="checkin-card", style={"borderLeftColor": "#5273ff"}), width=3, style={"padding": "0 0.3rem"}),
+            dbc.Col(html.Div([html.Div("Extra gecontroleerd", className="ci-label"), html.Div(str(mens), className="ci-date"), html.Div(f"{round(mens/totaal*100) if totaal else 0}% voor kwaliteit", className="ci-note")], className="checkin-card", style={"borderLeftColor": "#22c55e"}), width=3, style={"padding": "0 0.3rem"}),
+            dbc.Col(html.Div([html.Div("Foutloos verwerkt", className="ci-label"), html.Div(str(auto), className="ci-date"), html.Div("geen fouten gemeld", className="ci-note")], className="checkin-card", style={"borderLeftColor": "#8b5cf6"}), width=3, style={"padding": "0 0.3rem"}),
+            dbc.Col(html.Div([html.Div("Tijd bespaard", className="ci-label"), html.Div(f"{saved}h", className="ci-date"), html.Div("deze periode", className="ci-note")], className="checkin-card", style={"borderLeftColor": "#f59e0b"}), width=3, style={"padding": "0 0.3rem"}),
         ], style={"margin": "0 -0.3rem", "marginBottom": "0.8rem"})
 
         cat_rows = []
@@ -518,19 +524,19 @@ def build_conversie_page(cn, pe):
             cat_rows.append(html.Tr([html.Td(cn_), html.Td(str(cd.get("totaal", 0))), html.Td(str(cd.get("hitl", 0))), html.Td(f"{cd.get('percentage', 0)}%")]))
 
         cat_table = html.Table([
-            html.Thead(html.Tr([html.Th("Categorie"), html.Th("Totaal"), html.Th("HITL"), html.Th("%")])),
+            html.Thead(html.Tr([html.Th("Categorie"), html.Th("Totaal"), html.Th("Gecontroleerd"), html.Th("%")])),
             html.Tbody(cat_rows),
         ], className="detail-table")
 
-        hitl_section = [
-            html.Div([html.I(className="fas fa-robot", style={"color": "#8b5cf6"}), " HITL-overzicht"], className="section-title"),
-            hitl_cards,
+        kwaliteit_section = [
+            html.Div([html.I(className="fas fa-shield-alt", style={"color": "#22c55e"}), " Kwaliteitscontrole"], className="section-title"),
+            kwaliteit_cards,
             html.Div(cat_table, className="admin-card"),
         ]
 
     return html.Div([html.Div([html.H1("Conversie"), html.Div(f"KPI-overzicht . {pe}", className="subtitle")], className="page-header"),
         dbc.Row(kpi_cards, style={"margin": "0 -0.4rem"}),
-        *hitl_section], className="main-content")
+        *kwaliteit_section], className="main-content")
 
 def build_inzichten_page(cn, pe):
     d = clients[cn]
