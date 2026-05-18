@@ -143,7 +143,35 @@ body.dark .bw-onboard-box ul li{color:#e8e8ed}
     .sidebar{width:60px}
     .sidebar-brand h2,.sidebar-brand small,.sidebar-nav .nav-label,.sidebar-nav a span,.sidebar-period,.sidebar-footer .client-meta,.sidebar-footer .client-name{display:none}
     .sidebar-footer .client-avatar{margin:0 auto}
-    .main-content{margin-left:60px;padding:1rem}
+    .sidebar-nav a{justify-content:center;padding:0.5rem 0;margin:1px 0.3rem}
+    .sidebar-nav a i{margin:0}
+    .theme-toggle span{display:none}
+    .main-content{margin-left:60px;padding:0.8rem}
+    .page-header{flex-direction:column;gap:0.5rem}
+    .page-header h1{font-size:1rem}
+    .kpi-card{padding:0.7rem 0.8rem}
+    .kpi-value{font-size:1.1rem}
+    .kpi-icon{width:26px;height:26px;font-size:0.7rem}
+    .chart-box{padding:0.3rem}
+}
+@media(max-width:480px){
+    .sidebar{width:48px}
+    .main-content{margin-left:48px;padding:0.5rem}
+    .page-header h1{font-size:0.9rem}
+    .page-header .subtitle{font-size:0.65rem}
+    .kpi-card{padding:0.5rem 0.6rem}
+    .kpi-value{font-size:0.95rem}
+    .kpi-icon{width:22px;height:22px;font-size:0.6rem}
+    .kpi-label{font-size:0.55rem}
+    .kpi-target,.kpi-trend{font-size:0.6rem}
+    .kanal-card{padding:0.5rem}
+    .kanal-val{font-size:1rem}
+    .kanal-name{font-size:0.55rem}
+    .checkin-card{padding:0.5rem 0.6rem}
+    .checkin-card .ci-date{font-size:0.7rem}
+    .checkin-card .ci-note{font-size:0.65rem}
+    .section-title{font-size:0.75rem;margin:0.8rem 0 0.4rem}
+    .btn-pill{font-size:0.65rem;padding:0.25rem 0.6rem}
 }
 </style>
 {%css%}
@@ -369,7 +397,8 @@ def build_page(cn, pe, active_page="dashboard", vergelijk=False):
             html.Div(f"{ta(t)} {t}",className=f"kpi-trend {tc(t)}",style={"color":tcol(t)}),
             *vergelijk_html,
             kpi_progress(w, do)],className="kpi-card"),
-            width=3,style={"padding":"0 0.4rem","marginBottom":"0.5rem"}))
+            width=3,style={"padding":"0 0.4rem","marginBottom":"0.5rem"},
+            xs=12,sm=6,md=3))
 
     charts = []
     if graf:
@@ -380,7 +409,7 @@ def build_page(cn, pe, active_page="dashboard", vergelijk=False):
             fig = go.Figure(); fig.add_trace(go.Bar(x=gr["labels"],y=gr["waarden"],marker_color="#5273ff",opacity=0.85))
             if "doel" in gr: fig.add_hline(y=gr["doel"],line_dash="dash",line_color="#f59e0b",annotation_text=f"Doel: {gr['doel']}",annotation_position="top left")
             fig.update_layout(title=dict(text=gr["titel"],font=dict(size=12,color="#1a1a2e"),x=0.02),height=240,margin=dict(l=16,r=16,t=32,b=16),paper_bgcolor="#fff",plot_bgcolor="#fff",font=dict(size=10,color="#7e8299"),yaxis=dict(gridcolor="#f1efed"),xaxis=dict(gridcolor="#f1efed"),hoverlabel=dict(bgcolor="#5273ff",font_color="white"),showlegend=False)
-            row.append(dbc.Col(html.Div(dcc.Graph(figure=fig,config={"displayModeBar":False}),className="chart-box"),width=6,style={"padding":"0 0.4rem","marginBottom":"0.5rem"}))
+            row.append(dbc.Col(html.Div(dcc.Graph(figure=fig,config={"displayModeBar":False}),className="chart-box"),width=6,style={"padding":"0 0.4rem","marginBottom":"0.5rem"},xs=12,lg=6))
         charts = [dbc.Row(row,style={"margin":"0 -0.4rem"})]
 
     kan_section = []
@@ -684,7 +713,7 @@ def build_conversie_page(cn, pe):
             html.Div(f"Doel: {do}", className="kpi-target"),
             html.Div(f"{trend_arrow(t)} {t}", className=f"kpi-trend {trend_class(t)}", style={"color": trend_col(t)}),
             kpi_progress(w, do),
-        ], className="kpi-card"), width=4, style={"padding": "0 0.4rem", "marginBottom": "0.5rem"}))
+        ], className="kpi-card"), width=4, style={"padding": "0 0.4rem", "marginBottom": "0.5rem"}, xs=12, sm=6, lg=4))
 
     kwaliteit_section = []
     if hitl:
