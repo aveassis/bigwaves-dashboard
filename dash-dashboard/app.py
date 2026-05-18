@@ -272,7 +272,7 @@ KPI_ICONS = {
 KAN_ICON = {"website":"fa-globe","mail":"fa-envelope","whatsapp":"fa-whatsapp","telefoon":"fa-phone"}
 PAGE_LABELS = {"dashboard":"Dashboard","conversie":"Conversie","inzichten":"Inzichten","admin":"Admin","linkedin":"LinkedIn Outreach"}
 PAGE_ICONS = {"dashboard":"fa-chart-pie","conversie":"fa-chart-line","inzichten":"fa-lightbulb","admin":"fa-cog","linkedin":"fa-linkedin"}
-PAGE_ORDERS = ["dashboard","conversie","inzichten","admin","linkedin"]
+PAGE_ORDERS = ["dashboard", "conversie", "inzichten", "linkedin"]
 
 def status_emoji(s): return {"groen":"🟢","oranje":"🟠","rood":"🔴"}.get(s,"⚪")
 se = status_emoji
