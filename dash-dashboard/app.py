@@ -548,7 +548,7 @@ def admin_nieuwe_klant():
     with open(filepath, "w") as f:
         json.dump(template, f, indent=2, ensure_ascii=False)
     
-    return redirect("/admin/nieuw?msg=Template+opgeslagen:+{}.json".format(filepath.name))
+    return redirect("/admin/nieuw?msg=Template+opgeslagen:+{}".format(filepath.name))
 
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
