@@ -71,6 +71,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .kpi-target{font-size:0.65rem;color:var(--text-muted)}
 .kpi-trend{font-size:0.68rem;font-weight:500;margin-top:0.3rem}
 .kpi-trend.up{color:var(--green)}.kpi-trend.down{color:var(--red)}.kpi-trend.neutral{color:var(--text-sec)}
+.kpi-bar{width:100%;height:4px;background:var(--border);border-radius:4px;margin-top:0.4rem;overflow:hidden}
+.kpi-bar-fill{height:100%;border-radius:4px;transition:width 0.4s ease}
 .kpi-uitleg{font-size:0.6rem;color:var(--text-muted);margin-top:0.2rem;line-height:1.3}
 .chart-box{background:var(--chart-bg);border:1px solid var(--border);border-radius:10px;padding:0.5rem;margin-bottom:0.8rem;transition:background 0.2s}
 .kanal-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.8rem;text-align:center;height:100%;transition:background 0.2s}
@@ -228,7 +230,14 @@ def fmt_val(w,e):
     if e=="%": return f"{w}%"
     return f"{w:,}" if isinstance(w,int) else str(w)
 fv = fmt_val
+PAGE_LABELS = {"dashboard":"Dashboard","conversie":"Conversie","inzichten":"Inzichten","admin":"Admin","linkedin":"LinkedIn Outreach"}
 
+def kpi_progress(waarde, doel):
+    if not doel or doel == 0:
+        return ""
+    pct = min(round(waarde / doel * 100), 100)
+    color = "#22c55e" if pct >= 100 else "#f59e0b" if pct >= 80 else "#ef4444"
+    return html.Div(html.Div(style={"width": f"{pct}%", "background": color}), className="kpi-bar")
 
 def build_sidebar(cn, pe, active_page):
     d = clients[cn]
@@ -263,13 +272,14 @@ def build_page(cn, pe, active_page="dashboard"):
 
     kpi_cards = []
     for i,(nm,inf) in enumerate(list(kpis.items())[:4]):
-        w,e = inf["waarde"],inf.get("eenheid",""); t = inf.get("trend","")
+        w,e = inf["waarde"],inf.get("eenheid",""); t = inf.get("trend",""); do = inf.get("doel",0)
         ic = KPI_ICONS.get(nm,("fa-chart-bar","rgba(82,115,255,0.08)","#5273ff"))
         kpi_cards.append(dbc.Col(html.Div([
             html.Div(html.I(className=f"fas {ic[0]}",style={"color":ic[2]}),className="kpi-icon",style={"background":ic[1]}),
             html.Div(nm,className="kpi-label"),html.Div(fv(w,e),className="kpi-value"),
-            html.Div(f"Doel: {inf['doel']}",className="kpi-target"),
-            html.Div(f"{ta(t)} {t}",className=f"kpi-trend {tc(t)}",style={"color":tcol(t)})],className="kpi-card"),
+            html.Div(f"Doel: {do}",className="kpi-target"),
+            html.Div(f"{ta(t)} {t}",className=f"kpi-trend {tc(t)}",style={"color":tcol(t)}),
+            kpi_progress(w, do)],className="kpi-card"),
             width=3,style={"padding":"0 0.4rem","marginBottom":"0.5rem"}))
 
     charts = []
@@ -497,6 +507,7 @@ def build_conversie_page(cn, pe):
     for nm, inf in list(kpis.items())[:6]:
         w, e = inf["waarde"], inf.get("eenheid", "")
         t = inf.get("trend", "")
+        do = inf.get("doel", 0)
         # Hernoem HITL-ratio naar klantvriendelijke term
         label = "Kwaliteitsborging" if nm == "HITL-ratio" else nm
         ic = KPI_ICONS.get(nm, ("fa-chart-bar", "rgba(82,115,255,0.08)", "#5273ff"))
@@ -504,8 +515,9 @@ def build_conversie_page(cn, pe):
             html.Div(html.I(className=f"fas {ic[0]}", style={"color": ic[2]}), className="kpi-icon", style={"background": ic[1]}),
             html.Div(label, className="kpi-label"),
             html.Div(fmt_val(w, e), className="kpi-value"),
-            html.Div(f"Doel: {inf['doel']}", className="kpi-target"),
+            html.Div(f"Doel: {do}", className="kpi-target"),
             html.Div(f"{trend_arrow(t)} {t}", className=f"kpi-trend {trend_class(t)}", style={"color": trend_col(t)}),
+            kpi_progress(w, do),
         ], className="kpi-card"), width=4, style={"padding": "0 0.4rem", "marginBottom": "0.5rem"}))
 
     kwaliteit_section = []
