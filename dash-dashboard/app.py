@@ -921,7 +921,10 @@ def admin_logo(naam):
                 json.dump(data, f, indent=2, ensure_ascii=False)
         return redirect("/dashboard/admin")
     cur_logo = clients[naam].get("logo", "🌊")
-    return LOGO_PAGE.replace("🌊", cur_logo, 1).replace("Klant", f"{cur_logo} {naam}")
+    import html as html_mod
+    safe_logo = html_mod.escape(cur_logo)
+    safe_naam = html_mod.escape(f"{cur_logo} {naam}")
+    return LOGO_PAGE.replace('value="🌊"', f'value="{safe_logo}"').replace("Klant", safe_naam)
 
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
