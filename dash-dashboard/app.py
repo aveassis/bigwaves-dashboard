@@ -842,7 +842,19 @@ input:focus,select:focus{{border-color:#5273ff}}
     with open(filepath, "w") as f:
         json.dump(template, f, indent=2, ensure_ascii=False)
     
-    return redirect("/admin/nieuw?msg=Template+opgeslagen:+{}".format(filepath.name))
+    return redirect("/dashboard/admin")
+
+@server.route("/admin/verwijder/<naam>")
+def admin_verwijder_klant(naam):
+    is_admin = session.get("admin", False)
+    if not is_admin:
+        return redirect("/")
+    if naam not in clients:
+        return redirect("/dashboard/admin")
+    filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
+    if filepath.exists():
+        filepath.unlink()
+    return redirect("/dashboard/admin")
 
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
@@ -920,6 +932,9 @@ def build_admin_interface():
             html.Td(str(chk)),
             html.Td(str(perioden)),
             html.Td(sinds),
+            html.Td(html.A("🗑️", href=f"/admin/verwijder/{nm}", className="btn-pill",
+                           style={"textDecoration":"none","padding":"0.15rem 0.4rem","fontSize":"0.7rem"},
+                           onclick="return confirm('Weet je zeker dat je deze klant wilt verwijderen?')")),
         ]))
 
     return html.Div([
@@ -951,7 +966,7 @@ def build_admin_interface():
                 html.Div([html.I(className="fas fa-users", style={"color": "#5273ff"}), " Alle klanten"], className="section-title"),
                 html.Table([
                     html.Thead(html.Tr([html.Th("Klant"), html.Th("Pakket"), html.Th("Status"), html.Th("Prijs"),
-                                        html.Th("Workflows"), html.Th("Check-ins"), html.Th("Perioden"), html.Th("Sinds")])),
+                                        html.Th("Workflows"), html.Th("Check-ins"), html.Th("Perioden"), html.Th("Sinds"), html.Th("")])),
                     html.Tbody(klant_rows),
                 ], className="detail-table"),
             ], className="admin-card", style={"margin": "0 2rem 1rem"}),
