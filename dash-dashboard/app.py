@@ -1106,6 +1106,106 @@ def admin_data(naam):
     
     return DATA_EDIT_TPL.format(naam=naam, logo=logo, periodes_html=periodes_html, kanalen_html=kanalen_html)
 
+CHECKIN_TPL = """<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BigWaves — Check-ins</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:'Inter',sans-serif;background:#f5f6fa;padding:1rem;color:#1a1a2e}}
+h1{{font-size:1.15rem;font-weight:700;margin-bottom:0.2rem}}
+.sub{{color:#7e8299;font-size:0.7rem;margin-bottom:1rem}}
+.card{{background:#fff;border:1px solid #edf0f5;border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:0.8rem;box-shadow:0 4px 20px rgba(0,0,0,0.04)}}
+.card h2{{font-size:0.85rem;font-weight:600;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.3rem}}
+label{{display:block;font-size:0.62rem;font-weight:600;color:#7e8299;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.15rem}}
+input,select{{width:100%;padding:0.4rem 0.55rem;border:1px solid #e4e6ef;border-radius:6px;font-size:0.78rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:0.5rem}}
+input:focus,select:focus{{border-color:#5273ff}}
+textarea{{width:100%;padding:0.4rem 0.55rem;border:1px solid #e4e6ef;border-radius:6px;font-size:0.78rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:0.5rem;resize:vertical;min-height:60px}}
+textarea:focus{{border-color:#5273ff}}
+.btn{{padding:0.45rem 1.2rem;background:#5273ff;color:#fff;border:none;border-radius:200px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}}
+.btn:hover{{background:#3f5ee6}}.btn.sec{{background:transparent;border:1px solid #e4e6ef;color:#7e8299}}.btn.sec:hover{{border-color:#5273ff;color:#5273ff}}
+.btn.green{{background:#22c55e}}.btn.red{{background:#ef4444}}
+.ci-item{{background:#f9fafb;border:1px solid #edf0f5;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.4rem;display:flex;align-items:center;gap:0.5rem}}
+.ci-item .ci-info{{flex:1}}
+.ci-item .ci-date{{font-size:0.68rem;color:#7e8299}}
+.ci-item .ci-note{{font-size:0.78rem;color:#1a1a2e;margin-top:0.1rem}}
+.ci-item .ci-status{{width:8px;height:8px;border-radius:50%;flex-shrink:0}}
+.back{{display:block;text-align:center;margin-top:0.8rem;font-size:0.72rem;color:#7e8299;text-decoration:none}}
+.back:hover{{color:#5273ff}}
+</style>
+</head><body>
+<div style="max-width:600px;margin:0 auto">
+<div class="card">
+<h1>📋 Check-ins</h1>
+<p class="sub">{logo} {naam}</p>
+<form method="POST" action="/admin/checkins/{naam}">
+<div class="row" style="display:flex;gap:0.3rem;align-items:flex-end">
+<div style="flex:1"><label>Datum</label><input name="datum" type="date" value="{vandaag}"></div>
+<div style="flex:1"><label>Type</label><select name="type"><option value="wekelijkse check-in">Wekelijks</option><option value="maandelijkse check-in">Maandelijks</option><option value="ad-hoc">Ad-hoc</option></select></div>
+<div style="flex:0 0 80px"><label>Status</label><select name="status"><option value="groen">🟢</option><option value="oranje">🟠</option><option value="rood">🔴</option></select></div>
+</div>
+<label>Notities</label><textarea name="notities" placeholder="Wat besproken en afgesproken..."></textarea>
+<button class="btn green" type="submit">+ Check-in toevoegen</button>
+</form>
+</div>
+<div class="card"><h2>📋 Historie ({aantal})</h2>
+{checkins_html}
+</div>
+<a class="back" href="/dashboard/admin">← Terug naar beheer</a>
+</div>
+</body></html>"""
+
+@server.route("/admin/checkins/<naam>", methods=["GET", "POST"])
+def admin_checkins(naam):
+    is_admin = session.get("admin", False)
+    if not is_admin:
+        return redirect("/")
+    if naam not in clients:
+        return redirect("/dashboard/admin")
+    from datetime import date
+    vandaag = date.today().isoformat()
+    filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
+    if not filepath.exists():
+        for f in DATA_DIR.glob("*.json"):
+            if naam.lower().startswith(f.stem.lower().replace("-", " ")) or f.stem.lower().replace("-", " ").startswith(naam.lower()[:8]):
+                filepath = f
+                break
+    import json
+    with open(filepath) as f:
+        data = json.load(f)
+    
+    if request.method == "POST":
+        datum = request.form.get("datum", vandaag)
+        c_type = request.form.get("type", "wekelijkse check-in")
+        c_status = request.form.get("status", "groen")
+        notities = request.form.get("notities", "").strip()
+        gt = data.setdefault("groei_team", {})
+        chk = gt.setdefault("checkin_historie", [])
+        chk.insert(0, {"datum": datum, "type": c_type, "notities": notities, "status": c_status})
+        gt["laatste_checkin"] = datum
+        with open(filepath, "w") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        clients[naam] = data
+        return redirect(f"/admin/checkins/{naam}")
+    
+    # GET — toon check-ins
+    gt = data.get("groei_team", {})
+    chk = gt.get("checkin_historie", [])
+    logo = data.get("logo", "🌊")
+    
+    status_kleuren = {"groen": "#22c55e", "oranje": "#f59e0b", "rood": "#ef4444"}
+    ci_blocks = ""
+    for ci in chk:
+        s = ci.get("status", "groen")
+        kleur = status_kleuren.get(s, "#22c55e")
+        ci_blocks += f'<div class="ci-item"><div class="ci-status" style="background:{kleur}"></div><div class="ci-info"><div class="ci-date">{ci.get("datum","")} — {ci.get("type","")}</div><div class="ci-note">{ci.get("notities","")}</div></div></div>'
+    
+    if not ci_blocks:
+        ci_blocks = '<div style="text-align:center;padding:1rem;color:#7e8299;font-size:0.78rem">Nog geen check-ins</div>'
+    
+    return CHECKIN_TPL.format(naam=naam, logo=logo, vandaag=vandaag, aantal=len(chk), checkins_html=ci_blocks)
+
 @server.route("/admin/data/<naam>", methods=["POST"])
 def admin_data_post(naam):
     is_admin = session.get("admin", False)
@@ -1307,6 +1407,8 @@ def build_admin_interface():
             html.Td(str(perioden)),
             html.Td(sinds),
             html.Td([
+                html.A("📋", href=f"/admin/checkins/{nm}", className="btn-pill",
+                       style={"textDecoration":"none","padding":"0.15rem 0.3rem","fontSize":"0.7rem","marginRight":"0.15rem"}),
                 html.A("📝", href=f"/admin/data/{nm}", className="btn-pill",
                        style={"textDecoration":"none","padding":"0.15rem 0.3rem","fontSize":"0.7rem","marginRight":"0.15rem"}),
                 html.A("🎨", href=f"/admin/logo/{nm}", className="btn-pill",
