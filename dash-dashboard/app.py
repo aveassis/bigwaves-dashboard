@@ -1684,9 +1684,10 @@ def build_linkedin_page(cn, pe):
                      style={"textAlign": "center", "padding": "3rem 1rem"})], className="main-content")
 
     m = d.get("metrics", {})
-    prospects = d.get("prospects", [])[:8]
-    acties = d.get("recente_acties", [])[:6]
+    prospects = d.get("prospects", [])
+    acties = d.get("recente_acties", [])
     inst = d.get("instellingen", {})
+    wekelijks = d.get("wekelijks", [])
 
     metric_icons = {
         "totaal_prospects": ("fa-users", "#5273ff"),
@@ -1710,6 +1711,63 @@ def build_linkedin_page(cn, pe):
             html.Div(str(val), className="lc-value"),
         ], className="linkedin-card"), width=3, style={"padding": "0 0.4rem", "marginBottom": "0.5rem"}))
 
+    # Grafiek — wekelijkse trend
+    trend_chart = []
+    if wekelijks:
+        fig = go.Figure()
+        weken_labels = [w.get("week", f"W{i+1}") for i, w in enumerate(wekelijks)]
+        fig.add_trace(go.Scatter(x=weken_labels, y=[w.get("connecties", 0) for w in wekelijks],
+                                 mode="lines+markers", name="Connecties", line=dict(color="#f59e0b", width=2),
+                                 marker=dict(size=6)))
+        fig.add_trace(go.Scatter(x=weken_labels, y=[w.get("berichten", 0) for w in wekelijks],
+                                 mode="lines+markers", name="Berichten", line=dict(color="#8b5cf6", width=2),
+                                 marker=dict(size=6)))
+        fig.add_trace(go.Scatter(x=weken_labels, y=[w.get("afspraken", 0) for w in wekelijks],
+                                 mode="lines+markers", name="Afspraken", line=dict(color="#22c55e", width=2),
+                                 marker=dict(size=6)))
+        fig.update_layout(title=dict(text="Wekelijkse trend", font=dict(size=12, color="#1a1a2e"), x=0.02),
+                          height=260, margin=dict(l=16, r=16, t=36, b=16),
+                          paper_bgcolor="#fff", plot_bgcolor="#fff",
+                          font=dict(size=10, color="#7e8299"),
+                          legend=dict(orientation="h", y=1.1, font=dict(size=9)),
+                          yaxis=dict(gridcolor="#f1efed"), xaxis=dict(gridcolor="#f1efed"),
+                          hoverlabel=dict(bgcolor="#5273ff", font_color="white"))
+        trend_chart = [html.Div([html.I(className="fas fa-chart-line", style={"color": "#5273ff"}), " Wekelijkse trend"], className="section-title"),
+                       html.Div(dcc.Graph(figure=fig, config={"displayModeBar": False}), className="chart-box")]
+
+    # Conversietrechter
+    trechter = []
+    totaal = m.get("totaal_prospects", 0)
+    verzonden = m.get("connecties_verzonden", 0)
+    geaccepteerd = m.get("connecties_geaccepteerd", 0)
+    berichten = m.get("berichten_verzonden", 0)
+    afspraken = m.get("afspraken_ingeboekt", 0)
+    
+    trechter_stappen = [
+        ("Prospects", totaal, "#5273ff"),
+        ("Connecties verzonden", verzonden, "#f59e0b"),
+        ("Connecties geaccepteerd", geaccepteerd, "#22c55e"),
+        ("Berichten verzonden", berichten, "#8b5cf6"),
+        ("Afspraken", afspraken, "#22c55e"),
+    ]
+    
+    trechter_items = []
+    for label, val, kleur in trechter_stappen:
+        pct = round(val / totaal * 100, 1) if totaal else 0
+        breedte = max(val / totaal * 100, 5) if totaal else 0
+        trechter_items.append(html.Div([
+            html.Div(label, style={"fontSize": "0.7rem", "fontWeight": "600", "color": "#7e8299", "width": "140px", "textAlign": "right", "paddingRight": "0.5rem"}),
+            html.Div(html.Div(style={"width": f"{breedte}%", "height": "22px", "background": kleur, "borderRadius": "4px", "opacity": "0.85",
+                                      "display": "flex", "alignItems": "center", "justifyContent": "center", "color": "#fff", "fontSize": "0.68rem", "fontWeight": "600", "minWidth": "30px"}),
+                     style={"flex": "1", "background": "#f1efed", "borderRadius": "4px"}),
+            html.Div(str(val), style={"fontSize": "0.75rem", "fontWeight": "700", "color": kleur, "width": "50px", "textAlign": "left", "paddingLeft": "0.5rem"}),
+            html.Div(f"{pct}%", style={"fontSize": "0.62rem", "color": "#7e8299", "width": "40px", "textAlign": "right"}),
+        ], style={"display": "flex", "alignItems": "center", "marginBottom": "0.3rem"}))
+    
+    trechter = [html.Div([html.I(className="fas fa-filter", style={"color": "#5273ff"}), " Conversietrechter"], className="section-title"),
+                html.Div(trechter_items, className="admin-card")]
+
+    # Inzichtkaarten
     acc = m.get("acceptatiegraad", 0)
     resp_gr = m.get("responsgraad", 0)
     insight_cards = dbc.Row([
@@ -1725,6 +1783,7 @@ def build_linkedin_page(cn, pe):
         ], className="checkin-card", style={"borderLeftColor": "#8b5cf6"}), width=6, style={"padding": "0 0.4rem"}),
     ], style={"margin": "0 -0.4rem", "marginBottom": "0.8rem"})
 
+    # Instellingen
     inst_cards = dbc.Row([
         dbc.Col(html.Div([
             html.Div("Dagelijkse limiet", className="ci-label"), html.Div(str(inst.get("dagelijkse_limiet", 0)), className="ci-date"),
@@ -1740,9 +1799,23 @@ def build_linkedin_page(cn, pe):
         ], className="checkin-card", style={"borderLeftColor": "#8b5cf6"}), width=4, style={"padding": "0 0.4rem"}),
     ], style={"margin": "0 -0.4rem", "marginBottom": "0.8rem"})
 
-    status_labels = {"connected": "Verbonden", "pending": "In afwachting", "message": "Bericht gestuurd", "meeting": "Afspraak" }
+    # Status filters + prospects
+    status_labels = {"connected": "Verbonden", "pending": "In afwachting", "message": "Bericht gestuurd", "meeting": "Afspraak"}
     status_colors = {"connected": "#22c55e", "pending": "#f59e0b", "message": "#5273ff", "meeting": "#8b5cf6"}
+    
+    filter_knoppen = []
+    for s_key, s_label in [("all", "Alle"), ("connected", "Verbonden"), ("pending", "In afwachting"), ("message", "Bericht"), ("meeting", "Afspraak")]:
+        if s_key == "all":
+            filter_knoppen.append(html.A(s_label, href="/dashboard/linkedin", className="btn-pill",
+                                         style={"textDecoration": "none", "fontSize": "0.68rem", "marginRight": "0.2rem", "background": "#5273ff", "color": "#fff", "border": "1px solid #5273ff"}))
+        else:
+            filter_knoppen.append(html.A(s_label, href=f"/dashboard/linkedin?status={s_key}", className="btn-pill",
+                                         style={"textDecoration": "none", "fontSize": "0.68rem", "marginRight": "0.2rem"}))
 
+    # Prospects — allemaal, met filter
+    status_filter = None
+    if "?" in (d.get("filter", "")):
+        pass  # handled via URL param later
     prospect_items = []
     for p in prospects:
         s = p.get("status", "pending")
@@ -1762,6 +1835,7 @@ def build_linkedin_page(cn, pe):
             ], style={"textAlign": "right"}),
         ], className="profile-card"))
 
+    # Recente acties
     actie_items = []
     for a in acties:
         icon_type = "fa-user-plus" if a.get("type") == "connectie" else "fa-comment"
@@ -1775,11 +1849,14 @@ def build_linkedin_page(cn, pe):
     return html.Div([html.Div([html.H1("LinkedIn Outreach"), html.Div("Prospect management", className="subtitle")], className="page-header"),
         html.Div([html.I(className="fas fa-chart-bar", style={"color": "#5273ff"}), " Overzicht"], className="section-title"),
         dbc.Row(metric_cards, style={"margin": "0 -0.4rem"}),
+        *trend_chart,
+        *trechter,
         insight_cards,
         inst_cards,
-        html.Div([html.I(className="fas fa-address-card", style={"color": "#5273ff"}), " Recente prospects"], className="section-title"),
+        html.Div([html.I(className="fas fa-address-card", style={"color": "#5273ff"}), f" Prospects ({len(prospects)})"], className="section-title"),
+        html.Div(filter_knoppen, style={"marginBottom": "0.5rem"}),
         html.Div(prospect_items),
-        html.Div([html.I(className="fas fa-history", style={"color": "#f59e0b"}), " Recente acties"], className="section-title"),
+        html.Div([html.I(className="fas fa-history", style={"color": "#f59e0b"}), f" Recente acties ({len(acties)})"], className="section-title"),
         html.Div(html.Table([
             html.Thead(html.Tr([html.Th(""), html.Th("Prospect"), html.Th("Actie"), html.Th("Datum")])),
             html.Tbody(actie_items),
