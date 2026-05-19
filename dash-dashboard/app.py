@@ -234,7 +234,7 @@ body.dark .bw-onboard-box ul li{color:#e8e8ed}
   var o=document.getElementById('bw-onboard');
   if(o){
     try{
-      if(!localStorage.getItem('bw-onboarded') && !document.querySelector('#dash-content [class*=admin]')){o.classList.add('show');loadSteps();}
+      if(!localStorage.getItem('bw-onboarded') && location.pathname.indexOf('/admin')===-1){o.classList.add('show');loadSteps();}
     }catch(e){}
   }
   var nl=document.getElementById('bw-notif-list');
