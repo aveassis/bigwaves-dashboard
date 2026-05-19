@@ -288,7 +288,7 @@ LOGIN_PAGE += """</select>
 <input type="password" name="password" placeholder="Voer wachtwoord in">
 <button type="submit">Inloggen</button>
 <div class="login-err">ERROR_PLACEHOLDER</div></form>
-<div style="text-align:center;margin-top:1rem;font-size:0.7rem"><a href="/dashboard/admin" style="color:#7e8299;text-decoration:none">BigWaves beheer →</a></div>
+<div style="text-align:center;margin-top:1rem;font-size:0.7rem"><a href="/admin/login" style="color:#7e8299;text-decoration:none">BigWaves beheer →</a></div>
 </div></body></html>"""
 
 @server.route("/")
@@ -312,7 +312,47 @@ def login():
 def logout():
     session.clear(); return redirect("/")
 
-@server.route("/onboarding/steps")
+# ── Admin login ──────────────────────────────────────────────────────────────
+
+ADMIN_PASSWORD = "bigwaves2026"
+
+ADMIN_LOGIN_PAGE = """<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BigWaves — Beheer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#f5f6fa;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-box{width:380px;background:#fff;border:1px solid #edf0f5;border-radius:16px;padding:2.5rem 2rem;box-shadow:0 8px 40px rgba(0,0,0,0.06);text-align:center}
+.login-box .logo{font-size:2.2rem;margin-bottom:0.3rem}
+.login-box h2{font-size:1.3rem;font-weight:700;color:#1a1a2e;margin-bottom:0.2rem}
+.login-box .tagline{color:#7e8299;font-size:0.78rem;margin-bottom:1.5rem}
+.login-box input{width:100%;padding:0.55rem 0.8rem;border:1px solid #e4e6ef;border-radius:10px;font-size:0.82rem;outline:none;margin-bottom:0.7rem}
+.login-box input:focus{border-color:#5273ff}
+.login-box button{width:100%;padding:0.55rem;background:#5273ff;color:#fff;border:none;border-radius:200px;font-size:0.82rem;font-weight:600;cursor:pointer}
+.login-box button:hover{background:#3f5ee6}
+.login-err{color:#ef4444;font-size:0.75rem;margin-top:0.5rem}
+</style>
+</head>
+<body><div class="login-box"><div class="logo">🔐</div><h2>BigWaves Beheer</h2><p class="tagline">Alleen voor beheerders</p>
+<form method="POST" action="/admin/login">
+<input type="password" name="password" placeholder="Admin wachtwoord">
+<button type="submit">Inloggen</button>
+<div class="login-err">ERROR_PLACEHOLDER</div></form>
+<div style="text-align:center;margin-top:1rem;font-size:0.7rem"><a href="/" style="color:#7e8299;text-decoration:none">← Terug naar inloggen</a></div>
+</div></body></html>"""
+
+@server.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "GET":
+        return ADMIN_LOGIN_PAGE.replace("ERROR_PLACEHOLDER", "")
+    pw = request.form.get("password", "")
+    if pw == ADMIN_PASSWORD:
+        session["admin"] = True
+        session.permanent = True
+        return redirect("/dashboard/admin")
+    return ADMIN_LOGIN_PAGE.replace("ERROR_PLACEHOLDER", "Onjuist wachtwoord.")
 def onboarding_steps():
     c = session.get("client")
     if not c or c not in clients:
@@ -769,6 +809,11 @@ app.layout = html.Div([
 def router(pathname, search):
     c = session.get("client")
     pe = session.get("periode")
+    is_admin = session.get("admin", False)
+
+    if is_admin:
+        return build_admin_interface()
+
     if not c or c not in clients:
         return html.Div([html.H2("Niet ingelogd"), html.P(html.A("Ga naar inlogpagina", href="/"))],
                         style={"textAlign": "center", "marginTop": "4rem"})
@@ -806,6 +851,72 @@ def update_period(pe):
     if c and pe:
         session["periode"] = pe
     return {"periode": pe}
+
+def build_admin_interface():
+    """Volledige admin interface — geen sidebar, alleen beheer."""
+    from datetime import datetime
+
+    klant_rows = []
+    for nm, d in sorted(clients.items()):
+        gt = d.get("groei_team", {})
+        pakket = gt.get("pakket", "-")
+        status = gt.get("status", "-")
+        sinds = gt.get("sinds", "-")
+        prijs = gt.get("prijs", {}).get("huidig", 0)
+        wfs = len(gt.get("workflows", []))
+        chk = len(gt.get("checkin_historie", []))
+        ps = d.get("periodes", {})
+        perioden = len(ps)
+        klant_rows.append(html.Tr([
+            html.Td(nm),
+            html.Td(pakket),
+            html.Td(html.Span(status, className=f"badge {'groen' if status=='actief' else 'oranje'}")),
+            html.Td(f"€{prijs:,}/mnd" if prijs else "-"),
+            html.Td(str(wfs)),
+            html.Td(str(chk)),
+            html.Td(str(perioden)),
+            html.Td(sinds),
+        ]))
+
+    return html.Div([
+        html.Div([
+            html.Div([
+                html.H1("🔐 BigWaves Beheer", style={"fontSize": "1.3rem", "fontWeight": "700"}),
+                html.Div(f"Dashboard overzicht . {datetime.now().strftime('%d-%m-%Y')}", className="subtitle"),
+            ], className="page-header"),
+            html.Div([
+                html.A("Uitloggen (admin)", href="/uitloggen", className="btn-pill",
+                       style={"textDecoration": "none", "display": "inline-block"}),
+                html.A("🌊 Naar dashboard", href="/dashboard/", className="btn-pill",
+                       style={"textDecoration": "none", "display": "inline-block", "marginLeft": "0.3rem"}),
+            ]),
+        ], style={"padding": "1.5rem 2rem", "borderBottom": "1px solid var(--border)", "display": "flex",
+                   "justifyContent": "space-between", "alignItems": "flex-start"}),
+        html.Div([
+            html.Div([
+                html.Div([html.Div("Totaal klanten", className="kpi-label"), html.Div(str(len(clients)), className="kpi-value")],
+                         className="kpi-card", style={"textAlign": "center", "padding": "0.8rem"}),
+                html.Div([html.Div("Actieve abonnementen", className="kpi-label"),
+                          html.Div(str(sum(1 for d in clients.values() if d.get("groei_team",{}).get("status")=="actief")), className="kpi-value")],
+                         className="kpi-card", style={"textAlign": "center", "padding": "0.8rem"}),
+                html.Div([html.Div("Totale omzet/mnd", className="kpi-label"),
+                          html.Div(f"€{sum(d.get('groei_team',{}).get('prijs',{}).get('huidig',0) for d in clients.values()):,}", className="kpi-value")],
+                         className="kpi-card", style={"textAlign": "center", "padding": "0.8rem"}),
+            ], style={"display": "flex", "gap": "0.5rem", "margin": "1rem 2rem"}),
+            html.Div([
+                html.Div([html.I(className="fas fa-users", style={"color": "#5273ff"}), " Alle klanten"], className="section-title"),
+                html.Table([
+                    html.Thead(html.Tr([html.Th("Klant"), html.Th("Pakket"), html.Th("Status"), html.Th("Prijs"),
+                                        html.Th("Workflows"), html.Th("Check-ins"), html.Th("Perioden"), html.Th("Sinds")])),
+                    html.Tbody(klant_rows),
+                ], className="detail-table"),
+            ], className="admin-card", style={"margin": "0 2rem 1rem"}),
+            html.Div([
+                html.A("+ Nieuwe klant aanmaken", href="/admin/nieuw", className="btn-pill",
+                       style={"textDecoration": "none", "display": "inline-block"}),
+            ], style={"margin": "0 2rem"}),
+        ], style={"padding": "0 0 2rem"}),
+    ])
 
 def build_conversie_page(cn, pe):
     d = clients[cn]
