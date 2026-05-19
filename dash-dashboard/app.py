@@ -927,6 +927,57 @@ def admin_logo(naam):
     safe_naam = html_mod.escape(f"{cur_logo} {naam}")
     return LOGO_PAGE.replace('value="🌊"', f'value="{safe_logo}"').replace("Klant", safe_naam)
 
+@app.server.route("/admin/pakket/<naam>/<nieuw_pakket>")
+def admin_pakket(naam, nieuw_pakket):
+    is_admin = session.get("admin", False)
+    if not is_admin:
+        return redirect("/")
+    if naam not in clients or nieuw_pakket not in ("Start", "Groei", "Pro"):
+        return redirect("/dashboard/admin")
+    filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
+    if filepath.exists():
+        import json
+        with open(filepath) as f:
+            data = json.load(f)
+        gt = data.setdefault("groei_team", {})
+        gt["pakket"] = nieuw_pakket
+        prijzen = {"Start": 997, "Groei": 1497, "Pro": 2499}
+        setupprijzen = {"Start": 1500, "Groei": 2500, "Pro": 2500}
+        wf_aantallen = {"Start": 1, "Groei": 2, "Pro": 5}
+        prijs = prijzen.get(nieuw_pakket, 997)
+        setup = setupprijzen.get(nieuw_pakket, 1500)
+        wf_count = wf_aantallen.get(nieuw_pakket, 1)
+        jaarprijs = prijs * 12 - (prijs * 12 // 10)
+        jaarprijs = round(jaarprijs, -2)
+        gt.setdefault("prijs", {})
+        gt["prijs"]["huidig"] = prijs
+        gt["prijs"]["setup"] = setup
+        gt["prijs"]["jaar"] = jaarprijs
+        gt["prijs"]["workflows"] = wf_count
+        with open(filepath, "w") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        clients[naam] = data
+    return redirect("/dashboard/admin")
+
+@app.server.route("/admin/status/<naam>/<nieuwe_status>")
+def admin_status(naam, nieuwe_status):
+    is_admin = session.get("admin", False)
+    if not is_admin:
+        return redirect("/")
+    if naam not in clients or nieuwe_status not in ("actief", "pauze"):
+        return redirect("/dashboard/admin")
+    filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
+    if filepath.exists():
+        import json
+        with open(filepath) as f:
+            data = json.load(f)
+        gt = data.setdefault("groei_team", {})
+        gt["status"] = nieuwe_status
+        with open(filepath, "w") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        clients[naam] = data
+    return redirect("/dashboard/admin")
+
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
     html.Div(id="dash-content"),
@@ -995,10 +1046,27 @@ def build_admin_interface():
         chk = len(gt.get("checkin_historie", []))
         ps = d.get("periodes", {})
         perioden = len(ps)
+
+        pakket_badges = []
+        for pk in ["Start", "Groei", "Pro"]:
+            is_current = pk == pakket
+            bg = "#5273ff" if is_current else "transparent"
+            tc = "#fff" if is_current else "var(--sidebar-text)"
+            bc = "#5273ff" if is_current else "rgba(255,255,255,0.15)"
+            pakket_badges.append(
+                html.A(pk[0], href=f"/admin/pakket/{nm}/{pk}", className="btn-pill",
+                       style={"textDecoration":"none","padding":"0.1rem 0.35rem","fontSize":"0.6rem",
+                              "background":bg,"color":tc,"border":f"1px solid {bc}","marginRight":"0.1rem"})
+            )
+
+        status_link = f"/admin/status/{nm}/{('pauze' if status=='actief' else 'actief')}"
+        status_label = "Actief" if status == "actief" else "Gepauzeerd"
+        status_color = "#22c55e" if status == "actief" else "#f59e0b"
+
         klant_rows.append(html.Tr([
             html.Td(html.Div([html.Span(logo, style={"marginRight":"0.3rem","fontSize":"0.9rem"}), html.Span(nm)], style={"display":"flex","alignItems":"center"})),
-            html.Td(pakket),
-            html.Td(html.Span(status, className=f"badge {'groen' if status=='actief' else 'oranje'}")),
+            html.Td(html.Div(pakket_badges, style={"display":"flex","gap":"0.1rem"})),
+            html.Td(html.A(status_label, href=status_link, style={"color":status_color,"fontSize":"0.7rem","fontWeight":"600","textDecoration":"none","cursor":"pointer"})),
             html.Td(f"€{prijs:,}/mnd" if prijs else "-"),
             html.Td(str(wfs)),
             html.Td(str(chk)),
