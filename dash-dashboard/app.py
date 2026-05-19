@@ -106,6 +106,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .theme-toggle{padding:0.3rem 1rem;display:flex;align-items:center;gap:0.5rem;color:var(--sidebar-text);font-size:0.7rem;cursor:pointer;transition:all 0.15s;border:none;background:none;width:100%;text-align:left;border-radius:8px;margin:2px 0.6rem}
 .theme-toggle:hover{color:#fff;background:var(--sidebar-hover)}
 .theme-toggle i{width:16px;text-align:center;font-size:0.85rem}
+.nav-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:200px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:700;margin-left:auto}
 
 /* Onboarding overlay */
 .bw-onboard-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s}
@@ -194,13 +195,10 @@ body.dark .bw-onboard-box ul li{color:#e8e8ed}
 <div class="logo">🌊</div>
 <h2>Welkom bij BigWaves</h2>
 <p class="tag">Jij 1 call per week, wij regelen de rest.</p>
-<ul>
-<li><i class="fas fa-check-circle"></i> Jij hebt wekelijks 1 check-in call</li>
-<li><i class="fas fa-robot"></i> Wij verwerken al het binnenkomende verkeer</li>
-<li><i class="fas fa-chart-line"></i> Dit dashboard toont je resultaten</li>
-<li><i class="fas fa-headset"></i> Bij vragen staan we voor je klaar</li>
+<ul id="bw-onboard-steps">
+<li id="bw-step-1"><i class="fas fa-spinner fa-pulse"></i> Laden...</li>
 </ul>
-<button class="btn" onclick="document.getElementById('bw-onboard').classList.remove('show');try{localStorage.setItem('bw-onboarded','1')}catch(e){}">Aan de slag</button>
+<button class="btn" onclick="hideOnboard()">Aan de slag</button>
 </div>
 </div>
 <div class="bw-notif-overlay" id="bw-notif">
@@ -213,11 +211,31 @@ body.dark .bw-onboard-box ul li{color:#e8e8ed}
 </div>
 <script>
 (function(){
+  function hideOnboard(){
+    var o=document.getElementById('bw-onboard');
+    if(o){o.classList.remove('show');}
+    try{localStorage.setItem('bw-onboarded','1')}catch(e){}
+  }
+  window.hideOnboard=hideOnboard;
+  function loadSteps(){
+    var u=document.getElementById('bw-onboard-steps');
+    if(!u)return;
+    fetch('/onboarding/steps').then(function(r){return r.json();}).then(function(data){
+      u.innerHTML=data.steps.map(function(s){
+        var ic=s.done?'<i class=\"fas fa-check-circle\" style=\"color:#22c55e\"></i>':'<i class=\"fas fa-circle\" style=\"color:#d1d5db\"></i>';
+        var st=s.done?' style=\"color:#22c55e\"':'';
+        return '<li'+st+'><span style=\"margin-right:0.3rem\">'+ic+'</span>'+s.text+'</li>';
+      }).join('');
+    }).catch(function(){
+      u.innerHTML='<li><i class="fas fa-check-circle" style="color:#22c55e"></i> Jij hebt wekelijks 1 check-in call</li><li><i class="fas fa-check-circle" style="color:#22c55e"></i> Wij verwerken al het binnenkomende verkeer</li><li><i class="fas fa-chart-line"></i> Dit dashboard toont je resultaten</li><li><i class="fas fa-headset"></i> Bij vragen staan we voor je klaar</li>';
+      var o=document.getElementById('bw-onboard');
+    });
+  }
   var o=document.getElementById('bw-onboard');
   if(o){
     try{
-      if(!localStorage.getItem('bw-onboarded'))o.classList.add('show');
-    }catch(e){o.classList.add('show')}
+      if(!localStorage.getItem('bw-onboarded')){o.classList.add('show');loadSteps();}
+    }catch(e){o.classList.add('show');loadSteps();}
   }
   var nl=document.getElementById('bw-notif-list');
   if(nl){
@@ -294,6 +312,54 @@ def login():
 def logout():
     session.clear(); return redirect("/")
 
+@server.route("/onboarding/steps")
+def onboarding_steps():
+    c = session.get("client")
+    if not c or c not in clients:
+        return {"steps": [{"text": "Log in om je voortgang te zien", "done": False}]}
+    d = clients[c]
+    gt = d.get("groei_team", {})
+    chk = gt.get("checkin_historie", []) if gt else []
+    ps = d.get("periodes", {})
+    pe = session.get("periode")
+    if not pe or pe not in ps:
+        pe = list(ps.keys())[0] if ps else None
+    pd = ps.get(pe, {}) if pe else {}
+    kpis = pd.get("kpis", {})
+
+    steps = []
+
+    # Stap 1: Eerste check-in gedaan?
+    has_checkins = len(chk) > 0
+    steps.append({"text": "Jouw eerste check-in call is verwerkt" if has_checkins else "Jouw eerste check-in call staat gepland", "done": has_checkins})
+
+    # Stap 2: Workflows actief?
+    wfs = gt.get("workflows", [])
+    has_active_wfs = sum(1 for w in wfs if w.get("actief")) >= 2
+    if has_active_wfs:
+        steps.append({"text": f"{len(wfs)} workflows draaien voor jouw bedrijf", "done": True})
+    else:
+        steps.append({"text": "Wij zetten de workflows voor je op", "done": False})
+
+    # Stap 3: KPI-doelen behaald?
+    doelen_gehaald = sum(1 for nm, inf in kpis.items() if inf.get("waarde", 0) >= inf.get("doel", 0))
+    totaal_kpis = len(kpis)
+    if totaal_kpis > 0 and doelen_gehaald >= totaal_kpis * 0.6:
+        steps.append({"text": f"{doelen_gehaald}/{totaal_kpis} KPI-doelen behaald deze periode", "done": True})
+    elif totaal_kpis > 0:
+        steps.append({"text": f"{doelen_gehaald}/{totaal_kpis} KPI-doelen behaald deze periode", "done": False})
+    else:
+        steps.append({"text": "KPI-data wordt geladen voor de eerste analyse", "done": False})
+
+    # Stap 4: Resultaten?
+    kosten = pd.get("kosten_besparing", 0) or 0
+    if kosten > 0:
+        steps.append({"text": f"€{kosten:,} bespaard door automatisering", "done": True})
+    else:
+        steps.append({"text": "Resultaten worden zichtbaar na de eerste periode", "done": False})
+
+    return {"steps": steps}
+
 KPI_ICONS = {
     "Verwerkte items": ("fa-boxes", "rgba(82,115,255,0.08)", "#5273ff"),
     "Gem. responstijd": ("fa-clock", "rgba(34,197,94,0.08)", "#22c55e"),
@@ -360,6 +426,8 @@ def build_checkin_badge(d):
 
 def build_sidebar(cn, pe, active_page):
     d = clients[cn]
+    gt = d.get("groei_team", {})
+    chk = gt.get("checkin_historie", []) if gt else []
     nav_items = []
     for key in PAGE_ORDERS:
         label = PAGE_LABELS.get(key, key)
@@ -367,8 +435,11 @@ def build_sidebar(cn, pe, active_page):
         active_cls = " active" if key == active_page else ""
         url = "/dashboard/" + key if key != "dashboard" else "/dashboard/"
         icon_base = "fab" if key == "linkedin" else "fas"
+        badge = ""
+        if key == "inzichten" and chk:
+            badge = html.Span(str(len(chk)), className="nav-badge")
         nav_items.append(
-            html.A([html.I(className=f"{icon_base} {icon}"), html.Span(label)], href=url, className=active_cls)
+            html.A([html.I(className=f"{icon_base} {icon}"), html.Span(label), badge], href=url, className=active_cls)
         )
     return html.Div([html.Div([html.H2("🌊 BigWaves"), html.Small("Conversiebureau")], className="sidebar-brand"),
         html.Div([html.Div("Menu", className="nav-label"), *nav_items,
