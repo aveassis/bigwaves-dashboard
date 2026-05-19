@@ -749,6 +749,15 @@ def admin_nieuwe_klant():
     if request.method == "GET":
         msg = request.args.get("msg", "")
         success_html = f'<div style="padding:0.6rem 1rem;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;font-size:0.78rem;color:#22c55e;margin-bottom:1rem;text-align:center">✅ {msg}</div>' if msg else ""
+        pk_js = """<script>
+function updatePrijzen(){
+  var s=document.getElementById('bw-pakket');
+  var o=s.options[s.selectedIndex];
+  document.getElementById('bw-prijs').value=o.getAttribute('data-prijs');
+  document.getElementById('bw-setup').value=o.getAttribute('data-setup');
+  document.getElementById('bw-wf').value=o.getAttribute('data-wf');
+}
+</script>"""
         admin_form = f"""<!DOCTYPE html>
 <html lang="nl">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -780,15 +789,20 @@ input:focus,select:focus{{border-color:#5273ff}}
 <form method="POST">
 <label>Klantnaam</label><input name="naam" placeholder="Bijv. Bedrijf B.V." required>
 <label>Wachtwoord</label><input name="wachtwoord" value="demo">
-<label>Pakket</label><select name="pakket"><option>Start</option><option selected>Groei</option><option>Pro</option></select>
+<label>Pakket</label><select name="pakket" id="bw-pakket" onchange="updatePrijzen()">
+<option value="Start" data-prijs="997" data-setup="1500" data-wf="1">Start — €997/mnd</option>
+<option value="Groei" selected data-prijs="1497" data-setup="2500" data-wf="2">Groei — €1.497/mnd</option>
+<option value="Pro" data-prijs="2499" data-setup="2500" data-wf="5">Pro — €2.499/mnd</option>
+</select>
 <div class="row">
-<div><label>Maandprijs (EUR)</label><input name="prijs" type="number" value="1497"></div>
-<div><label>Setup (EUR)</label><input name="setup" type="number" value="2500"></div>
-<div><label>Workflows</label><input name="workflows" type="number" value="2"></div>
+<div><label>Maandprijs (EUR)</label><input name="prijs" id="bw-prijs" type="number" value="1497"></div>
+<div><label>Setup (EUR)</label><input name="setup" id="bw-setup" type="number" value="2500"></div>
+<div><label>Workflows</label><input name="workflows" id="bw-wf" type="number" value="2"></div>
 </div>
 <button class="btn" type="submit">Genereer template</button>
 </form>
 <a class="back" href="/dashboard/admin">← Terug naar beheer</a>
+{pk_js}
 </div>
 </body></html>"""
         return admin_form
