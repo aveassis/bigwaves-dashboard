@@ -851,8 +851,15 @@ def admin_verwijder_klant(naam):
         return redirect("/")
     if naam not in clients:
         return redirect("/dashboard/admin")
-    filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
-    if filepath.exists():
+    import json, os
+    safe = naam.lower().replace(" ", "-")
+    filepath = DATA_DIR / f"{safe}.json"
+    if not filepath.exists():
+        for f in DATA_DIR.glob("*.json"):
+            if f.stem.lower().replace("-", " ") == naam.lower():
+                filepath = f
+                break
+    if filepath and filepath.exists():
         filepath.unlink()
     return redirect("/dashboard/admin")
 
@@ -911,8 +918,14 @@ def admin_logo(naam):
         return redirect("/dashboard/admin")
     if request.method == "POST":
         nieuw_logo = request.form.get("logo", "🌊").strip()
-        filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
-        if filepath.exists():
+        safe = naam.lower().replace(" ", "-")
+        filepath = DATA_DIR / f"{safe}.json"
+        if not filepath.exists():
+            for f in DATA_DIR.glob("*.json"):
+                if f.stem.lower().replace("-", " ") == naam.lower():
+                    filepath = f
+                    break
+        if filepath and filepath.exists():
             import json
             with open(filepath) as f:
                 data = json.load(f)
@@ -935,9 +948,15 @@ def admin_pakket(naam, nieuw_pakket):
     if naam not in clients or nieuw_pakket not in ("Start", "Groei", "Pro"):
         return redirect("/dashboard/admin")
     import json, os
-    filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
-    if filepath.exists():
-        import json
+    # Vind het juiste bestand (los van spaties/hoofdletters)
+    safe = naam.lower().replace(" ", "-")
+    filepath = DATA_DIR / f"{safe}.json"
+    if not filepath.exists():
+        for f in DATA_DIR.glob("*.json"):
+            if f.stem.lower().replace("-", " ") == naam.lower():
+                filepath = f
+                break
+    if filepath and filepath.exists():
         with open(filepath) as f:
             data = json.load(f)
         gt = data.setdefault("groei_team", {})
@@ -967,8 +986,15 @@ def admin_status(naam, nieuwe_status):
         return redirect("/")
     if naam not in clients or nieuwe_status not in ("actief", "pauze"):
         return redirect("/dashboard/admin")
-    filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
-    if filepath.exists():
+    import json, os
+    safe = naam.lower().replace(" ", "-")
+    filepath = DATA_DIR / f"{safe}.json"
+    if not filepath.exists():
+        for f in DATA_DIR.glob("*.json"):
+            if f.stem.lower().replace("-", " ") == naam.lower():
+                filepath = f
+                break
+    if filepath and filepath.exists():
         import json
         with open(filepath) as f:
             data = json.load(f)
@@ -1083,7 +1109,13 @@ def admin_data_post(naam):
         return redirect("/")
     if naam not in clients:
         return redirect("/dashboard/admin")
-    filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
+    safe = naam.lower().replace(" ", "-")
+    filepath = DATA_DIR / f"{safe}.json"
+    if not filepath.exists():
+        for f in DATA_DIR.glob("*.json"):
+            if f.stem.lower().replace("-", " ") == naam.lower():
+                filepath = f
+                break
     import json
     data = clients[naam]
     # Parse periodes uit form
