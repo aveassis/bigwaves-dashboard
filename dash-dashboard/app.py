@@ -966,18 +966,18 @@ def admin_pakket(naam, nieuw_pakket):
         else:
             gt["pakket"] = nieuw_pakket
             prijzen = {"Start": 997, "Groei": 1497, "Pro": 2499}
-        setupprijzen = {"Start": 1500, "Groei": 2500, "Pro": 2500}
-        wf_aantallen = {"Start": 1, "Groei": 2, "Pro": 5}
-        prijs = prijzen.get(nieuw_pakket, 997)
-        setup = setupprijzen.get(nieuw_pakket, 1500)
-        wf_count = wf_aantallen.get(nieuw_pakket, 1)
-        jaarprijs = prijs * 12 - (prijs * 12 // 10)
-        jaarprijs = round(jaarprijs, -2)
-        gt.setdefault("prijs", {})
-        gt["prijs"]["huidig"] = prijs
-        gt["prijs"]["setup"] = setup
-        gt["prijs"]["jaar"] = jaarprijs
-        gt["prijs"]["workflows"] = wf_count
+            setupprijzen = {"Start": 1500, "Groei": 2500, "Pro": 2500}
+            wf_aantallen = {"Start": 1, "Groei": 2, "Pro": 5}
+            prijs = prijzen.get(nieuw_pakket, 997)
+            setup = setupprijzen.get(nieuw_pakket, 1500)
+            wf_count = wf_aantallen.get(nieuw_pakket, 1)
+            jaarprijs = prijs * 12 - (prijs * 12 // 10)
+            jaarprijs = round(jaarprijs, -2)
+            gt.setdefault("prijs", {})
+            gt["prijs"]["huidig"] = prijs
+            gt["prijs"]["setup"] = setup
+            gt["prijs"]["jaar"] = jaarprijs
+            gt["prijs"]["workflows"] = wf_count
         with open(filepath, "w") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         clients[naam] = data
