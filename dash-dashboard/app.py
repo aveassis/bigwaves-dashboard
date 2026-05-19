@@ -932,9 +932,8 @@ def build_admin_interface():
             html.Td(str(chk)),
             html.Td(str(perioden)),
             html.Td(sinds),
-            html.Td(html.A("🗑️", href=f"/admin/verwijder/{nm}", className="btn-pill",
-                           style={"textDecoration":"none","padding":"0.15rem 0.4rem","fontSize":"0.7rem"},
-                           onclick="return confirm('Weet je zeker dat je deze klant wilt verwijderen?')")),
+            html.Td(html.A("🗑️", href=f"javascript:if(confirm('Weet je zeker dat je deze klant wilt verwijderen?'))location.href='/admin/verwijder/{nm}'", className="btn-pill",
+                           style={"textDecoration":"none","padding":"0.15rem 0.4rem","fontSize":"0.7rem"})),
         ]))
 
     return html.Div([
