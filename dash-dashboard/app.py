@@ -919,6 +919,7 @@ def admin_logo(naam):
             data["logo"] = nieuw_logo
             with open(filepath, "w") as f:
                 json.dump(data, f, indent=2, ensure_ascii=False)
+            clients[naam] = data
         return redirect("/dashboard/admin")
     cur_logo = clients[naam].get("logo", "🌊")
     import html as html_mod
