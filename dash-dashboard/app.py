@@ -978,155 +978,105 @@ def admin_status(naam, nieuwe_status):
         clients[naam] = data
     return redirect("/dashboard/admin")
 
-DATA_EDIT_PAGE = """<!DOCTYPE html>
+DATA_EDIT_TPL = """<!DOCTYPE html>
 <html lang="nl">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BigWaves — Data bewerken</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#f5f6fa;padding:1rem;color:#1a1a2e}
-h1{font-size:1.15rem;font-weight:700;margin-bottom:0.2rem}
-.sub{color:#7e8299;font-size:0.7rem;margin-bottom:1rem}
-.card{background:#fff;border:1px solid #edf0f5;border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:0.8rem;box-shadow:0 4px 20px rgba(0,0,0,0.04)}
-.card h2{font-size:0.85rem;font-weight:600;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.3rem}
-label{display:block;font-size:0.62rem;font-weight:600;color:#7e8299;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.15rem}
-.row{display:flex;gap:0.5rem;flex-wrap:wrap}
-.row>div{flex:1;min-width:120px}
-input,select{width:100%;padding:0.4rem 0.55rem;border:1px solid #e4e6ef;border-radius:6px;font-size:0.78rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:0.5rem}
-input:focus,select:focus{border-color:#5273ff}
-.btn{padding:0.45rem 1.2rem;background:#5273ff;color:#fff;border:none;border-radius:200px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
-.btn:hover{background:#3f5ee6}.btn.sec{background:transparent;border:1px solid #e4e6ef;color:#7e8299}.btn.sec:hover{border-color:#5273ff;color:#5273ff}
-.btn.green{background:#22c55e}.btn.green:hover{background:#16a34a}
-.save-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid #edf0f5;padding:0.8rem 1.5rem;display:flex;justify-content:space-between;align-items:center;margin:0 -1.5rem -1.2rem;border-radius:0 0 12px 12px}
-.save-bar .status{font-size:0.72rem;color:#22c55e;font-weight:500}
-.kpi-block{background:#f9fafb;border:1px solid #edf0f5;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.4rem}
-.kpi-block .kpi-header{font-size:0.72rem;font-weight:600;margin-bottom:0.3rem}
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:'Inter',sans-serif;background:#f5f6fa;padding:1rem;color:#1a1a2e}}
+h1{{font-size:1.15rem;font-weight:700;margin-bottom:0.2rem}}
+.sub{{color:#7e8299;font-size:0.7rem;margin-bottom:1rem}}
+.card{{background:#fff;border:1px solid #edf0f5;border-radius:12px;padding:1.2rem 1.5rem;margin-bottom:0.8rem;box-shadow:0 4px 20px rgba(0,0,0,0.04)}}
+.card h2{{font-size:0.85rem;font-weight:600;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.3rem}}
+label{{display:block;font-size:0.62rem;font-weight:600;color:#7e8299;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.15rem}}
+.row{{display:flex;gap:0.5rem;flex-wrap:wrap}}
+.row>div{{flex:1;min-width:120px}}
+input,select{{width:100%;padding:0.4rem 0.55rem;border:1px solid #e4e6ef;border-radius:6px;font-size:0.78rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:0.5rem}}
+input:focus,select:focus{{border-color:#5273ff}}
+.btn{{padding:0.45rem 1.2rem;background:#5273ff;color:#fff;border:none;border-radius:200px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}}
+.btn:hover{{background:#3f5ee6}}.btn.sec{{background:transparent;border:1px solid #e4e6ef;color:#7e8299}}.btn.sec:hover{{border-color:#5273ff;color:#5273ff}}
+.btn.green{{background:#22c55e}}
+.save-bar{{position:sticky;bottom:0;background:#fff;border-top:1px solid #edf0f5;padding:0.8rem 1.5rem;display:flex;justify-content:space-between;align-items:center;margin:0 -1.5rem -1.2rem;border-radius:0 0 12px 12px}}
+.save-bar .status{{font-size:0.72rem;color:#22c55e;font-weight:500}}
+.kpi-block{{background:#f9fafb;border:1px solid #edf0f5;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.4rem}}
+.kpi-block .kpi-header{{font-size:0.72rem;font-weight:600;margin-bottom:0.3rem}}
 </style>
 </head><body>
-<form method="POST" id="data-form">
+<form method="POST" action="/admin/data/{naam}">
 <div style="max-width:800px;margin:0 auto">
 <div class="card">
 <h1>📝 Data bewerken</h1>
-<p class="sub" id="header-info">KLANT — PERIODE</p>
+<p class="sub">{logo} {naam}</p>
 <div class="row" style="margin-bottom:0.5rem">
-<div><label>Periode</label><select name="periode" id="sel-periode" onchange="laadPeriode()"></select></div>
-<div><label>Nieuwe periode</label><input name="nieuwe_periode" placeholder="Bijv. Juni 2026"></div>
-<div style="display:flex;align-items:flex-end;gap:0.3rem">
-<button type="button" class="btn sec" onclick="voegPeriodeToe()" style="margin-bottom:0.5rem;padding:0.4rem 0.6rem;font-size:0.7rem">+ Toevoegen</button>
-<button type="button" class="btn sec" onclick="verwijderPeriode()" style="margin-bottom:0.5rem;padding:0.4rem 0.6rem;font-size:0.7rem">− Verwijderen</button>
+<div><label>Nieuwe periode toevoegen</label><input name="nieuwe_periode" placeholder="Bijv. Juni 2026"></div>
+<div style="display:flex;align-items:flex-end;"><button class="btn sec" type="submit" style="margin-bottom:0.5rem">+ Toevoegen & opslaan</button></div>
 </div>
 </div>
-<div class="row" style="margin-bottom:0.5rem">
-<div><label>Laatste update</label><input name="laatste_update" id="f-lupdate"></div>
+<div class="card"><h2>📊 Bestaande periodes</h2>
+{periodes_html}
 </div>
-</div>
-<div class="card"><h2>📊 KPI's</h2><div id="kpi-container"></div></div>
-<div class="card"><h2>📬 Kanalen</h2><div id="kanal-container"></div></div>
-<div class="card"><h2>🔍 Bottleneck</h2>
-<label>Tekst</label><input name="bottleneck_tekst" id="f-bn-tekst" placeholder="Geen knelpunten">
-<label>Prioriteit</label><select name="bottleneck_prioriteit" id="f-bn-prio"><option value="laag">Laag</option><option value="medium">Medium</option><option value="hoog">Hoog</option></select>
+<div class="card"><h2>📬 Kanalen</h2>
+{kanalen_html}
 </div>
 <div class="card">
 <div class="save-bar">
-<div class="status" id="save-status"></div>
 <div><button class="btn green" type="submit">💾 Alles opslaan</button></div>
 </div>
 </div>
 </div>
 </form>
 <script>
-var DATA={KLANTEN:{}};
-var HUIDIGE_PERIODE='';
-function laadPeriode(){
-  var pe=document.getElementById('sel-periode').value;
-  if(!pe||!DATA.PERIODES[pe])return;
-  HUIDIGE_PERIODE=pe;
-  var pd=DATA.PERIODES[pe];
-  document.getElementById('f-lupdate').value=pd.laatste_update||'';
-  // KPI's
-  var kc=document.getElementById('kpi-container');
-  var kpiHtml='';
-  var kpis=pd.kpis||{};
-  var kpiNamen=Object.keys(kpis);
-  if(kpiNamen.length===0){
-    var defs={0:['Verwerkte items','items',800],1:['Gem. responstijd','seconden',3],2:['Nauwkeurigheid','%',95],3:['Uptime','%',99],4:['Kwaliteitsborging','%',20],5:['Kostenbesparing','euro',3000]};
-    for(var i in defs){var d=defs[i];kpiHtml+='<div class="kpi-block"><div class="kpi-header">'+d[0]+'</div><input type="hidden" name="kpi_'+i+'_naam" value="'+d[0]+'"><div class="row"><div><label>Waarde</label><input name="kpi_'+i+'_waarde" type="number" step="any" value="'+d[2]+'"></div><div><label>Doel</label><input name="kpi_'+i+'_doel" type="number" step="any" value="'+d[2]+'"></div><div><label>Eenheid</label><input name="kpi_'+i+'_eenheid" value="'+d[1]+'"></div><div><label>Trend</label><input name="kpi_'+i+'_trend" placeholder="Bijv. +5% vs vorige maand"></div></div></div>';}
-  }else{
-    var idx=0;
-    for(var nm in kpis){
-      var k=kpis[nm];
-      kpiHtml+='<div class="kpi-block"><div class="kpi-header">'+nm+'</div><input type="hidden" name="kpi_'+idx+'_naam" value="'+nm+'"><div class="row"><div><label>Waarde</label><input name="kpi_'+idx+'_waarde" type="number" step="any" value="'+(k.waarde||0)+'"></div><div><label>Doel</label><input name="kpi_'+idx+'_doel" type="number" step="any" value="'+(k.doel||0)+'"></div><div><label>Eenheid</label><input name="kpi_'+idx+'_eenheid" value="'+(k.eenheid||'')+'"></div><div><label>Trend</label><input name="kpi_'+idx+'_trend" value="'+(k.trend||'')+'"></div></div></div>';
-      idx++;}
-  }
-  kc.innerHTML=kpiHtml;
-  // Kanalen
-  var kl=document.getElementById('kanal-container');
-  var kanHtml='';
-  var kans=DATA.KANALEN||{};
-  for(var kn in kans){
-    var kv=kans[kn];
-    kanHtml+='<div class="kpi-block"><div class="kpi-header">'+kn+'</div><div class="row"><div><label>Verwerkt</label><input name="kan_'+kn+'_verwerkt" type="number" value="'+(kv.verwerkt||0)+'"></div><div><label>Bestellingen</label><input name="kan_'+kn+'_bestellingen" type="number" value="'+(kv.bestellingen||0)+'"></div></div></div>';
-  }
-  kl.innerHTML=kanHtml;
-  // Bottleneck
-  var bn=pd.bottleneck||{};
-  document.getElementById('f-bn-tekst').value=bn.tekst||'';
-  document.getElementById('f-bn-prio').value=bn.prioriteit||'laag';
-}
-function voegPeriodeToe(){
-  var inp=document.getElementsByName('nieuwe_periode')[0];
-  var nm=inp.value.trim();
-  if(!nm)return;
-  var sel=document.getElementById('sel-periode');
-  var opt=document.createElement('option');
-  opt.value=nm;opt.text=nm;opt.selected=true;
-  sel.appendChild(opt);
-  DATA.PERIODES[nm]={kpis:{},laatste_update:new Date().toISOString().slice(0,10)};
-  inp.value='';
-  laadPeriode();
-}
-function verwijderPeriode(){
-  var sel=document.getElementById('sel-periode');
-  var pe=sel.value;
-  if(!pe||!confirm('Weet je zeker dat je de periode "'+pe+'" wilt verwijderen?'))return;
-  delete DATA.PERIODES[pe];
-  sel.remove(sel.selectedIndex);
-  laadPeriode();
-}
-document.getElementById('data-form').addEventListener('submit',function(e){
-  var form=this;
-  var fd=new FormData(form);
-  fd.set('periodes_json',JSON.stringify(DATA.PERIODES));
-  fd.set('huidige_periode',HUIDIGE_PERIODE);
-  var x=new XMLHttpRequest();
-  x.open('POST',window.location.href,true);
-  x.onload=function(){
-    if(x.status===302||x.status===200){
-      document.getElementById('save-status').textContent='✅ Opgeslagen!';
-      setTimeout(function(){location.href=x.responseURL||'/dashboard/admin';},600);
-    }else{document.getElementById('save-status').textContent='❌ Fout bij opslaan';}
-  };
-  x.send(fd);
-  e.preventDefault();
-});
-// Init
-(function(){
-  var sel=document.getElementById('sel-periode');
-  for(var pe in DATA.PERIODES){
-    var opt=document.createElement('option');
-    opt.value=pe;opt.text=pe;
-    if(!sel.value)sel.appendChild(opt);
-    else sel.appendChild(opt);
-  }
-  if(sel.options.length>0)sel.selectedIndex=0;
-  laadPeriode();
-})();
+document.querySelectorAll('.periode-select').forEach(function(s){{
+  s.addEventListener('change',function(){{
+    var pe=this.value;
+    document.querySelectorAll('.pe-block').forEach(function(b){{
+      b.style.display=b.dataset.pe===pe?'block':'none';
+    }});
+  }});
+  if(s.options.length>0){{s.selectedIndex=0;s.dispatchEvent(new Event('change'));}}
+}});
 </script>
 </body></html>"""
 
-@app.server.route("/admin/data/<naam>", methods=["GET", "POST"])
+@app.server.route("/admin/data/<naam>")
 def admin_data(naam):
+    is_admin = session.get("admin", False)
+    if not is_admin:
+        return redirect("/")
+    if naam not in clients:
+        return redirect("/dashboard/admin")
+    d = clients[naam]
+    ps = d.get("periodes", {})
+    kan = d.get("kanalen", {})
+    logo = d.get("logo", "🌊")
+    
+    # Bouw periodes HTML
+    periode_opties = "".join(f'<option value="{pe}">{pe}</option>' for pe in ps.keys())
+    periodes_html = ""
+    if ps:
+        periodes_html += f'<label>Selecteer periode</label><select class="periode-select" style="margin-bottom:0.8rem">{periode_opties}</select>'
+    for pe, pd in ps.items():
+        kpis = pd.get("kpis", {})
+        kpi_blocks = ""
+        for nm, inf in kpis.items():
+            kpi_blocks += f'<div class="kpi-block"><div class="kpi-header">{nm}</div><input type="hidden" name="pe_{pe}_kpi_{nm}_nm" value="{nm}"><div class="row"><div><label>Waarde</label><input name="pe_{pe}_kpi_{nm}_w" type="number" step="any" value="{inf.get("waarde",0)}"></div><div><label>Doel</label><input name="pe_{pe}_kpi_{nm}_d" type="number" step="any" value="{inf.get("doel",0)}"></div><div><label>Eenheid</label><input name="pe_{pe}_kpi_{nm}_e" value="{inf.get("eenheid","")}"></div><div><label>Trend</label><input name="pe_{pe}_kpi_{nm}_t" value="{inf.get("trend","")}"></div></div></div>'
+        bn = pd.get("bottleneck", {})
+        bn_html = f'<div class="row"><div><label>Bottleneck tekst</label><input name="pe_{pe}_bn_t" value="{bn.get("tekst","")}" placeholder="Geen knelpunten"></div><div><label>Prioriteit</label><select name="pe_{pe}_bn_p"><option value="laag" {"selected" if bn.get("prioriteit")=="laag" else ""}>Laag</option><option value="medium" {"selected" if bn.get("prioriteit")=="medium" else ""}>Medium</option><option value="hoog" {"selected" if bn.get("prioriteit")=="hoog" else ""}>Hoog</option></select></div></div>'
+        update = pd.get("laatste_update", "")
+        periodes_html += f'<div class="pe-block" data-pe="{pe}" style="display:none"><div class="row"><div><label>Laatste update</label><input name="pe_{pe}_update" value="{update}"></div></div>{kpi_blocks}<div class="card" style="padding:0.6rem 0.8rem;margin-top:0.3rem"><h2>🔍 Bottleneck</h2>{bn_html}</div></div>'
+    
+    # Bouw kanalen HTML
+    kanalen_html = '<div class="row">'
+    for kn, inf in kan.items():
+        kanalen_html += f'<div><label>{kn}</label><input name="kanaal_{kn}_v" type="number" value="{inf.get("verwerkt",0)}" placeholder="Verwerkt"><input name="kanaal_{kn}_b" type="number" value="{inf.get("bestellingen",0)}" placeholder="Bestellingen" style="margin-top:0.2rem"></div>'
+    kanalen_html += '</div>'
+    
+    return DATA_EDIT_TPL.format(naam=naam, logo=logo, periodes_html=periodes_html, kanalen_html=kanalen_html)
+
+@app.server.route("/admin/data/<naam>", methods=["POST"])
+def admin_data_post(naam):
     is_admin = session.get("admin", False)
     if not is_admin:
         return redirect("/")
@@ -1134,79 +1084,86 @@ def admin_data(naam):
         return redirect("/dashboard/admin")
     filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
     import json
-    if request.method == "POST":
-        periodes_json = request.form.get("periodes_json", "{}")
-        try:
-            nieuwe_periodes = json.loads(periodes_json)
-        except json.JSONDecodeError:
-            nieuwe_periodes = {}
-        # Lees KPI's uit form voor de huidige periode
-        huidige_pe = request.form.get("huidige_periode", "")
-        kpi_namen = [v for k,v in request.form.items() if k.endswith("_naam")]
-        if huidige_pe and kpi_namen and huidige_pe not in nieuwe_periodes:
-            nieuwe_periodes[huidige_pe] = {"kpis": {}, "laatste_update": ""}
-        if huidige_pe and huidige_pe in nieuwe_periodes:
-            kpis = {}
-            for i, nm in enumerate(kpi_namen):
-                waarde_raw = request.form.get(f"kpi_{i}_waarde", "0")
-                try:
-                    waarde = float(waarde_raw) if "." in waarde_raw else int(waarde_raw)
-                except ValueError:
-                    waarde = 0
-                doel_raw = request.form.get(f"kpi_{i}_doel", "0")
-                try:
-                    doel = float(doel_raw) if "." in doel_raw else int(doel_raw)
-                except ValueError:
-                    doel = 0
-                eenheid = request.form.get(f"kpi_{i}_eenheid", "")
-                trend = request.form.get(f"kpi_{i}_trend", "")
-                kpis[nm] = {"waarde": waarde, "doel": doel, "eenheid": eenheid, "trend": trend}
-            nieuwe_periodes[huidige_pe]["kpis"] = kpis
-        nieuwe_periodes[huidige_pe]["laatste_update"] = request.form.get("laatste_update", "")
-        # Kanalen
-        kanalen = {}
-        for key, val in request.form.items():
-            if key.startswith("kan_") and key.endswith("_verwerkt"):
-                kn = key[4:-9]
-                verwerkt = request.form.get(f"kan_{kn}_verwerkt", "0")
-                best = request.form.get(f"kan_{kn}_bestellingen", "0")
-                try:
-                    kanalen[kn] = {"verwerkt": int(verwerkt), "bestellingen": int(best)}
-                except ValueError:
-                    kanalen[kn] = {"verwerkt": 0, "bestellingen": 0}
-        # Bottleneck
-        bn_tekst = request.form.get("bottleneck_tekst", "")
-        bn_prio = request.form.get("bottleneck_prioriteit", "laag")
-        if huidige_pe and huidige_pe in nieuwe_periodes:
-            nieuwe_periodes[huidige_pe]["bottleneck"] = {
-                "actief": bool(bn_tekst.strip()),
-                "tekst": bn_tekst.strip(),
-                "prioriteit": bn_prio
-            }
-        # Opslaan
-        data = clients[naam]
-        data["periodes"] = nieuwe_periodes
-        if kanalen:
-            data["kanalen"] = kanalen
-        with open(filepath, "w") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-        clients[naam] = data
-        return redirect("/dashboard/admin")
-    # GET
-    d = clients[naam]
-    ps = d.get("periodes", {})
-    kan = d.get("kanalen", {})
-    logo = d.get("logo", "🌊")
-    
-    ps_json = json.dumps(ps)
-    kan_json = json.dumps(kan)
-    
-    page = DATA_EDIT_PAGE
-    page = page.replace('KLANTEN={}', f'KLANTEN={{"{naam}":{{}}}}')
-    page = page.replace('DATA.PERIODES', f'DATA.PERIODES={ps_json}; DATA.PERIODES')
-    page = page.replace('DATA.KANALEN', f'DATA.KANALEN={kan_json}; DATA.KANALEN')
-    page = page.replace('KLANT — PERIODE', f'{logo} {naam}')
-    return page
+    data = clients[naam]
+    # Parse periodes uit form
+    periodes = {}
+    for key, val in request.form.items():
+        if key.startswith("pe_"):
+            parts = key.split("_", 2)
+            if len(parts) < 3: continue
+            pe_naam = parts[1]
+            veld = parts[2]
+            if pe_naam not in periodes:
+                periodes[pe_naam] = {"kpis": {}}
+            if veld == "update":
+                periodes[pe_naam]["update"] = val
+            elif veld == "bn_t":
+                periodes[pe_naam]["bn_t"] = val
+            elif veld == "bn_p":
+                periodes[pe_naam]["bn_p"] = val
+            elif veld.startswith("kpi_"):
+                kpi_rest = key[len(f"pe_{pe_naam}_kpi_"):]
+                kpi_parts = kpi_rest.rsplit("_", 1)
+                if len(kpi_parts) < 2: continue
+                kpi_nm = kpi_parts[0]
+                kpi_v = kpi_parts[1]
+                if kpi_nm not in periodes[pe_naam]["kpis"]:
+                    periodes[pe_naam]["kpis"][kpi_nm] = {}
+                if kpi_v == "w":
+                    try: periodes[pe_naam]["kpis"][kpi_nm]["w"] = float(val) if "." in val else int(val)
+                    except: periodes[pe_naam]["kpis"][kpi_nm]["w"] = 0
+                elif kpi_v == "d":
+                    try: periodes[pe_naam]["kpis"][kpi_nm]["d"] = float(val) if "." in val else int(val)
+                    except: periodes[pe_naam]["kpis"][kpi_nm]["d"] = 0
+                elif kpi_v == "e":
+                    periodes[pe_naam]["kpis"][kpi_nm]["e"] = val
+                elif kpi_v == "t":
+                    periodes[pe_naam]["kpis"][kpi_nm]["t"] = val
+    # Zet om naar juist formaat
+    nieuwe_periodes = {}
+    for pe_naam, pd in periodes.items():
+        kpis = {}
+        for nm, kpi in pd["kpis"].items():
+            kpis[nm] = {"waarde": kpi.get("w", 0), "doel": kpi.get("d", 0), "eenheid": kpi.get("e", ""), "trend": kpi.get("t", "")}
+        entry = {"kpis": kpis, "laatste_update": pd.get("update", "")}
+        if "bn_t" in pd or "bn_p" in pd:
+            entry["bottleneck"] = {"actief": bool(pd.get("bn_t", "")), "tekst": pd.get("bn_t", ""), "prioriteit": pd.get("bn_p", "laag")}
+        nieuwe_periodes[pe_naam] = entry
+    # Kanalen
+    kanalen = {}
+    for key, val in request.form.items():
+        if key.startswith("kanaal_"):
+            parts = key.split("_", 2)
+            if len(parts) < 3: continue
+            kn = parts[1]
+            veld = parts[2]
+            if kn not in kanalen:
+                kanalen[kn] = {"verwerkt": 0, "bestellingen": 0}
+            if veld == "v":
+                try: kanalen[kn]["verwerkt"] = int(val)
+                except: pass
+            elif veld == "b":
+                try: kanalen[kn]["bestellingen"] = int(val)
+                except: pass
+    # Nieuwe periode toevoegen
+    nieuwe_pe = request.form.get("nieuwe_periode", "").strip()
+    if nieuwe_pe and nieuwe_pe not in nieuwe_periodes:
+        nieuwe_periodes[nieuwe_pe] = {
+            "kpis": {"Verwerkte items": {"waarde": 0, "doel": 800, "eenheid": "items", "trend": ""},
+                     "Gem. responstijd": {"waarde": 0, "doel": 3, "eenheid": "seconden", "trend": ""},
+                     "Nauwkeurigheid": {"waarde": 0, "doel": 95, "eenheid": "%", "trend": ""},
+                     "Uptime": {"waarde": 0, "doel": 99, "eenheid": "%", "trend": ""},
+                     "Kwaliteitsborging": {"waarde": 0, "doel": 20, "eenheid": "%", "trend": ""},
+                     "Kostenbesparing": {"waarde": 0, "doel": 3000, "eenheid": "euro", "trend": ""}},
+            "laatste_update": ""
+        }
+    data["periodes"] = nieuwe_periodes
+    if kanalen:
+        data["kanalen"] = kanalen
+    with open(filepath, "w") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    clients[naam] = data
+    return redirect("/dashboard/admin")
 
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
