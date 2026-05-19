@@ -1130,14 +1130,16 @@ def build_conversie_page(cn, pe):
     pd = ps[pe]
     kpis = pd.get("kpis", {})
     hitl = pd.get("hitl_detail", {})
+    kan = d.get("kanalen", {})
+    bn = pd.get("bottleneck", {})
+    graf = pd.get("grafieken", {})
 
-    # Hernoem de HITL-ratio KPI naar "Kwaliteitsborging" in de conversie pagina
+    # KPI-kaarten (max 6, HITL-ratio → Kwaliteitsborging)
     kpi_cards = []
     for nm, inf in list(kpis.items())[:6]:
         w, e = inf["waarde"], inf.get("eenheid", "")
         t = inf.get("trend", "")
         do = inf.get("doel", 0)
-        # Hernoem HITL-ratio naar klantvriendelijke term
         label = "Kwaliteitsborging" if nm == "HITL-ratio" else nm
         ic = KPI_ICONS.get(nm, ("fa-chart-bar", "rgba(82,115,255,0.08)", "#5273ff"))
         kpi_cards.append(dbc.Col(html.Div([
@@ -1149,6 +1151,56 @@ def build_conversie_page(cn, pe):
             kpi_progress(w, do),
         ], className="kpi-card"), width=4, style={"padding": "0 0.4rem", "marginBottom": "0.5rem"}, xs=12, sm=6, lg=4))
 
+    # Grafiek — conversietrechter of verloop
+    charts = []
+    if graf:
+        row = []
+        for k, gr in graf.items():
+            if k == "hitl_trend":
+                continue
+            fig = go.Figure()
+            fig.add_trace(go.Bar(x=gr["labels"], y=gr["waarden"], marker_color="#5273ff", opacity=0.85))
+            if "doel" in gr:
+                fig.add_hline(y=gr["doel"], line_dash="dash", line_color="#f59e0b",
+                              annotation_text=f"Doel: {gr['doel']}", annotation_position="top left")
+            fig.update_layout(title=dict(text=gr["titel"], font=dict(size=12, color="#1a1a2e"), x=0.02),
+                              height=240, margin=dict(l=16, r=16, t=32, b=16),
+                              paper_bgcolor="#fff", plot_bgcolor="#fff",
+                              font=dict(size=10, color="#7e8299"),
+                              yaxis=dict(gridcolor="#f1efed"), xaxis=dict(gridcolor="#f1efed"),
+                              hoverlabel=dict(bgcolor="#5273ff", font_color="white"), showlegend=False)
+            row.append(dbc.Col(html.Div(dcc.Graph(figure=fig, config={"displayModeBar": False}), className="chart-box"),
+                               width=6, style={"padding": "0 0.4rem", "marginBottom": "0.5rem"}, xs=12, lg=6))
+        charts = [dbc.Row(row, style={"margin": "0 -0.4rem"})]
+
+    # Kanalen met conversiepercentage
+    kan_section = []
+    if kan:
+        row = []
+        for nm, inf in sorted(kan.items()):
+            ic = KAN_ICON.get(nm.lower(), "fa-inbox")
+            verwerkt = inf.get("verwerkt", 0)
+            best = inf.get("bestellingen", 0)
+            conv = round(best / verwerkt * 100, 1) if verwerkt else 0
+            row.append(dbc.Col(html.Div([
+                html.Div(html.I(className=f"fas {ic}"), className="kanal-icon"),
+                html.Div(nm, className="kanal-name"),
+                html.Div(str(verwerkt), className="kanal-val"),
+                html.Div(f"{best} bestellingen", className="kanal-sub"),
+                html.Div(f"{conv}% conversie", style={"fontSize": "0.6rem", "color": "#22c55e"}),
+            ], className="kanal-card"), width=12//len(kan), style={"padding": "0 0.4rem", "marginBottom": "0.5rem"}))
+        kan_section = [
+            html.Div([html.I(className="fas fa-inbox", style={"color": "#5273ff"}), " Kanalen met conversie"], className="section-title"),
+            dbc.Row(row, style={"margin": "0 -0.4rem"})
+        ]
+
+    # Bottleneck-analyse
+    bn_section = []
+    if bn and bn.get("tekst"):
+        bc = "#ef4444" if bn.get("prioriteit") == "hoog" else "#f59e0b" if bn.get("prioriteit") == "medium" else "#22c55e"
+        bn_section = [html.Div([html.Strong("🔍 Bottleneck-analyse "), bn["tekst"]], className="bn-card", style={"borderLeftColor": bc})]
+
+    # Kwaliteitscontrole (HITL)
     kwaliteit_section = []
     if hitl:
         totaal = hitl.get("totaal_acties", 0)
@@ -1157,7 +1209,6 @@ def build_conversie_page(cn, pe):
         saved = hitl.get("bespaarde_uren", 0)
         cat = hitl.get("categorieen", {})
 
-        # Klantvriendelijke kwaliteitscontrole kaarten
         kwaliteit_cards = dbc.Row([
             dbc.Col(html.Div([html.Div("Totaal verwerkt", className="ci-label"), html.Div(str(totaal), className="ci-date")], className="checkin-card", style={"borderLeftColor": "#5273ff"}), width=3, style={"padding": "0 0.3rem"}),
             dbc.Col(html.Div([html.Div("Extra gecontroleerd", className="ci-label"), html.Div(str(mens), className="ci-date"), html.Div(f"{round(mens/totaal*100) if totaal else 0}% voor kwaliteit", className="ci-note")], className="checkin-card", style={"borderLeftColor": "#22c55e"}), width=3, style={"padding": "0 0.3rem"}),
@@ -1182,6 +1233,9 @@ def build_conversie_page(cn, pe):
 
     return html.Div([html.Div([html.H1("Conversie"), html.Div(f"KPI-overzicht . {pe}", className="subtitle")], className="page-header"),
         dbc.Row(kpi_cards, style={"margin": "0 -0.4rem"}),
+        *charts,
+        *kan_section,
+        *bn_section,
         *kwaliteit_section], className="main-content")
 
 def build_inzichten_page(cn, pe):
