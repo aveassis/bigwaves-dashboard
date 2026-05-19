@@ -747,20 +747,51 @@ def admin_nieuwe_klant():
     if not is_admin and (not c or c not in clients):
         return redirect("/")
     if request.method == "GET":
-        admin_form = """<h1>Nieuwe klant aanmaken</h1>
-<div class="sub">Er wordt een JSON template gegenereerd in de data directory</div>
+        msg = request.args.get("msg", "")
+        success_html = f'<div style="padding:0.6rem 1rem;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;font-size:0.78rem;color:#22c55e;margin-bottom:1rem;text-align:center">✅ {msg}</div>' if msg else ""
+        admin_form = f"""<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BigWaves — Nieuwe klant</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:'Inter',sans-serif;background:#f5f6fa;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}}
+.wrap{{width:460px;background:#fff;border:1px solid #edf0f5;border-radius:16px;padding:2rem 2.2rem;box-shadow:0 8px 40px rgba(0,0,0,0.06)}}
+h1{{font-size:1.15rem;font-weight:700;color:#1a1a2e;margin-bottom:0.2rem}}
+.sub{{color:#7e8299;font-size:0.7rem;margin-bottom:1.3rem}}
+label{{display:block;font-size:0.68rem;font-weight:600;color:#7e8299;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.25rem}}
+input,select{{width:100%;padding:0.5rem 0.7rem;border:1px solid #e4e6ef;border-radius:8px;font-size:0.82rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:0.8rem;background:#fff;color:#1a1a2e}}
+input:focus,select:focus{{border-color:#5273ff}}
+.row{{display:flex;gap:0.6rem}}
+.row>*{{flex:1}}
+.btn{{width:100%;padding:0.55rem;background:#5273ff;color:#fff;border:none;border-radius:200px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:0.2rem}}
+.btn:hover{{background:#3f5ee6}}
+.back{{display:block;text-align:center;margin-top:0.8rem;font-size:0.72rem;color:#7e8299;text-decoration:none}}
+.back:hover{{color:#5273ff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div style="font-size:1.8rem;text-align:center;margin-bottom:0.3rem">🌊</div>
+<h1 style="text-align:center">Nieuwe klant aanmaken</h1>
+<p class="sub" style="text-align:center">Er wordt een JSON template gegenereerd in de data directory</p>
+{success_html}
 <form method="POST">
-<label>Klantnaam</label><input name="naam" required>
+<label>Klantnaam</label><input name="naam" placeholder="Bijv. Bedrijf B.V." required>
 <label>Wachtwoord</label><input name="wachtwoord" value="demo">
 <label>Pakket</label><select name="pakket"><option>Start</option><option selected>Groei</option><option>Pro</option></select>
-<label>Maandprijs (EUR)</label><input name="prijs" type="number" value="1497">
-<label>Setup (EUR)</label><input name="setup" type="number" value="2500">
-<label>Aantal workflows</label><input name="workflows" type="number" value="2">
+<div class="row">
+<div><label>Maandprijs (EUR)</label><input name="prijs" type="number" value="1497"></div>
+<div><label>Setup (EUR)</label><input name="setup" type="number" value="2500"></div>
+<div><label>Workflows</label><input name="workflows" type="number" value="2"></div>
+</div>
 <button class="btn" type="submit">Genereer template</button>
-</form></body></html>"""
-        msg = request.args.get("msg", "")
-        success = '<div class="success">' + msg + "</div>" if msg else ""
-        return admin_form.replace("<form", success + "<form")
+</form>
+<a class="back" href="/dashboard/admin">← Terug naar beheer</a>
+</div>
+</body></html>"""
+        return admin_form
     
     # POST: genereer template
     import json, os
