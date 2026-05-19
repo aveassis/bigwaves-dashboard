@@ -856,7 +856,7 @@ def admin_verwijder_klant(naam):
     filepath = DATA_DIR / f"{safe}.json"
     if not filepath.exists():
         for f in DATA_DIR.glob("*.json"):
-            if f.stem.lower().replace("-", " ") == naam.lower():
+            if naam.lower().startswith(f.stem.lower().replace("-", " ")) or f.stem.lower().replace("-", " ").startswith(naam.lower()[:8]):
                 filepath = f
                 break
     if filepath and filepath.exists():
@@ -953,7 +953,7 @@ def admin_pakket(naam, nieuw_pakket):
     filepath = DATA_DIR / f"{safe}.json"
     if not filepath.exists():
         for f in DATA_DIR.glob("*.json"):
-            if f.stem.lower().replace("-", " ") == naam.lower():
+            if naam.lower().startswith(f.stem.lower().replace("-", " ")) or f.stem.lower().replace("-", " ").startswith(naam.lower()[:8]):
                 filepath = f
                 break
     if filepath and filepath.exists():
@@ -991,7 +991,7 @@ def admin_status(naam, nieuwe_status):
     filepath = DATA_DIR / f"{safe}.json"
     if not filepath.exists():
         for f in DATA_DIR.glob("*.json"):
-            if f.stem.lower().replace("-", " ") == naam.lower():
+            if naam.lower().startswith(f.stem.lower().replace("-", " ")) or f.stem.lower().replace("-", " ").startswith(naam.lower()[:8]):
                 filepath = f
                 break
     if filepath and filepath.exists():
@@ -1113,7 +1113,7 @@ def admin_data_post(naam):
     filepath = DATA_DIR / f"{safe}.json"
     if not filepath.exists():
         for f in DATA_DIR.glob("*.json"):
-            if f.stem.lower().replace("-", " ") == naam.lower():
+            if naam.lower().startswith(f.stem.lower().replace("-", " ")) or f.stem.lower().replace("-", " ").startswith(naam.lower()[:8]):
                 filepath = f
                 break
     import json
