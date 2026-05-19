@@ -186,6 +186,16 @@ body.dark .bw-onboard-box ul li{color:#e8e8ed}
     .section-title{font-size:0.75rem;margin:0.8rem 0 0.4rem}
     .btn-pill{font-size:0.65rem;padding:0.25rem 0.6rem}
 }
+/* LinkedIn pagina */
+.linkedin-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.7rem;height:100%;text-align:center;transition:background 0.2s}
+.lc-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.8rem;margin:0 auto 0.3rem}
+.lc-label{font-size:0.58rem;color:var(--text-sec);text-transform:uppercase;letter-spacing:0.4px;font-weight:500}
+.lc-value{font-size:1.2rem;font-weight:700;color:var(--text);margin-top:0.05rem}
+.profile-card{display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0.7rem;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:0.3rem;transition:background 0.2s}
+.profile-avatar{width:32px;height:32px;border-radius:8px;background:rgba(82,115,255,0.1);color:#5273ff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0}
+.profile-name{font-size:0.78rem;font-weight:600;color:var(--text)}
+.profile-title{font-size:0.62rem;color:var(--text-sec);margin-top:0.05rem}
+.profile-status{font-size:0.62rem;font-weight:600}
 </style>
 {%css%}
 </head>
@@ -1340,7 +1350,7 @@ def router(pathname, search):
     elif active == "admin":
         main = build_admin_page(c, pe)
     elif active == "linkedin":
-        main = build_linkedin_page(c, pe)
+        main = build_linkedin_page(c, pe, search)
     else:
         main = build_page(c, pe, "dashboard")
     sidebar = build_sidebar(c, pe, active)
@@ -1675,7 +1685,7 @@ def build_admin_page(cn, pe):
         ], className="detail-table"), className="admin-card"),
         html.Div([html.A("+ Nieuwe klant", href="/admin/nieuw", className="btn-pill", style={"textDecoration":"none","display":"inline-block"})], style={"marginTop":"0.5rem"})], className="main-content")
 
-def build_linkedin_page(cn, pe):
+def build_linkedin_page(cn, pe, search=None):
     d = linkedin_data
     if not d or "metrics" not in d:
         return html.Div([html.Div([html.H1("LinkedIn Outreach"), html.Div("Geen data — start de outreach tool", className="subtitle")], className="page-header"),
@@ -1688,6 +1698,16 @@ def build_linkedin_page(cn, pe):
     acties = d.get("recente_acties", [])
     inst = d.get("instellingen", {})
     wekelijks = d.get("wekelijks", [])
+
+    # Filter op status uit URL search param
+    status_filter = None
+    if search and "status=" in search:
+        for part in search.replace("?", "").split("&"):
+            if part.startswith("status="):
+                status_filter = part.split("=", 1)[1]
+                break
+    if status_filter:
+        prospects = [p for p in prospects if p.get("status") == status_filter]
 
     metric_icons = {
         "totaal_prospects": ("fa-users", "#5273ff"),
@@ -1805,17 +1825,19 @@ def build_linkedin_page(cn, pe):
     
     filter_knoppen = []
     for s_key, s_label in [("all", "Alle"), ("connected", "Verbonden"), ("pending", "In afwachting"), ("message", "Bericht"), ("meeting", "Afspraak")]:
+        is_active = (s_key == "all" and not status_filter) or (s_key == status_filter)
+        bg = "#5273ff" if is_active else "transparent"
+        tc = "#fff" if is_active else "var(--text)"
+        bc = "#5273ff" if is_active else "var(--border)"
         if s_key == "all":
-            filter_knoppen.append(html.A(s_label, href="/dashboard/linkedin", className="btn-pill",
-                                         style={"textDecoration": "none", "fontSize": "0.68rem", "marginRight": "0.2rem", "background": "#5273ff", "color": "#fff", "border": "1px solid #5273ff"}))
+            href = "/dashboard/linkedin"
         else:
-            filter_knoppen.append(html.A(s_label, href=f"/dashboard/linkedin?status={s_key}", className="btn-pill",
-                                         style={"textDecoration": "none", "fontSize": "0.68rem", "marginRight": "0.2rem"}))
+            href = f"/dashboard/linkedin?status={s_key}"
+        filter_knoppen.append(html.A(s_label, href=href, className="btn-pill",
+                                     style={"textDecoration": "none", "fontSize": "0.68rem", "marginRight": "0.2rem",
+                                            "background": bg, "color": tc, "border": f"1px solid {bc}"}))
 
     # Prospects — allemaal, met filter
-    status_filter = None
-    if "?" in (d.get("filter", "")):
-        pass  # handled via URL param later
     prospect_items = []
     for p in prospects:
         s = p.get("status", "pending")
