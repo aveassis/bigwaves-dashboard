@@ -743,7 +743,8 @@ def toggle_vergelijk():
 @server.route("/admin/nieuw", methods=["GET", "POST"])
 def admin_nieuwe_klant():
     c = session.get("client")
-    if not c or c not in clients:
+    is_admin = session.get("admin", False)
+    if not is_admin and (not c or c not in clients):
         return redirect("/")
     if request.method == "GET":
         admin_form = """<h1>Nieuwe klant aanmaken</h1>
