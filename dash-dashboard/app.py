@@ -109,8 +109,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);trans
 .nav-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:200px;background:#ef4444;color:#fff;font-size:0.6rem;font-weight:700;margin-left:auto}
 
 /* Onboarding overlay */
-.bw-onboard-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s}
-.bw-onboard-overlay.show{opacity:1;pointer-events:all}
+.bw-onboard-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.55);z-index:9999;display:none;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.bw-onboard-overlay.show{opacity:1;pointer-events:all;display:flex}
 .bw-onboard-box{background:#fff;border-radius:16px;padding:2.5rem 2.2rem;max-width:440px;text-align:center;box-shadow:0 16px 60px rgba(0,0,0,0.2)}
 .bw-onboard-box .logo{font-size:2.5rem;margin-bottom:0.5rem}
 .bw-onboard-box h2{font-size:1.2rem;font-weight:700;color:#1a1a2e;margin-bottom:0.3rem}
@@ -879,7 +879,6 @@ def build_admin_interface():
         ]))
 
     return html.Div([
-        html.Style("#bw-onboard{display:none!important}"),
         html.Div([
             html.Div([
                 html.H1("🔐 BigWaves Beheer", style={"fontSize": "1.3rem", "fontWeight": "700"}),
