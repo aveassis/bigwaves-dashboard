@@ -351,7 +351,7 @@ def admin_login():
     if pw == ADMIN_PASSWORD:
         session["admin"] = True
         session.permanent = True
-        return redirect("/dashboard/admin")
+        return """<!DOCTYPE html><html><body><script>try{localStorage.setItem('bw-onboarded','1')}catch(e){};location.href='/dashboard/admin'</script></body></html>"""
     return ADMIN_LOGIN_PAGE.replace("ERROR_PLACEHOLDER", "Onjuist wachtwoord.")
 def onboarding_steps():
     c = session.get("client")
