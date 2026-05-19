@@ -879,7 +879,7 @@ def build_admin_interface():
         ]))
 
     return html.Div([
-        html.Script("document.getElementById('bw-onboard')&&document.getElementById('bw-onboard').classList.remove('show');try{localStorage.setItem('bw-onboarded','1')}catch(e){}"),
+        html.Style("#bw-onboard{display:none!important}"),
         html.Div([
             html.Div([
                 html.H1("🔐 BigWaves Beheer", style={"fontSize": "1.3rem", "fontWeight": "700"}),
