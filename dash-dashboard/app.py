@@ -1767,16 +1767,18 @@ def build_linkedin_page(cn, pe, search=None):
         ("Prospects", totaal, "#5273ff"),
         ("Connecties verzonden", verzonden, "#f59e0b"),
         ("Connecties geaccepteerd", geaccepteerd, "#22c55e"),
-        ("Berichten verzonden", berichten, "#8b5cf6"),
+        ("Berichten verzonden (na connectie)", berichten, "#8b5cf6"),
         ("Afspraken", afspraken, "#22c55e"),
     ]
     
     trechter_items = []
-    for label, val, kleur in trechter_stappen:
-        pct = round(val / totaal * 100, 1) if totaal else 0
-        breedte = max(val / totaal * 100, 5) if totaal else 0
+    for i, (label, val, kleur) in enumerate(trechter_stappen):
+        prev_val = trechter_stappen[i-1][1] if i > 0 else totaal
+        pct = round(val / prev_val * 100, 1) if prev_val else 0
+        pct_van_totaal = round(val / totaal * 100, 1) if totaal else 0
+        breedte = max(pct, 5) if i > 0 else 100
         trechter_items.append(html.Div([
-            html.Div(label, style={"fontSize": "0.7rem", "fontWeight": "600", "color": "#7e8299", "width": "140px", "textAlign": "right", "paddingRight": "0.5rem"}),
+            html.Div(label, style={"fontSize": "0.7rem", "fontWeight": "600", "color": "#7e8299", "width": "155px", "textAlign": "right", "paddingRight": "0.5rem"}),
             html.Div(html.Div(style={"width": f"{breedte}%", "height": "22px", "background": kleur, "borderRadius": "4px", "opacity": "0.85",
                                       "display": "flex", "alignItems": "center", "justifyContent": "center", "color": "#fff", "fontSize": "0.68rem", "fontWeight": "600", "minWidth": "30px"}),
                      style={"flex": "1", "background": "#f1efed", "borderRadius": "4px"}),
