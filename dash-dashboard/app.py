@@ -234,8 +234,8 @@ body.dark .bw-onboard-box ul li{color:#e8e8ed}
   var o=document.getElementById('bw-onboard');
   if(o){
     try{
-      if(!localStorage.getItem('bw-onboarded') && location.pathname.indexOf('/admin')===-1){o.classList.add('show');loadSteps();}
-    }catch(e){}
+      if(!localStorage.getItem('bw-onboarded')){o.classList.add('show');loadSteps();}
+    }catch(e){o.classList.add('show');loadSteps();}
   }
   var nl=document.getElementById('bw-notif-list');
   if(nl){
@@ -879,6 +879,7 @@ def build_admin_interface():
         ]))
 
     return html.Div([
+        html.Script("document.getElementById('bw-onboard')&&document.getElementById('bw-onboard').classList.remove('show');try{localStorage.setItem('bw-onboarded','1')}catch(e){}"),
         html.Div([
             html.Div([
                 html.H1("🔐 BigWaves Beheer", style={"fontSize": "1.3rem", "fontWeight": "700"}),
