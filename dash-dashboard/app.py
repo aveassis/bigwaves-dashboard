@@ -856,6 +856,73 @@ def admin_verwijder_klant(naam):
         filepath.unlink()
     return redirect("/dashboard/admin")
 
+LOGO_PAGE = """<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BigWaves — Logo wijzigen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#f5f6fa;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.wrap{width:440px;background:#fff;border:1px solid #edf0f5;border-radius:16px;padding:2rem 2.2rem;box-shadow:0 8px 40px rgba(0,0,0,0.06)}
+h1{font-size:1.15rem;font-weight:700;color:#1a1a2e;margin-bottom:0.2rem;text-align:center}
+.sub{color:#7e8299;font-size:0.7rem;margin-bottom:1.3rem;text-align:center}
+label{display:block;font-size:0.68rem;font-weight:600;color:#7e8299;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.25rem}
+input{width:100%;padding:0.5rem 0.7rem;border:1px solid #e4e6ef;border-radius:8px;font-size:0.82rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:0.8rem;text-align:center;font-size:1.5rem}
+input:focus{border-color:#5273ff}
+.btn{width:100%;padding:0.55rem;background:#5273ff;color:#fff;border:none;border-radius:200px;font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.btn:hover{background:#3f5ee6}
+.back{display:block;text-align:center;margin-top:0.8rem;font-size:0.72rem;color:#7e8299;text-decoration:none}
+.back:hover{color:#5273ff}
+.emojis{display:flex;flex-wrap:wrap;gap:0.3rem;justify-content:center;margin-bottom:0.8rem}
+.emojis a{display:inline-flex;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid #e4e6ef;border-radius:8px;font-size:1.2rem;text-decoration:none;cursor:pointer}
+.emojis a:hover{border-color:#5273ff;background:rgba(82,115,255,0.06)}
+.cur{text-align:center;font-size:3rem;margin:0.5rem 0;padding:0.5rem;background:#f9fafb;border-radius:12px}
+</style>
+</head><body>
+<div class="wrap">
+<div class="cur" id="preview">🌊</div>
+<h1>Logo wijzigen</h1>
+<p class="sub" id="klant-naam">Klant</p>
+<div class="emojis">
+<a href="#" onclick="pick('🌊')">🌊</a> <a href="#" onclick="pick('🏢')">🏢</a> <a href="#" onclick="pick('🚀')">🚀</a>
+<a href="#" onclick="pick('⭐')">⭐</a> <a href="#" onclick="pick('💼')">💼</a> <a href="#" onclick="pick('📊')">📊</a>
+<a href="#" onclick="pick('🎯')">🎯</a> <a href="#" onclick="pick('🔥')">🔥</a> <a href="#" onclick="pick('💎')">💎</a>
+<a href="#" onclick="pick('🛡️')">🛡️</a> <a href="#" onclick="pick('📈')">📈</a> <a href="#" onclick="pick('🤖')">🤖</a>
+<a href="#" onclick="pick('🌐')">🌐</a> <a href="#" onclick="pick('🎨')">🎨</a> <a href="#" onclick="pick('⚡')">⚡</a>
+</div>
+<form method="POST">
+<input name="logo" id="logo-input" value="🌊" placeholder="Typ een emoji">
+<button class="btn" type="submit">Opslaan</button>
+</form>
+<a class="back" href="/dashboard/admin">← Terug naar beheer</a>
+<script>
+function pick(e){document.getElementById('logo-input').value=e;document.getElementById('preview').textContent=e}
+document.getElementById('logo-input').addEventListener('input',function(){document.getElementById('preview').textContent=this.value||'🌊'});
+</script>
+</div></body></html>"""
+
+@server.route("/admin/logo/<naam>", methods=["GET", "POST"])
+def admin_logo(naam):
+    is_admin = session.get("admin", False)
+    if not is_admin:
+        return redirect("/")
+    if naam not in clients:
+        return redirect("/dashboard/admin")
+    if request.method == "POST":
+        nieuw_logo = request.form.get("logo", "🌊").strip()
+        filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
+        if filepath.exists():
+            import json
+            with open(filepath) as f:
+                data = json.load(f)
+            data["logo"] = nieuw_logo
+            with open(filepath, "w") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+        return redirect("/dashboard/admin")
+    cur_logo = clients[naam].get("logo", "🌊")
+    return LOGO_PAGE.replace("🌊", cur_logo, 1).replace("Klant", f"{cur_logo} {naam}")
+
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
     html.Div(id="dash-content"),
@@ -915,6 +982,7 @@ def build_admin_interface():
     klant_rows = []
     for nm, d in sorted(clients.items()):
         gt = d.get("groei_team", {})
+        logo = d.get("logo", "🌊")
         pakket = gt.get("pakket", "-")
         status = gt.get("status", "-")
         sinds = gt.get("sinds", "-")
@@ -924,7 +992,7 @@ def build_admin_interface():
         ps = d.get("periodes", {})
         perioden = len(ps)
         klant_rows.append(html.Tr([
-            html.Td(nm),
+            html.Td(html.Div([html.Span(logo, style={"marginRight":"0.3rem","fontSize":"0.9rem"}), html.Span(nm)], style={"display":"flex","alignItems":"center"})),
             html.Td(pakket),
             html.Td(html.Span(status, className=f"badge {'groen' if status=='actief' else 'oranje'}")),
             html.Td(f"€{prijs:,}/mnd" if prijs else "-"),
@@ -932,8 +1000,12 @@ def build_admin_interface():
             html.Td(str(chk)),
             html.Td(str(perioden)),
             html.Td(sinds),
-            html.Td(html.A("🗑️", href=f"javascript:if(confirm('Weet je zeker dat je deze klant wilt verwijderen?'))location.href='/admin/verwijder/{nm}'", className="btn-pill",
-                           style={"textDecoration":"none","padding":"0.15rem 0.4rem","fontSize":"0.7rem"})),
+            html.Td([
+                html.A("🎨", href=f"/admin/logo/{nm}", className="btn-pill",
+                       style={"textDecoration":"none","padding":"0.15rem 0.3rem","fontSize":"0.7rem","marginRight":"0.15rem"}),
+                html.A("🗑️", href=f"javascript:if(confirm('Weet je zeker dat je deze klant wilt verwijderen?'))location.href='/admin/verwijder/{nm}'", className="btn-pill",
+                       style={"textDecoration":"none","padding":"0.15rem 0.4rem","fontSize":"0.7rem"}),
+            ]),
         ]))
 
     return html.Div([
