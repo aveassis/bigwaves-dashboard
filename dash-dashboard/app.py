@@ -945,7 +945,7 @@ def admin_pakket(naam, nieuw_pakket):
     is_admin = session.get("admin", False)
     if not is_admin:
         return redirect("/")
-    if naam not in clients or nieuw_pakket not in ("Start", "Groei", "Pro"):
+    if naam not in clients or (nieuw_pakket not in ("Start", "Groei", "Pro") and nieuw_pakket != "-"):
         return redirect("/dashboard/admin")
     import json, os
     # Vind het juiste bestand (los van spaties/hoofdletters)
@@ -960,8 +960,12 @@ def admin_pakket(naam, nieuw_pakket):
         with open(filepath) as f:
             data = json.load(f)
         gt = data.setdefault("groei_team", {})
-        gt["pakket"] = nieuw_pakket
-        prijzen = {"Start": 997, "Groei": 1497, "Pro": 2499}
+        if nieuw_pakket == "-":
+            gt["pakket"] = "-"
+            gt.pop("prijs", None)
+        else:
+            gt["pakket"] = nieuw_pakket
+            prijzen = {"Start": 997, "Groei": 1497, "Pro": 2499}
         setupprijzen = {"Start": 1500, "Groei": 2500, "Pro": 2500}
         wf_aantallen = {"Start": 1, "Groei": 2, "Pro": 5}
         prijs = prijzen.get(nieuw_pakket, 997)
@@ -1268,13 +1272,23 @@ def build_admin_interface():
         perioden = len(ps)
 
         pakket_badges = []
-        for pk in ["Start", "Groei", "Pro"]:
-            is_current = pk == pakket
-            bg = "#5273ff" if is_current else "transparent"
-            tc = "#fff" if is_current else "var(--sidebar-text)"
-            bc = "#5273ff" if is_current else "rgba(255,255,255,0.15)"
+        for pk_label, pk_val in [("-", None), ("S", "Start"), ("G", "Groei"), ("P", "Pro")]:
+            if pk_val is None:
+                is_current = not pakket or pakket == "-"
+                href = f"/admin/pakket/{nm}/-"
+                bg = "rgba(255,255,255,0.1)" if is_current else "transparent"
+                tc = "rgba(255,255,255,0.5)" if is_current else "var(--sidebar-text)"
+                bc = "rgba(255,255,255,0.1)" if is_current else "rgba(255,255,255,0.08)"
+                letter = pk_label
+            else:
+                is_current = pk_val == pakket
+                href = f"/admin/pakket/{nm}/{pk_val}"
+                bg = "#5273ff" if is_current else "transparent"
+                tc = "#fff" if is_current else "var(--sidebar-text)"
+                bc = "#5273ff" if is_current else "rgba(255,255,255,0.15)"
+                letter = pk_label
             pakket_badges.append(
-                html.A(pk[0], href=f"/admin/pakket/{nm}/{pk}", className="btn-pill",
+                html.A(letter, href=href, className="btn-pill",
                        style={"textDecoration":"none","padding":"0.1rem 0.35rem","fontSize":"0.6rem",
                               "background":bg,"color":tc,"border":f"1px solid {bc}","marginRight":"0.1rem"})
             )
