@@ -927,13 +927,14 @@ def admin_logo(naam):
     safe_naam = html_mod.escape(f"{cur_logo} {naam}")
     return LOGO_PAGE.replace('value="🌊"', f'value="{safe_logo}"').replace("Klant", safe_naam)
 
-@app.server.route("/admin/pakket/<naam>/<nieuw_pakket>")
+@server.route("/admin/pakket/<naam>/<nieuw_pakket>")
 def admin_pakket(naam, nieuw_pakket):
     is_admin = session.get("admin", False)
     if not is_admin:
         return redirect("/")
     if naam not in clients or nieuw_pakket not in ("Start", "Groei", "Pro"):
         return redirect("/dashboard/admin")
+    import json, os
     filepath = DATA_DIR / f"{naam.lower().replace(' ', '-')}.json"
     if filepath.exists():
         import json
@@ -959,7 +960,7 @@ def admin_pakket(naam, nieuw_pakket):
         clients[naam] = data
     return redirect("/dashboard/admin")
 
-@app.server.route("/admin/status/<naam>/<nieuwe_status>")
+@server.route("/admin/status/<naam>/<nieuwe_status>")
 def admin_status(naam, nieuwe_status):
     is_admin = session.get("admin", False)
     if not is_admin:
@@ -1040,7 +1041,7 @@ document.querySelectorAll('.periode-select').forEach(function(s){{
 </script>
 </body></html>"""
 
-@app.server.route("/admin/data/<naam>")
+@server.route("/admin/data/<naam>")
 def admin_data(naam):
     is_admin = session.get("admin", False)
     if not is_admin:
@@ -1075,7 +1076,7 @@ def admin_data(naam):
     
     return DATA_EDIT_TPL.format(naam=naam, logo=logo, periodes_html=periodes_html, kanalen_html=kanalen_html)
 
-@app.server.route("/admin/data/<naam>", methods=["POST"])
+@server.route("/admin/data/<naam>", methods=["POST"])
 def admin_data_post(naam):
     is_admin = session.get("admin", False)
     if not is_admin:
