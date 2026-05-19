@@ -1764,26 +1764,30 @@ def build_linkedin_page(cn, pe, search=None):
     afspraken = m.get("afspraken_ingeboekt", 0)
     
     trechter_stappen = [
-        ("Prospects", totaal, "#5273ff"),
-        ("Connecties verzonden", verzonden, "#f59e0b"),
-        ("Connecties geaccepteerd", geaccepteerd, "#22c55e"),
-        ("Berichten verzonden (na connectie)", berichten, "#8b5cf6"),
-        ("Afspraken", afspraken, "#22c55e"),
+        ("Prospects", totaal, "#5273ff", None),
+        ("Connecties verzonden", verzonden, "#f59e0b", None),
+        ("Connecties geaccepteerd", geaccepteerd, "#22c55e", None),
+        ("Berichten verzonden", berichten, "#8b5cf6", "gem."),
+        ("Afspraken", afspraken, "#22c55e", None),
     ]
     
     trechter_items = []
-    for i, (label, val, kleur) in enumerate(trechter_stappen):
+    for i, (label, val, kleur, suffix) in enumerate(trechter_stappen):
         prev_val = trechter_stappen[i-1][1] if i > 0 else totaal
-        pct = round(val / prev_val * 100, 1) if prev_val else 0
-        pct_van_totaal = round(val / totaal * 100, 1) if totaal else 0
-        breedte = max(pct, 5) if i > 0 else 100
+        if suffix == "gem." and prev_val:
+            pct = round(val / prev_val, 1)
+            pct_display = f"{pct}/conn."
+        else:
+            pct = round(val / prev_val * 100, 1) if prev_val else 0
+            pct_display = f"{pct}%"
+        breedte = max(val / totaal * 100, 5) if totaal else 0
         trechter_items.append(html.Div([
             html.Div(label, style={"fontSize": "0.7rem", "fontWeight": "600", "color": "#7e8299", "width": "155px", "textAlign": "right", "paddingRight": "0.5rem"}),
             html.Div(html.Div(style={"width": f"{breedte}%", "height": "22px", "background": kleur, "borderRadius": "4px", "opacity": "0.85",
                                       "display": "flex", "alignItems": "center", "justifyContent": "center", "color": "#fff", "fontSize": "0.68rem", "fontWeight": "600", "minWidth": "30px"}),
                      style={"flex": "1", "background": "#f1efed", "borderRadius": "4px"}),
             html.Div(str(val), style={"fontSize": "0.75rem", "fontWeight": "700", "color": kleur, "width": "50px", "textAlign": "left", "paddingLeft": "0.5rem"}),
-            html.Div(f"{pct}%", style={"fontSize": "0.62rem", "color": "#7e8299", "width": "40px", "textAlign": "right"}),
+            html.Div(f"{pct_display}", style={"fontSize": "0.62rem", "color": "#7e8299", "width": "55px", "textAlign": "right"}),
         ], style={"display": "flex", "alignItems": "center", "marginBottom": "0.3rem"}))
     
     trechter = [html.Div([html.I(className="fas fa-filter", style={"color": "#5273ff"}), " Conversietrechter"], className="section-title"),
