@@ -282,9 +282,7 @@ body{font-family:'Inter',sans-serif;background:#f5f6fa;min-height:100vh;display:
 </style>
 </head>
 <body><div class="login-box"><div class="logo">🌊</div><h2>BigWaves</h2><p class="tagline">Performance Dashboard</p>
-<form method="POST" action="/login"><select name="client">"""
-for k in clients: LOGIN_PAGE += f'<option value="{k}">{k}</option>'
-LOGIN_PAGE += """</select>
+<form method="POST" action="/login"><input type="text" name="client" placeholder="Uw bedrijfsnaam" style="text-transform:capitalize">
 <input type="password" name="password" placeholder="Voer wachtwoord in">
 <button type="submit">Inloggen</button>
 <div class="login-err">ERROR_PLACEHOLDER</div></form>
